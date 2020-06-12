@@ -40,9 +40,10 @@ class m200607_070530_add_some_references extends Migration
         self::insertRefs(self::MEASURE_TYPE, 'Тепловая энергия на обратке', MeasureType::HEAT_OUT);
         self::insertRefs(self::MEASURE_TYPE, 'Потребление холодной воды', MeasureType::COLD_WATER);
 
-        self::insertRefs(self::OBJECT_SUB_TYPE, 'Общий', ObjectSubType::OBJECT_TYPE_GENERAL);
-        self::insertRefs(self::OBJECT_SUB_TYPE, 'МКД', ObjectSubType::OBJECT_TYPE_MKD);
-        self::insertRefs(self::OBJECT_SUB_TYPE, 'Коммерческий', ObjectSubType::OBJECT_TYPE_COMMERCE);
+        self::insertRefs(self::OBJECT_SUB_TYPE, 'Общий', ObjectSubType::GENERAL);
+        self::insertRefs(self::OBJECT_SUB_TYPE, 'МКД', ObjectSubType::MKD);
+        self::insertRefs(self::OBJECT_SUB_TYPE, 'Коммерческий', ObjectSubType::COMMERCE);
+        self::insertRefs(self::OBJECT_SUB_TYPE, 'Размещение', ObjectSubType::PLACEMENT);
 
         self::insertRefs(self::OBJECT_TYPE, 'Регион', ObjectType::REGION);
         self::insertRefs(self::OBJECT_TYPE, 'Район', ObjectType::DISTRICT);

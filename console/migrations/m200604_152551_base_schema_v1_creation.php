@@ -1,5 +1,7 @@
 <?php
 
+use common\models\EquipmentStatus;
+use common\models\ObjectSubType;
 use common\models\Settings;
 use yii\db\Migration;
 
@@ -9,7 +11,7 @@ use yii\db\Migration;
 class m200604_152551_base_schema_v1_creation extends Migration
 {
     const OBJECT = '{{%object}}';
-    const OBJECT_SUB_DISTRICT = '{{%object_sub_district}}';
+    const OBJECT_DISTRICT = '{{%object_district}}';
     const DISTRICT_COORDINATES = '{{%district_coordinates}}';
 
     const EQUIPMENT = '{{%equipment}}';
@@ -44,20 +46,20 @@ class m200604_152551_base_schema_v1_creation extends Migration
         $tableOptions = null;
 
         if ($this->db->driverName === 'mysql') {
-            $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
+            $tableOptions = 'CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB';
         }
 
         $this->createTable(self::OBJECT_TYPE, [
             '_id' => $this->primaryKey(),
-            'uuid' => $this->string(45)->notNull()->unique(),
+            'uuid' => $this->string(36)->notNull()->unique(),
             'title' => $this->string()->notNull(),
             'createdAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
             'changedAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
         ], $tableOptions);
 
-        $this->createTable(self::OBJECT_TYPE, [
+        $this->createTable(self::OBJECT_SUB_TYPE, [
             '_id' => $this->primaryKey(),
-            'uuid' => $this->string(45)->notNull()->unique(),
+            'uuid' => $this->string(36)->notNull()->unique(),
             'title' => $this->string()->notNull(),
             'createdAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
             'changedAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
@@ -65,15 +67,15 @@ class m200604_152551_base_schema_v1_creation extends Migration
 
         $this->createTable(self::OBJECT, [
             '_id' => $this->primaryKey(),
-            'uuid' => $this->string(45)->notNull()->unique(),
+            'uuid' => $this->string(36)->notNull()->unique(),
             'title' => $this->string()->notNull(),
-            'parentUuid' => $this->string(45),
-            'objectTypeUuid' => $this->string(45)->notNull(),
-            'subTypeUuid' => $this->string(45)->notNull(),
+            'parentUuid' => $this->string(36)->null()->defaultValue(null),
+            'objectTypeUuid' => $this->string(36)->notNull(),
+            'objectSubTypeUuid' => $this->string(36)->notNull()->defaultValue(ObjectSubType::PLACEMENT),
             'latitude' => $this->double()->defaultValue('55.15'),
             'longitude' => $this->double()->defaultValue('61.13'),
-            'fias_guid' => $this->string(),
-            'parent_guid' => $this->string(),
+            'fiasGuid' => $this->string(),
+            'fiasParentGuid' => $this->string(),
             'okato' => $this->string(),
             'deleted' => $this->smallInteger()->defaultValue(0),
             'createdAt' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
@@ -99,14 +101,14 @@ class m200604_152551_base_schema_v1_creation extends Migration
         $this->createIndex(
             'idx-subTypeUuid',
             self::OBJECT,
-            'subTypeUuid'
+            'objectSubTypeUuid'
         );
 
         $this->addForeignKey(
-            'fk-object-subTypeUuid',
+            'fk-object-objectSubTypeUuid',
             self::OBJECT,
-            'subTypeUuid',
-            self::OBJECT_TYPE,
+            'objectSubTypeUuid',
+            self::OBJECT_SUB_TYPE,
             'uuid',
             $delete = 'RESTRICT',
             $update = 'CASCADE'
@@ -118,34 +120,24 @@ class m200604_152551_base_schema_v1_creation extends Migration
             'parentUuid'
         );
 
-        $this->addForeignKey(
-            'fk-object-parentUuid',
-            self::OBJECT,
-            'parentUuid',
-            self::OBJECT,
-            'uuid',
-            $delete = 'RESTRICT',
-            $update = 'CASCADE'
-        );
-
-        $this->createTable(self::OBJECT_SUB_DISTRICT, [
+        $this->createTable(self::OBJECT_DISTRICT, [
             '_id' => $this->primaryKey(),
-            'uuid' => $this->string(45)->notNull()->unique(),
-            'districtUuid' => $this->string(45)->notNull(),
-            'objectUuid' => $this->string(45)->notNull(),
+            'uuid' => $this->string(36)->notNull()->unique(),
+            'districtUuid' => $this->string(36)->notNull(),
+            'objectUuid' => $this->string(36)->notNull(),
             'createdAt' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
             'changedAt' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
         ], $tableOptions);
 
         $this->createIndex(
             'idx-districtUuid',
-            self::OBJECT_SUB_DISTRICT,
+            self::OBJECT_DISTRICT,
             'districtUuid'
         );
 
         $this->addForeignKey(
-            'fk-object_sub_district-districtUuid',
-            self::OBJECT_SUB_DISTRICT,
+            'fk-object_district-districtUuid',
+            self::OBJECT_DISTRICT,
             'districtUuid',
             self::OBJECT,
             'uuid',
@@ -155,13 +147,13 @@ class m200604_152551_base_schema_v1_creation extends Migration
 
         $this->createIndex(
             'idx-objectUuid',
-            self::OBJECT_SUB_DISTRICT,
+            self::OBJECT_DISTRICT,
             'objectUuid'
         );
 
         $this->addForeignKey(
-            'fk-object_sub_district-districtUuid',
-            self::OBJECT_SUB_DISTRICT,
+            'fk-object_district-objectUuid',
+            self::OBJECT_DISTRICT,
             'objectUuid',
             self::OBJECT,
             'uuid',
@@ -171,9 +163,9 @@ class m200604_152551_base_schema_v1_creation extends Migration
 
         $this->createTable(self::DISTRICT_COORDINATES, [
             '_id' => $this->primaryKey(),
-            'uuid' => $this->string(45)->notNull()->unique(),
-            'districtUuid' => $this->string(45)->notNull(),
-            'coordinates' => $this->string()->notNull(),
+            'uuid' => $this->string(36)->notNull()->unique(),
+            'districtUuid' => $this->string(36)->notNull(),
+            'coordinates' => $this->text()->notNull(), // JSON массив координат
             'createdAt' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
             'changedAt' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
         ], $tableOptions);
@@ -196,7 +188,7 @@ class m200604_152551_base_schema_v1_creation extends Migration
 
         $this->createTable(self::EQUIPMENT_TYPE, [
             '_id' => $this->primaryKey(),
-            'uuid' => $this->string(45)->notNull()->unique(),
+            'uuid' => $this->string(36)->notNull()->unique(),
             'title' => $this->string()->notNull(),
             'createdAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
             'changedAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
@@ -204,7 +196,7 @@ class m200604_152551_base_schema_v1_creation extends Migration
 
         $this->createTable(self::EQUIPMENT_STATUS, [
             '_id' => $this->primaryKey(),
-            'uuid' => $this->string(45)->notNull()->unique(),
+            'uuid' => $this->string(36)->notNull()->unique(),
             'title' => $this->string()->notNull(),
             'createdAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
             'changedAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
@@ -212,11 +204,11 @@ class m200604_152551_base_schema_v1_creation extends Migration
 
         $this->createTable(self::EQUIPMENT, [
             '_id' => $this->primaryKey(),
-            'uuid' => $this->string(45)->notNull()->unique(),
+            'uuid' => $this->string(36)->notNull()->unique(),
             'title' => $this->string(150)->notNull(),
-            'objectUuid' => $this->string(45)->notNull(),
-            'equipmentTypeUuid' => $this->string(45)->notNull(),
-            'equipmentStatusUuid' => $this->string(45)->notNull(),
+            'objectUuid' => $this->string(36)->notNull(),
+            'equipmentTypeUuid' => $this->string(36)->notNull(),
+            'equipmentStatusUuid' => $this->string(36)->notNull()->defaultValue(EquipmentStatus::UNKNOWN),
             'serial' => $this->string(),
             'deleted' => $this->smallInteger()->defaultValue(0),
             'createdAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
@@ -273,7 +265,7 @@ class m200604_152551_base_schema_v1_creation extends Migration
 
         $this->createTable(self::MEASURE_TYPE, [
             '_id' => $this->primaryKey(),
-            'uuid' => $this->string(45)->notNull()->unique(),
+            'uuid' => $this->string(36)->notNull()->unique(),
             'title' => $this->string()->notNull(),
             'createdAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
             'changedAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP')
@@ -281,10 +273,10 @@ class m200604_152551_base_schema_v1_creation extends Migration
 
         $this->createTable(self::MEASURE_CHANNEL, [
             '_id' => $this->primaryKey(),
-            'uuid' => $this->string(45)->notNull()->unique(),
+            'uuid' => $this->string(36)->notNull()->unique(),
             'title' => $this->string()->notNull(),
-            'equipmentUuid' => $this->string(45)->notNull(),
-            'measureTypeUuid' => $this->string(45)->notNull(),
+            'equipmentUuid' => $this->string(36)->notNull(),
+            'measureTypeUuid' => $this->string(36)->notNull(),
             'deleted' => $this->smallInteger()->defaultValue(0),
             'createdAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
             'changedAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP')
@@ -324,8 +316,8 @@ class m200604_152551_base_schema_v1_creation extends Migration
 
         $this->createTable(self::MEASURE, [
             '_id' => $this->primaryKey(),
-            'uuid' => $this->string(45)->notNull()->unique(),
-            'measureChannelUuid' => $this->string(45)->notNull(),
+            'uuid' => $this->string(36)->notNull()->unique(),
+            'measureChannelUuid' => $this->string(36)->notNull(),
             'value' => $this->double()->defaultValue(0),
             'type' => $this->tinyInteger()->defaultValue(0)->notNull(),
             'date' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP')->notNull(),
@@ -351,7 +343,7 @@ class m200604_152551_base_schema_v1_creation extends Migration
 
         $this->createTable(self::PARAMETER_TYPE, [
             '_id' => $this->primaryKey(),
-            'uuid' => $this->string(45)->notNull()->unique(),
+            'uuid' => $this->string(36)->notNull()->unique(),
             'title' => $this->string()->notNull(),
             'createdAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
             'changedAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP')
@@ -359,9 +351,9 @@ class m200604_152551_base_schema_v1_creation extends Migration
 
         $this->createTable(self::PARAMETER, [
             '_id' => $this->primaryKey(),
-            'uuid' => $this->string(45)->notNull()->unique(),
-            'entityUuid' => $this->string(45)->notNull(),
-            'parameterTypeUuid' => $this->string(45)->notNull(),
+            'uuid' => $this->string(36)->notNull()->unique(),
+            'entityUuid' => $this->string(36)->notNull(),
+            'parameterTypeUuid' => $this->string(36)->notNull(),
             'value' => $this->double()->defaultValue(0),
             'date' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP')->notNull(),
             'createdAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
@@ -386,9 +378,9 @@ class m200604_152551_base_schema_v1_creation extends Migration
 
         $this->createTable(self::BALANCE_POINT, [
             '_id' => $this->primaryKey(),
-            'uuid' => $this->string(45)->notNull()->unique(),
-            'measureChannelUuid' => $this->string(45)->notNull(),
-            'objectUuid' => $this->string(45)->notNull(),
+            'uuid' => $this->string(36)->notNull()->unique(),
+            'measureChannelUuid' => $this->string(36)->notNull(),
+            'objectUuid' => $this->string(36)->notNull(),
             'input' => $this->tinyInteger()->defaultValue(0),
             'createdAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
             'changedAt' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
@@ -428,10 +420,10 @@ class m200604_152551_base_schema_v1_creation extends Migration
 
         $this->createTable(self::EVENT, [
             '_id' => $this->primaryKey(),
-            'uuid' => $this->string(45)->notNull()->unique(),
+            'uuid' => $this->string(36)->notNull()->unique(),
             'title' => $this->string()->notNull(),
             'description' => $this->text()->notNull(),
-            'objectUuid' => $this->string(45)->notNull(),
+            'objectUuid' => $this->string(36)->notNull(),
             'deleted' => $this->smallInteger()->defaultValue(0),
             'createdAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
             'changedAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
@@ -455,7 +447,7 @@ class m200604_152551_base_schema_v1_creation extends Migration
 
         $this->createTable(self::ATTRIBUTE_TYPE, [
             '_id' => $this->primaryKey(),
-            'uuid' => $this->string(45)->notNull()->unique(),
+            'uuid' => $this->string(36)->notNull()->unique(),
             'title' => $this->string()->notNull(),
             'createdAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
             'changedAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
@@ -463,10 +455,10 @@ class m200604_152551_base_schema_v1_creation extends Migration
 
         $this->createTable(self::ATTRIBUTE, [
             '_id' => $this->primaryKey(),
-            'uuid' => $this->string(45)->notNull()->unique(),
+            'uuid' => $this->string(36)->notNull()->unique(),
             'title' => $this->string()->notNull(),
-            'attributeTypeUuid' => $this->text()->notNull(),
-            'entityUuid' => $this->string(45)->notNull(),
+            'attributeTypeUuid' => $this->string(36)->notNull(),
+            'entityUuid' => $this->string(36)->notNull(),
             'createdAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
             'changedAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
         ], $tableOptions);
@@ -489,46 +481,46 @@ class m200604_152551_base_schema_v1_creation extends Migration
 
         $this->createTable(self::ALARM, [
             '_id' => $this->primaryKey(),
-            'uuid' => $this->string(45)->notNull()->unique(),
+            'uuid' => $this->string(36)->notNull()->unique(),
             'title' => $this->string()->notNull(),
-            'entityUuid' => $this->string(45)->notNull(),
+            'entityUuid' => $this->string(36)->notNull(),
             'createdAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
             'changedAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
         ], $tableOptions);
 
         $this->createTable(self::REGISTER, [
             '_id' => $this->primaryKey(),
-            'uuid' => $this->string(45)->notNull()->unique(),
+            'uuid' => $this->string(36)->notNull()->unique(),
             'title' => $this->string()->notNull(),
             'type' => $this->integer()->defaultValue(0),
-            'entityUuid' => $this->string(45)->notNull(),
+            'entityUuid' => $this->string(36)->notNull(),
             'createdAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
             'changedAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
         ], $tableOptions);
 
         $this->createTable(self::ACTION_REGISTER, [
             '_id' => $this->primaryKey(),
-            'uuid' => $this->string(45)->notNull()->unique(),
+            'uuid' => $this->string(36)->notNull()->unique(),
             'title' => $this->string()->notNull(),
             'type' => $this->integer()->defaultValue(0),
-            'userUuid' => $this->string(45)->notNull(),
+            'userId' => $this->integer()->notNull(),
             'entityUuid' => $this->string(45),
             'createdAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
             'changedAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
         ], $tableOptions);
 
         $this->createIndex(
-            'idx-userUuid',
+            'idx-userId',
             self::ACTION_REGISTER,
-            'userUuid'
+            'userId'
         );
 
         $this->addForeignKey(
-            'fk-action_register-userUuid',
+            'fk-action_register-userId',
             self::ACTION_REGISTER,
-            'userUuid',
+            'userId',
             self::USER,
-            'uuid',
+            'id',
             $delete = 'RESTRICT',
             $update = 'CASCADE'
         );
