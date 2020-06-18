@@ -2,7 +2,6 @@
 
 use common\models\EquipmentStatus;
 use common\models\ObjectSubType;
-use common\models\Settings;
 use yii\db\Migration;
 
 /**
