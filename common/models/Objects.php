@@ -1,0 +1,190 @@
+<?php
+
+namespace common\models;
+
+use Yii;
+use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
+use yii\db\Expression;
+
+/**
+ * This is the model class for table "objects".
+ *
+ * @property integer $_id
+ * @property string $uuid
+ * @property string $title
+ * @property string $parentUuid
+ * @property string $objectTypeUuid
+ * @property string $objectSubTypeUuid
+ * @property double $latitude
+ * @property double $longitude
+ * @property string $fiasGuid
+ * @property string $fiasParentGuid
+ * @property string $okato
+ * @property boolean $deleted
+ * @property string $createdAt
+ * @property string $changedAt
+ *
+ * @property ObjectType $objectType
+ * @property Objects $parent
+ * @property ObjectSubType $objectSubType
+ */
+class Objects extends ActiveRecord
+{
+    /**
+     * Название таблицы
+     *
+     * @inheritdoc
+     *
+     * @return string
+     */
+    public static function tableName()
+    {
+        return 'objects';
+    }
+
+    /**
+     * Behaviors
+     *
+     * @return array
+     */
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::class,
+                'createdAtAttribute' => 'createdAt',
+                'updatedAtAttribute' => 'changedAt',
+                'value' => new Expression('NOW()')
+            ],
+        ];
+    }
+
+    /**
+     * Rules
+     *
+     * @inheritdoc
+     *
+     * @return array
+     */
+    public function rules()
+    {
+        return [
+            [
+                [
+                    'uuid',
+                    'objectTypeUuid',
+                    'title'
+                ],
+                'required'
+            ],
+            [['latitude', 'longitude'], 'number'],
+            [['uuid', 'objectTypeUuid', 'parentUuid', 'objectSubTypeUuid', 'fiasGuid', 'fiasParentGuid'], 'string', 'max' => 50],
+            [['createdAt', 'changedAt'], 'safe'],
+            [['title', 'okato'], 'string', 'max' => 250],
+            [
+                [
+                    'uuid',
+                    'parentUuid',
+                    'title',
+                    'objectTypeUuid',
+                    'objectSubTypeUuid',
+                ],
+                'filter', 'filter' => function ($param) {
+                return htmlspecialchars($param, ENT_QUOTES | ENT_HTML401);
+            }
+            ]
+        ];
+    }
+
+    /**
+     * Названия отрибутов
+     *
+     * @inheritdoc
+     *
+     * @return array
+     */
+    public function attributeLabels()
+    {
+        return [
+            '_id' => Yii::t('app', '№'),
+            'uuid' => Yii::t('app', 'ID'),
+            'title' => Yii::t('app', 'Название'),
+            'parentUuid' => Yii::t('app', 'Тип параметра'),
+            'objectTypeUuid' => Yii::t('app', 'Тип объекта'),
+            'objectSubTypeUuid' => Yii::t('app', 'Подтип объекта'),
+            'latitude' => Yii::t('app', 'Широта'),
+            'longitude' => Yii::t('app', 'Долгота'),
+            'fiasGuid' => Yii::t('app', 'ID Fias'),
+            'fiasParentGuid' => Yii::t('app', 'ID Fias'),
+            'okato' => Yii::t('app', 'ОКАТО'),
+            'createdAt' => Yii::t('app', 'Создан'),
+            'changedAt' => Yii::t('app', 'Изменен'),
+        ];
+    }
+
+    /**
+     * Fields
+     *
+     * @return array
+     */
+    public function fields()
+    {
+        return ['_id', 'uuid', 'title',
+            'parentUuid',
+            'parent' => function ($model) {
+                return $model->parent;
+            },
+            'objectTypeUuid',
+            'objectType' => function ($model) {
+                return $model->objectType;
+            },
+            'objectSubTypeUuid',
+            'objectSubType' => function ($model) {
+                return $model->objectSubType;
+            },
+            'latitude',
+            'longitude',
+            'fiasGuid',
+            'fiasParentGuid',
+            'okato',
+            'createdAt',
+            'changedAt',
+        ];
+    }
+
+    /**
+     * Объект связанного поля.
+     *
+     * @return ActiveQuery
+     */
+    public function getObjectType()
+    {
+        return $this->hasOne(ObjectType::class, ['uuid' => 'objectTypeUuid']);
+    }
+
+    /**
+     * Объект связанного поля.
+     *
+     * @return ActiveQuery
+     */
+    public function getObjectSubType()
+    {
+        return $this->hasOne(ObjectSubType::class, ['uuid' => 'objectSubTypeUuid']);
+    }
+
+    /**
+     * Объект связанного поля.
+     *
+     * @return ActiveQuery
+     */
+    public function getParent()
+    {
+        if ($this->parentUuid) {
+            return $this->hasOne(Objects::class, ['uuid' => 'parentUuid']);
+        }
+        return null;
+    }
+
+}

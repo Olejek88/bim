@@ -20,7 +20,7 @@ use yii\db\TableSchema;
 class GetFlows extends ActiveRecord
 {
     /**
-     * @return object|Connection|null
+     * @return Objects|Connection|null
      * @throws InvalidConfigException
      */
     public static function getDb()
