@@ -22,6 +22,7 @@ use yii\db\Expression;
  * @property string $path
  * @property string $original_name
  * @property string $param_id
+ * @property integer $type
  *
  * @property MeasureType $measureType
  * @property Equipment $equipment
@@ -63,6 +64,7 @@ class MeasureChannel extends ActiveRecord
             [['uuid', 'title', 'equipmentUuid', 'measureTypeUuid'], 'required'],
             [['createdAt', 'changedAt'], 'safe'],
             [['uuid', 'equipmentUuid', 'measureTypeUuid'], 'string', 'max' => 50],
+            [['type'], 'integer'],
             [['title'], 'string', 'max' => 250],
         ];
     }
@@ -80,6 +82,7 @@ class MeasureChannel extends ActiveRecord
             'equipmentUuid' => Yii::t('app', 'Устройство'),
             'measureType' => Yii::t('app', 'Тип измерения'),
             'measureTypeUuid' => Yii::t('app', 'Тип измерения'),
+            'type' => Yii::t('app', 'Тип значений'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
         ];

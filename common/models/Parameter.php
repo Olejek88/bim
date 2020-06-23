@@ -2,7 +2,6 @@
 
 namespace common\models;
 
-use common\components\MtmActiveRecord;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;

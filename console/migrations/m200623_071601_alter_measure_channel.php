@@ -12,9 +12,10 @@ class m200623_071601_alter_measure_channel extends Migration
      */
     public function safeUp()
     {
-        $this->addColumn('measure_channel', 'path', $this->string());
+        $this->addColumn('measure_channel', 'path', $this->text());
         $this->addColumn('measure_channel', 'original_name', $this->string());
         $this->addColumn('measure_channel', 'param_id', $this->string());
+        $this->addColumn('measure_channel', 'type', $this->integer()->defaultValue(0));
     }
 
     /**
@@ -26,6 +27,7 @@ class m200623_071601_alter_measure_channel extends Migration
         $this->dropColumn('measure_channel', 'path');
         $this->dropColumn('measure_channel', 'original_name');
         $this->dropColumn('measure_channel', 'param_id');
+        $this->dropColumn('measure_channel', 'type');
         return false;
     }
 }

@@ -2,14 +2,11 @@
 
 namespace common\models;
 
-use backend\controllers\EquipmentRegisterController;
-use Da\QrCode\QrCode;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
-use yii\redis\Connection;
 
 
 /**

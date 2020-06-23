@@ -2,7 +2,6 @@
 
 namespace common\models;
 
-use common\components\MtmActiveRecord;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -17,7 +16,6 @@ use yii\db\Expression;
  * @property string $measureChannelUuid
  * @property double $value
  * @property string $date
- * @property integer $type
  * @property string $createdAt
  * @property string $changedAt
  *
@@ -117,20 +115,6 @@ class Measure extends ActiveRecord
             'createdAt',
             'changedAt',
         ];
-    }
-
-    /**
-     * Проверка целостности модели?
-     *
-     * @return bool
-     */
-    public function upload()
-    {
-        if ($this->validate()) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
     /**
