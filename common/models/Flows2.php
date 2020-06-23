@@ -11,7 +11,9 @@ use yii\db\Connection;
 use yii\db\TableSchema;
 
 /**
- * Class GetFlows
+ * Class Flows
+ *
+ * Каналы измерений с приборов учёта из внешней системы с текущими значениями.
  *
  * @property string PATH
  * @property string NAME
@@ -21,7 +23,7 @@ use yii\db\TableSchema;
  * @property string TIME
  * @property string WRITEABLE
  */
-class GetFlows2 extends ActiveRecord
+class Flows2 extends ActiveRecord
 {
     /**
      * @return object|Connection|null
@@ -46,10 +48,10 @@ class GetFlows2 extends ActiveRecord
             'PATH' => new ColumnSchema(['type' => 'string', 'phpType' => 'string']),
             'NAME' => new ColumnSchema(['type' => 'string', 'phpType' => 'string']),
             'ID' => new ColumnSchema(['type' => 'integer', 'phpType' => 'integer']),
-            'FIXEDTYPE' => new ColumnSchema(['type' => 'integer', 'phpType' => 'integer']),
-            'VALUE' => new ColumnSchema(['type' => 'integer', 'phpType' => 'integer']),
-            'TIME' => new ColumnSchema(['type' => 'integer', 'phpType' => 'integer']),
-            'WRITEABLE' => new ColumnSchema(['type' => 'integer', 'phpType' => 'integer']),
+            'FIXEDTYPE' => new ColumnSchema(['type' => 'string', 'phpType' => 'string']),
+            'VALUE' => new ColumnSchema(['type' => 'string', 'phpType' => 'string']),
+            'TIME' => new ColumnSchema(['type' => 'string', 'phpType' => 'string']),
+            'WRITEABLE' => new ColumnSchema(['type' => 'string', 'phpType' => 'string']),
         ];
         return $sch;
     }
@@ -60,9 +62,22 @@ class GetFlows2 extends ActiveRecord
      */
     public static function find()
     {
-        $query = Yii::createObject(ActiveQuery::class, [GetFlows::class]);
+        $query = Yii::createObject(ActiveQuery::class, [Flows2::class]);
         $query->sql = /** @lang oracle sql */
             'select * from table(PTER_LINK_API.GetFlows2())';
         return $query->params([]);
+    }
+
+    /**
+     * @param $id integer
+     * @return Flows2|null
+     * @throws InvalidConfigException
+     */
+    public static function findOne($id)
+    {
+        $query = Yii::createObject(ActiveQuery::class, [Flows2::class]);
+        $query->sql = /** @lang oracle sql */
+            'select * from table(PTER_LINK_API.GetFlows2()) where ID=:id';
+        return $query->params([':id' => $id])->one();
     }
 }

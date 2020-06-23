@@ -11,13 +11,15 @@ use yii\db\Connection;
 use yii\db\TableSchema;
 
 /**
- * Class GetFlows
+ * Class Flows
+ *
+ * Каналы измерений с приборов учёта из внешней системы.
  *
  * @property string PATH
  * @property string NAME
  * @property string ID
  */
-class GetFlows extends ActiveRecord
+class Flows extends ActiveRecord
 {
     /**
      * @return object|Connection|null
@@ -38,13 +40,10 @@ class GetFlows extends ActiveRecord
         $sch->name = $tableName;
         $sch->fullName = $tableName;
         $sch->primaryKey = [];
-        $path = new ColumnSchema(['type' => 'string', 'phpType' => 'string']);
-        $name = new ColumnSchema(['type' => 'string', 'phpType' => 'string']);
-        $id = new ColumnSchema(['type' => 'integer', 'phpType' => 'integer']);
         $sch->columns = [
-            'PATH' => $path,
-            'NAME' => $name,
-            'ID' => $id,
+            'PATH' => new ColumnSchema(['type' => 'string', 'phpType' => 'string']),
+            'NAME' => new ColumnSchema(['type' => 'string', 'phpType' => 'string']),
+            'ID' => new ColumnSchema(['type' => 'integer', 'phpType' => 'integer']),
         ];
         return $sch;
     }
@@ -55,9 +54,31 @@ class GetFlows extends ActiveRecord
      */
     public static function find()
     {
-        $query = Yii::createObject(ActiveQuery::class, [GetFlows::class]);
+        $query = Yii::createObject(ActiveQuery::class, [Flows::class]);
         $query->sql = /** @lang oracle sql */
             'select * from table(PTER_LINK_API.GetFlows())';
         return $query->params([]);
     }
+
+    /**
+     * @param $id integer
+     * @return Flows|null
+     * @throws InvalidConfigException
+     */
+    public static function findOne($id)
+    {
+        $query = Yii::createObject(ActiveQuery::class, [Flows::class]);
+        $query->sql = /** @lang oracle sql */
+            'select * from table(PTER_LINK_API.GetFlows(:id))';
+        return $query->params([':id' => $id])->one();
+    }
+
+    public static function findAll($condition)
+    {
+        $query = Yii::createObject(ActiveQuery::class, [Flows::class]);
+        $query->sql = /** @lang oracle sql */
+            'select * from table(PTER_LINK_API.GetFlows())';
+        return $query->params([]);
+    }
+
 }
