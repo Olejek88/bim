@@ -19,6 +19,9 @@ use yii\db\Expression;
  * @property string $createdAt
  * @property string $changedAt
  * @property boolean $deleted
+ * @property string $path
+ * @property string $original_name
+ * @property string $param_id
  *
  * @property MeasureType $measureType
  * @property Equipment $equipment
