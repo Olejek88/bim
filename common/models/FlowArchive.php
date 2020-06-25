@@ -29,15 +29,17 @@ class FlowArchive extends ActiveRecord
         return Yii::$app->get('oracle');
     }
 
+    public static function tableName()
+    {
+        return 'table(PTER_LINK_API.GetFlowArchive(:id,
+         TO_TIMESTAMP(:fromTime, \'DD.MM.YYYY\'), TO_TIMESTAMP(:toTime, \'DD.MM.YYYY\')))';
+    }
+
     public static function getTableSchema()
     {
         $sch = new TableSchema();
-        // типа имя таблицы
-//        $tableName = /** @lang oracle sql */
-//            'select * from table(PTER_LINK_API.GetFlows())';
-        $tableName = 'get_flows';
-        $sch->name = $tableName;
-        $sch->fullName = $tableName;
+        $sch->name = self::tableName();
+        $sch->fullName = self::tableName();
         $sch->primaryKey = [];
         $sch->columns = [
             'TIME' => new ColumnSchema(['type' => 'string', 'phpType' => 'string']),
@@ -48,22 +50,24 @@ class FlowArchive extends ActiveRecord
     }
 
     /**
-     * @return void|ActiveRecord
+     * @return object|ActiveQuery
      * @throws InvalidConfigException
      */
     public static function find()
     {
-        throw new InvalidConfigException();
+        return Yii::createObject(FlowArchiveQuery::class, [self::class]);
     }
 
     /**
      * @param $condition
-     * @return void|ActiveRecord[]
+     * @return ActiveRecord[]
      * @throws InvalidConfigException
      */
     public static function findAll($condition)
     {
-        throw new InvalidConfigException();
+        $query = Yii::createObject(FlowArchiveQuery::class, [self::class]);
+        $query->where($condition);
+        return $query->all();
     }
 
 
@@ -74,10 +78,20 @@ class FlowArchive extends ActiveRecord
      */
     public static function findOne($id)
     {
-        $query = Yii::createObject(ActiveQuery::class, [Flows::class]);
-        $query->sql = /** @lang oracle sql */
-            'select * from table(PTER_LINK_API.GetFlowArchive(:id, null, null))';
-        return $query->params([':id' => $id])->one();
+        $query = Yii::createObject(FlowArchiveQuery::class, [self::class]);
+        $query->where(['ID' => $id])->orderBy('TIME desc')->limit(1);
+        return $query->one();
     }
 
+
+    public function afterFind()
+    {
+        $timeFields = ['TIME', 'ADDTIME'];
+        foreach ($timeFields as $field) {
+            $pDate = date_parse_from_format('d.m.y H:i:s,v', $this->$field);
+            $date = date('Y-m-d H:i:s', mktime($pDate['hour'], $pDate['minute'], $pDate['second'], $pDate['month'], $pDate['day'], $pDate['year']));
+            $this->$field = $date;
+            $this->setOldAttribute($field, $date);
+        }
+    }
 }
