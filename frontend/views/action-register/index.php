@@ -8,7 +8,7 @@ use kartik\date\DatePicker;
 use kartik\grid\GridView;
 use yii\widgets\ActiveForm;
 
-$this->title = Yii::t('app', 'ТОИРУС::Журнал действий');
+$this->title = Yii::t('app', 'ПолиТЭР::Журнал действий');
 
 $gridColumns = [
     [

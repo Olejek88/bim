@@ -31,6 +31,12 @@ use yii\web\IdentityInterface;
 
 class User extends ActiveRecord implements IdentityInterface
 {
+    const PERMISSION_ADMIN = 'accessAdmin';
+    const PERMISSION_OPERATOR = 'accessOperator';
+
+    const ROLE_ADMIN = 'admin';
+    const ROLE_OPERATOR = 'operator';
+
     const STATUS_DELETED = 0;
     const STATUS_INACTIVE = 9;
     const STATUS_ACTIVE = 10;

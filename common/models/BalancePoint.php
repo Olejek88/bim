@@ -24,12 +24,16 @@ use yii\db\Expression;
  */
 class BalancePoint extends ActiveRecord
 {
+    const CONSUMER = 0;
+    const INPUT = 1;
+    const OUTPUT = 2;
+
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'object_district';
+        return 'balance_point';
     }
 
     public function behaviors()

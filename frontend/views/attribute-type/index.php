@@ -5,7 +5,7 @@ use frontend\models\AttributeSearchType;
 use kartik\grid\GridView;
 use yii\helpers\Html;
 
-$this->title = Yii::t('app', 'ТОИРУС::Типы атрибутов');
+$this->title = Yii::t('app', 'ПолиТЭР::Типы атрибутов');
 
 $gridColumns = [
     ['class' => 'yii\grid\SerialColumn'],
