@@ -27,7 +27,7 @@ class ServiceRegister extends ActiveRecord
     const TYPE_WARNING = 1;
     const TYPE_ERROR = 2;
 
-    const SERVICE_ORDER = '[order]';
+    const SERVICE_IMPORT = '[politer]';
 
     /**
      * @inheritdoc

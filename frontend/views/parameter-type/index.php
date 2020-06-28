@@ -1,17 +1,17 @@
 <?php
-/* @var $searchModel frontend\models\MeasureSearch
- * @var $channels
-*/
+/* @var $dataProvider */
 
+/* @var $searchModel ParameterTypeSearch */
+
+use frontend\models\ParameterTypeSearch;
 use kartik\grid\GridView;
-use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
-$this->title = Yii::t('app', 'Измерения');
+$this->title = Yii::t('app', 'Типы параметров');
 
 $gridColumns = [
     [
-        'attribute' => 'date',
+        'attribute' => 'uuid',
         'hAlign' => 'center',
         'vAlign' => 'middle',
         'contentOptions' => [
@@ -20,62 +20,38 @@ $gridColumns = [
         ],
         'headerOptions' => ['class' => 'text-center'],
         'mergeHeader' => true,
-        'content' => function ($data) {
-            return date("d-m-Y", strtotime($data->date));
-        }
     ],
     [
-        'attribute' => 'measureChannelUuid',
+        'class' => 'kartik\grid\EditableColumn',
+        'attribute' => 'title',
         'vAlign' => 'middle',
         'mergeHeader' => true,
         'contentOptions' => [
             'class' => 'table_class'
         ],
         'headerOptions' => ['class' => 'text-center'],
-        'filterType' => GridView::FILTER_SELECT2,
-        'filter' => ArrayHelper::map($channels,
-            'uuid', 'title'),
-        'filterWidgetOptions' => [
-            'pluginOptions' => ['allowClear' => true],
-        ],
-        'filterInputOptions' => ['placeholder' => 'Любой'],
-        'content' => function ($data) {
-            return $data['measureChannel']->getFullTitle();
-        }
-    ],
-    [
-        'vAlign' => 'middle',
-        'width' => '150px',
-        'header' => 'Тип измерения',
-        'format' => 'raw',
-        'contentOptions' => [
-            'class' => 'table_class'
-        ],
-        'content' => function ($data) {
-            return $data['measureChannel']['measureType']['title'];
-        }
-    ],
-    [
-        'attribute' => 'value',
-        'hAlign' => 'center',
-        'vAlign' => 'middle',
-        'format' => 'raw',
-        'headerOptions' => ['class' => 'kartik-sheet-style'],
-        'mergeHeader' => true,
-        'contentOptions' => [
-            'class' => 'table_class'
-        ],
     ],
     [
         'class' => 'kartik\grid\ActionColumn',
         'header' => 'Действия',
-        'template'=> '{delete}',
+        'buttons' => [
+            'edit' => function ($url, $model) {
+                $url = Yii::$app->getUrlManager()->createUrl(['../parameter-type/edit', 'id' => $model['_id']]);
+                return Html::a('<span class="fa fa-edit"></span>', $url,
+                    [
+                        'title' => Yii::t('app', 'Редактировать'),
+                        'data-toggle' => 'modal',
+                        'data-target' => '#modalAdd',
+                    ]);
+            },
+        ],
+        'template' => '{delete} {edit}',
         'headerOptions' => ['class' => 'kartik-sheet-style'],
     ]
 ];
 
 echo GridView::widget([
-    'id' => 'requests-table',
+    'id' => 'parameter-type-table',
     'dataProvider' => $dataProvider,
     'filterModel' => $searchModel,
     'columns' => $gridColumns,
@@ -86,9 +62,6 @@ echo GridView::widget([
         '{toggleData}'
     ],
     'toolbar' => [
-        ['content' =>
-            Html::a('Новый', ['/measure/create'], ['class' => 'btn btn-success'])
-        ],
         '{export}',
     ],
     'export' => [
@@ -108,7 +81,20 @@ echo GridView::widget([
     'hover' => true,
     'panel' => [
         'type' => GridView::TYPE_PRIMARY,
-        'heading' => '<i class="glyphicon glyphicon-wrench"></i>&nbsp; Измерения',
+        'heading' => '<i class="glyphicon glyphicon-wrench"></i>&nbsp; Типы параметров',
         'headingOptions' => ['style' => 'background: #337ab7']
     ],
 ]);
+
+$this->registerJs('$("#modalAdd").on("hidden.bs.modal",
+function () {
+    $(this).removeData();
+})');
+?>
+
+<div class="modal remote fade" id="modalAdd">
+    <div class="modal-dialog" style="width: 700px">
+        <div class="modal-content loader-lg" id="modalContent">
+        </div>
+    </div>
+</div>

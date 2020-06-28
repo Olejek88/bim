@@ -38,7 +38,7 @@ class MeasureType extends ActiveRecord
     const HOT_WATER = '40876BDE-4933-443E-B3D1-5E8610DE8E24';
 
     const MEASURE_TYPE_CURRENT = 0;
-    const MEASURE_TYPE_HOUSE = 1;
+    const MEASURE_TYPE_HOURS = 1;
     const MEASURE_TYPE_DAYS = 2;
     const MEASURE_TYPE_MONTH = 4;
     const MEASURE_TYPE_INTERVAL = 9;
