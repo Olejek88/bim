@@ -42,7 +42,7 @@ class Register extends ActiveRecord
      * @throws Exception
      */
 
-    public static function addServiceRegister($title, $type, $entityUuid)
+    public static function addRegister($title, $type, $entityUuid)
     {
         $model = new Register();
         $model->title = $title;
