@@ -1,17 +1,20 @@
 <?php
-/* @var $searchModel frontend\models\AlarmSearch */
 
-/** @var $dataProvider */
-
-use kartik\date\DatePicker;
+use common\models\ParameterType;
+use frontend\models\ParameterSearch;
+use kartik\editable\Editable;
 use kartik\grid\GridView;
-use yii\widgets\ActiveForm;
 
-$this->title = Yii::t('app', 'ПолиТЭР::Предупреждения');
+/* @var $searchModel ParameterSearch
+ * /* @var $dataProvider
+ * @var $parameterTypes ParameterType []
+ */
+
+$this->title = Yii::t('app', 'Вычисляемые параметры');
 
 $gridColumns = [
     [
-        'attribute' => 'createdAt',
+        'attribute' => 'date',
         'vAlign' => 'middle',
         'contentOptions' => [
             'class' => 'table_class',
@@ -21,11 +24,40 @@ $gridColumns = [
         'headerOptions' => ['class' => 'text-center'],
     ],
     [
-        'attribute' => 'title',
-        'vAlign' => 'middle',
+        'class' => 'kartik\grid\EditableColumn',
+        'attribute' => 'parameterTypeUuid',
         'hAlign' => 'center',
+        'vAlign' => 'middle',
+        'filterType' => GridView::FILTER_SELECT2,
+        'filter' => $attributeTypes,
+        'filterWidgetOptions' => [
+            'pluginOptions' => ['allowClear' => true],
+        ],
+        'filterInputOptions' => ['placeholder' => Yii::t('app', 'Любой')],
+        'format' => 'raw',
         'contentOptions' => [
             'class' => 'table_class'
+        ],
+        'value' => function ($data) {
+            return $data['title'];
+        },
+        'editableOptions' => function () use ($parameterTypes) {
+            return [
+                'header' => Yii::t('app', 'Типы атрибутов'),
+                'size' => 'lg',
+                'inputType' => Editable::INPUT_DROPDOWN_LIST,
+                'displayValueConfig' => $parameterTypes,
+                'data' => $parameterTypes
+            ];
+        },
+    ],
+    [
+        'class' => 'kartik\grid\EditableColumn',
+        'attribute' => 'value',
+        'vAlign' => 'middle',
+        'contentOptions' => [
+            'class' => 'table_class',
+            'style' => 'width: 100px; text-align: center;'
         ],
         'mergeHeader' => true,
         'headerOptions' => ['class' => 'text-center'],
@@ -45,53 +77,7 @@ $gridColumns = [
     ]
 ];
 
-ob_start();
-// форма указания периода
-$form = ActiveForm::begin([
-    'action' => ['alarm/index'],
-    'method' => 'get',
-]);
-?>
-    <div class="row" style="margin-bottom: 8px; width:100%">
-        <div class="col-sm-4" style="width:36%">
-            <?php
-            echo $form->field($searchModel, 'createTimeStart')->widget(DatePicker::class, [
-                'removeButton' => false,
-                'pjaxContainerId' => 'alarm',
-                'options' => [
-                    'class' => 'add-filter',
-                ],
-                'pluginOptions' => [
-                    'autoclose' => true,
-                    'format' => 'yyyy-mm-dd'
-                ]
-            ])->label(false);
-            ?>
-        </div>
-        <div class="col-sm-4" style="width:36%">
-            <?php
-            echo $form->field($searchModel, 'createTimeEnd')->widget(DatePicker::class, [
-                'removeButton' => false,
-                'pjaxContainerId' => 'alarm',
-                'options' => [
-                    'class' => 'add-filter',
-                ],
-                'pluginOptions' => [
-                    'autoclose' => true,
-                    'format' => 'yyyy-mm-dd'
-                ]
-            ])->label(false);
-            ?>
-        </div>
-    </div>
-
-<?php
-ActiveForm::end();
-$formHtml = ob_get_contents();
-ob_end_clean();
-
 echo GridView::widget([
-    'filterSelector' => '.add-filter',
     'dataProvider' => $dataProvider,
     'filterModel' => $searchModel,
     'columns' => $gridColumns,
@@ -124,6 +110,6 @@ echo GridView::widget([
     'floatHeader' => false,
     'panel' => [
         'type' => GridView::TYPE_PRIMARY,
-        'heading' => '<i class="fa fa-list"></i>&nbsp; ' . Yii::t('app', 'Предупреждения')
+        'heading' => '<i class="fa fa-equation"></i>&nbsp; ' . Yii::t('app', 'Вычисляемые параметры')
     ]
 ]);

@@ -1,25 +1,25 @@
 <?php
 
 /* @var $events */
-/* @var $type integer */
 /* @var $today_date */
 
-/* @var $id integer */
+/* @var $type int */
 
 use kartik\select2\Select2;
 use yii\helpers\Html;
 
-$this->title = Yii::t('app', 'ПолиТЭР::Лента событий пользователя');
+$this->title = Yii::t('app', 'ПолиТЭР::Новости');
+$type = htmlspecialchars(Yii::$app->request->getQueryParam('type', 0));
 ?>
 
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <section class="content-header">
         <h1>
-            <?php echo Yii::t('app', 'Лента действий пользователя') ?>
-            <small><?php echo Yii::t('app', 'изменения параметров, редактирование объектов') ?></small>
+            <?php echo Yii::t('app', 'Лента событий') ?>
+            <small><?php echo Yii::t('app', 'зарегистрированные дефекты, выполненные наряды, события системы') ?></small>
         </h1>
-        <form action="/users/timeline?id=<?= $id ?>">
+        <form action="">
             <table style="width: 400px; padding: 3px">
                 <tr>
                     <td style="width: 300px">
@@ -31,15 +31,14 @@ $this->title = Yii::t('app', 'ПолиТЭР::Лента событий поль
                                 'language' => Yii::t('app', 'ru'),
                                 'data' => [
                                     Yii::t('app', 'Все события'),
+                                    Yii::t('app', 'Объекты'),
                                     Yii::t('app', 'Параметры')
                                 ],
                                 'options' => ['placeholder' => Yii::t('app', 'Тип события')],
                                 'pluginOptions' => [
                                     'allowClear' => true
                                 ],
-                            ]) .
-                            Html::hiddenInput('id', $id)
-                            . '</td><td>&nbsp;</td><td style="width: 100px">' .
+                            ]) . '</td><td>&nbsp;</td><td style="width: 100px">' .
                             Html::submitButton(Yii::t('app', 'Выбрать'),
                                 ['class' => 'btn btn-success']) . '';
                         ?>

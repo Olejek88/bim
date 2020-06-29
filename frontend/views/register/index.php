@@ -6,7 +6,7 @@ use kartik\date\DatePicker;
 use kartik\grid\GridView;
 use yii\widgets\ActiveForm;
 
-$this->title = Yii::t('app', 'ПолиТЭР::Журнал сервисов');
+$this->title = Yii::t('app', 'ПолиТЭР::Журнал ');
 
 $gridColumns = [
     [

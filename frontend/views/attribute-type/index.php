@@ -36,8 +36,14 @@ try {
         ],
         'toolbar' => [
             ['content' =>
-                Html::a(Yii::t('app', 'Новый'), ['/attribute-type/create'], ['class' => 'btn btn-success']),
-                Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['grid-demo'], ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => Yii::t('app', 'Сбросить')])
+                Html::a(Yii::t('app', 'Новый'),
+                    ['/attribute-type/new', 'reference' => 'table'],
+                    [
+                        'class' => 'btn btn-success',
+                        'title' => Yii::t('app', 'Новое'),
+                        'data-toggle' => 'modal',
+                        'data-target' => '#modalAdd'
+                    ])
             ],
             '{export}',
         ],

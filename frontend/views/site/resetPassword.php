@@ -3,13 +3,13 @@
 /* @var $this yii\web\View */
 /* @var $form yii\bootstrap\ActiveForm */
 
-/* @var $model \frontend\models\ResetPasswordForm */
+/* @var $model ResetPasswordForm */
 
+use frontend\models\ResetPasswordForm;
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
 
 $this->title = 'Reset password';
-$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-reset-password">
     <h1><?= Html::encode($this->title) ?></h1>

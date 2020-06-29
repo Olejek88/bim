@@ -59,7 +59,14 @@ echo GridView::widget([
     ],
     'toolbar' => [
         ['content' =>
-            Html::a('Новый', ['/object-sub-type/create'], ['class' => 'btn btn-success'])
+            Html::a(Yii::t('app', 'Новый'),
+                ['/object-sub-type/new', 'reference' => 'table'],
+                [
+                    'class' => 'btn btn-success',
+                    'title' => Yii::t('app', 'Новое'),
+                    'data-toggle' => 'modal',
+                    'data-target' => '#modalAdd'
+                ])
         ],
         '{export}',
     ],

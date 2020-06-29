@@ -1,22 +1,14 @@
 <?php
 
-use common\models\AttributeType;
 use kartik\editable\Editable;
 use kartik\grid\GridView;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
 
 /* @var $searchModel frontend\models\AttributeSearch */
-/** @var $dataProvider */
+/* @var $dataProvider */
+/* @var $attributeTypes */
 
 $this->title = Yii::t('app', 'Атрибуты');
-
-$attributeTypeArr = AttributeType::find()->orderBy('title')->asArray()->all();
-$attributeTypes = ArrayHelper::map($attributeTypeArr, 'uuid', function ($attributeTypeArr) {
-    return [
-        'title' => $attributeTypeArr['title']
-    ];
-});
 
 $gridColumns = [
     [
@@ -44,14 +36,11 @@ $gridColumns = [
         'attribute' => 'attributeTypeUuid',
         'hAlign' => 'center',
         'vAlign' => 'middle',
-        'filterType' => \kartik\grid\GridView::FILTER_SELECT2,
-        'filter' => ArrayHelper::map($attributeTypeArr, 'uuid', 'title'),
+        'filterType' => GridView::FILTER_SELECT2,
+        'filter' => ArrayHelper::map($attributeTypes, 'uuid', 'title'),
         'filterWidgetOptions' => [
             'pluginOptions' => ['allowClear' => true],
         ],
-        'header' => Yii::t('app', 'Модель оборудования') . ' ' . Html::a('<span class="glyphicon glyphicon-plus"></span>',
-                '/equipment-model/create?from=equipment/index',
-                ['title' => Yii::t('app', 'Добавить')]),
         'filterInputOptions' => ['placeholder' => Yii::t('app', 'Любой')],
         'format' => 'raw',
         'contentOptions' => [
@@ -60,8 +49,8 @@ $gridColumns = [
         'value' => function ($data) {
             return $data['title'];
         },
-        'editableOptions' => function () use ($attributeTypeArr) {
-            $types = ArrayHelper::map($attributeTypeArr, 'uuid', 'title');
+        'editableOptions' => function () use ($attributeTypes) {
+            $types = ArrayHelper::map($attributeTypes, 'uuid', 'title');
             return [
                 'header' => Yii::t('app', 'Типы атрибутов'),
                 'size' => 'lg',
@@ -119,6 +108,6 @@ echo GridView::widget([
     'floatHeader' => false,
     'panel' => [
         'type' => GridView::TYPE_PRIMARY,
-        'heading' => '<i class="fa fa-list"></i>&nbsp; ' . Yii::t('app', 'Журнал событий')
+        'heading' => '<i class="fa fa-list"></i>&nbsp; ' . Yii::t('app', 'Атрибуты')
     ]
 ]);

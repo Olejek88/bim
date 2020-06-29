@@ -32,6 +32,12 @@
     "kartik-v/yii2-editable": "^1.7.8",
     "kartik-v/yii2-widget-fileinput": "~1.0.6",
     "kartik-v/yii2-widget-select2": "~2.1.3",
+    "msvdev/yii2-widget-mappicker": "~1.0.1",
+    "2amigos/yii2-leaflet-extension": "~1.0",
+    "2amigos/yii2-leaflet-geocoder-plugin": "~1.0.3",
+    "2amigos/yii2-leaflet-markercluster-plugin": "~1.0",
+    "kartik-v/yii2-widget-depdrop": "~1.0.5",
+    "koputo/yii2-leaflet-subgroup-plugin": "dev-master",
     "ext-oci8": "*",
     "neconix/yii2-oci8": "1.*",
     "ext-PDO": "*"

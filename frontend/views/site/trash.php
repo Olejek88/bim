@@ -2,24 +2,19 @@
 
 /* @var $events */
 /* @var $type integer */
-/* @var $today_date */
 
-/* @var $id integer */
+/* @var $today_date */
 
 use kartik\select2\Select2;
 use yii\helpers\Html;
 
-$this->title = Yii::t('app', 'ПолиТЭР::Лента событий пользователя');
+$this->title = Yii::t('app', 'ПолиТЭР::Корзина объектов');
 ?>
 
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <section class="content-header">
-        <h1>
-            <?php echo Yii::t('app', 'Лента действий пользователя') ?>
-            <small><?php echo Yii::t('app', 'изменения параметров, редактирование объектов') ?></small>
-        </h1>
-        <form action="/users/timeline?id=<?= $id ?>">
+        <form action="">
             <table style="width: 400px; padding: 3px">
                 <tr>
                     <td style="width: 300px">
@@ -30,16 +25,14 @@ $this->title = Yii::t('app', 'ПолиТЭР::Лента событий поль
                                 'value' => $type,
                                 'language' => Yii::t('app', 'ru'),
                                 'data' => [
-                                    Yii::t('app', 'Все события'),
-                                    Yii::t('app', 'Параметры')
-                                ],
-                                'options' => ['placeholder' => Yii::t('app', 'Тип события')],
+                                    Yii::t('app', 'Все объекты'),
+                                    Yii::t('app', 'Объекты'),
+                                    Yii::t('app', 'Каналы измерения')],
+                                'options' => ['placeholder' => Yii::t('app', 'Тип')],
                                 'pluginOptions' => [
                                     'allowClear' => true
                                 ],
-                            ]) .
-                            Html::hiddenInput('id', $id)
-                            . '</td><td>&nbsp;</td><td style="width: 100px">' .
+                            ]) . '</td><td>&nbsp;</td><td style="width: 100px">' .
                             Html::submitButton(Yii::t('app', 'Выбрать'),
                                 ['class' => 'btn btn-success']) . '';
                         ?>
@@ -47,6 +40,10 @@ $this->title = Yii::t('app', 'ПолиТЭР::Лента событий поль
                 </tr>
             </table>
         </form>
+        <h1>
+            <?php echo Yii::t('app', 'Корзина удаленных объектов') ?>
+            <small><?php echo Yii::t('app', 'для восстановления требуется нажать на иконку восстановления') ?></small>
+        </h1>
     </section>
 
     <section class="content">
@@ -62,11 +59,6 @@ $this->title = Yii::t('app', 'ПолиТЭР::Лента событий поль
                     if (count($events)) {
                         $date = $events[0]['date'];
                         foreach ($events as $event) {
-                            if ($event['date'] != $date) {
-                                $date = $event['date'];
-                                echo '<li class="time-label"><span class="bg-aqua btn-xs">' .
-                                    date("d-m-Y", strtotime($date)) . '</span></li>';
-                            }
                             echo $event['event'];
                         }
                     }
