@@ -3,6 +3,7 @@
 
 /** @var $dataProvider */
 
+use common\models\Alarm;
 use kartik\date\DatePicker;
 use kartik\grid\GridView;
 use yii\widgets\ActiveForm;
@@ -40,6 +41,7 @@ $gridColumns = [
         'mergeHeader' => true,
         'headerOptions' => ['class' => 'text-center'],
         'content' => function ($data) {
+            /** @var Alarm $data */
             return $data->getEntityTitle();
         }
     ]
