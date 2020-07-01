@@ -17,7 +17,7 @@ class EventSearch extends Event
     public function rules()
     {
         return [
-            [['_id', 'active'], 'integer'],
+            [['_id'], 'integer'],
             [['uuid', 'title', 'description', 'objectUuid', 'createdAt', 'changedAt'], 'safe'],
         ];
     }

@@ -1,18 +1,19 @@
 <?php
 
-namespace backend\controllers;
+namespace frontend\controllers;
 
-use backend\models\ServiceSearch;
-use common\models\Service;
+use common\models\BalancePoint;
+use frontend\models\BalancePointSearch;
 use Yii;
+use yii\db\StaleObjectException;
 use yii\web\NotFoundHttpException;
 
 /**
- * ServiceController implements the CRUD actions for Service model.
+ * BalancePointController implements the CRUD actions for BalancePoint model.
  */
-class ServiceController extends PoliterController
+class BalancePointController extends PoliterController
 {
-    protected $modelClass = Service::class;
+    protected $modelClass = BalancePoint::class;
 
     /**
      * Lists all Equipment models.
@@ -21,32 +22,24 @@ class ServiceController extends PoliterController
      */
     public function actionIndex()
     {
-        Service::updateAll(['status' => 0],
-            'last_start_date is null or unix_timestamp() > (unix_timestamp(last_start_date) + delay)');
         if (isset($_POST['editableAttribute'])) {
-            $model = Service::find()
+            $model = BalancePoint::find()
                 ->where(['_id' => $_POST['editableKey']])
                 ->one();
-            if ($_POST['editableAttribute'] == 'title') {
-                $model['title'] = $_POST['Service'][$_POST['editableIndex']]['title'];
+            if ($_POST['editableAttribute'] == 'measureChannelUuid') {
+                $model['measureChannelUuid'] = $_POST['Service'][$_POST['editableIndex']]['measureChannelUuid'];
             }
-            if ($_POST['editableAttribute'] == 'service_name') {
-                $model['service_name'] = $_POST['Service'][$_POST['editableIndex']]['service_name'];
+            if ($_POST['editableAttribute'] == 'objectUuid') {
+                $model['objectUuid'] = $_POST['Service'][$_POST['editableIndex']]['objectUuid'];
             }
-            if ($_POST['editableAttribute'] == 'status') {
-                $model['status'] = $_POST['Service'][$_POST['editableIndex']]['status'];
-            }
-            if ($_POST['editableAttribute'] == 'delay') {
-                $model['delay'] = $_POST['Service'][$_POST['editableIndex']]['delay'];
-            }
-            if ($_POST['editableAttribute'] == 'active') {
-                $model['active'] = $_POST['Service'][$_POST['editableIndex']]['active'];
+            if ($_POST['editableAttribute'] == 'input') {
+                $model['input'] = $_POST['Service'][$_POST['editableIndex']]['input'];
             }
             $model->save();
             return json_encode('');
         }
 
-        $searchModel = new ServiceSearch();
+        $searchModel = new BalancePointSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 50;
 
@@ -60,35 +53,17 @@ class ServiceController extends PoliterController
     }
 
     /**
-     * Displays a single Service model.
-     *
-     * @param integer $id Id
-     *
-     * @return mixed
-     * @throws NotFoundHttpException
-     */
-    public function actionView($id)
-    {
-        return $this->render(
-            'view',
-            [
-                'model' => $this->findModel($id),
-            ]
-        );
-    }
-
-    /**
-     * Finds the Service model based on its primary key value.
+     * Finds the BalancePoint model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      *
      * @param integer $id Id
      *
-     * @return Service the loaded model
+     * @return BalancePoint the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Service::findOne($id)) !== null) {
+        if (($model = BalancePoint::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException(Yii::t('app', 'Запрашиваемая страница не существует.'));
@@ -96,84 +71,57 @@ class ServiceController extends PoliterController
     }
 
     /**
-     * Creates a new Service model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     *
-     * @return mixed
-     */
-    public function actionCreate()
-    {
-        $model = new Service();
-        $searchModel = new ServiceSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        $dataProvider->pagination->pageSize = 10;
-        $dataProvider->setSort(['defaultOrder' => ['_id' => SORT_DESC]]);
-
-        if ($model->load(Yii::$app->request->post())) {
-            // проверяем все поля, если что-то не так показываем форму с ошибками
-            if (!$model->validate()) {
-                return $this->render('create', ['model' => $model]);
-            }
-
-            // сохраняем запись
-            if ($model->save(false)) {
-                return $this->redirect(['view', 'id' => $model->_id]);
-            }
-        }
-        return $this->render('create', ['model' => $model, 'dataProvider' => $dataProvider]);
-    }
-
-    /**
-     * Updates an existing Service model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     *
-     * @param integer $id Id
-     *
-     * @return mixed
-     * @throws NotFoundHttpException
-     */
-    public function actionUpdate($id)
-    {
-        // TODO: реализовать перенос файлов документации в новый каталог
-        // если изменилась модель оборудования при редактировании оборудования!
-        // так как файлы документации должны храниться в папке с uuid
-        // модели оборудования
-
-        $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post())) {
-            // сохраняем модель
-            if ($model->save()) {
-                return $this->redirect(['view', 'id' => $model->_id]);
-            } else {
-                return $this->render(
-                    'update',
-                    [
-                        'model' => $model,
-                    ]
-                );
-            }
-        } else {
-            return $this->render(
-                'update',
-                [
-                    'model' => $model,
-                ]
-            );
-        }
-    }
-
-    /**
-     * Deletes an existing Service model.
+     * Deletes an existing BalancePoint model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      *
      * @param integer $id Id
      *
      * @return mixed
+     * @throws NotFoundHttpException
+     * @throws \Throwable
+     * @throws StaleObjectException
      */
     public function actionDelete($id)
     {
-        //$this->findModel($id)->delete();
+        $this->findModel($id)->delete();
         return $this->redirect(['index']);
+    }
+
+    /**
+     * функция отрабатывает сигналы от дерева и выполняет добавление нового
+     *
+     * @return mixed
+     */
+    public
+    function actionNew()
+    {
+        $balancePoint = new BalancePoint();
+        return $this->renderAjax('_add_form', [
+            'model' => $balancePoint
+        ]);
+    }
+
+    /**
+     * Creates a new model.
+     * @return mixed
+     */
+    public
+    function actionSave()
+    {
+        $model = new BalancePoint();
+        if ($model->load(Yii::$app->request->post())) {
+            if ($model->save(false)) {
+                return $this->redirect('../balance-point/index');
+            } else {
+                $message = '';
+                foreach ($model->errors as $key => $error) {
+                    $message .= $error[0] . '</br>';
+                }
+                return json_encode(['message' => $message]);
+            }
+        }
+        return $this->render('_add_form', [
+            'model' => $model
+        ]);
     }
 }

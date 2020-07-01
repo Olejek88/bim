@@ -3,6 +3,7 @@
 namespace frontend\models;
 
 use common\models\Alarm;
+use kartik\daterange\DateRangeBehavior;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
@@ -11,13 +12,33 @@ use yii\data\ActiveDataProvider;
  */
 class AlarmSearch extends Alarm
 {
+    public $createTimeRange;
+    public $createTimeStart;
+    public $createTimeEnd;
+
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => DateRangeBehavior::class,
+                'attribute' => 'createTimeRange',
+                'dateStartAttribute' => 'createTimeStart',
+                'dateEndAttribute' => 'createTimeEnd',
+            ]
+        ];
+    }
+
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
-            [['uuid', 'title', 'entityUuid'], 'safe'],
+            [['uuid', 'title', 'entityUuid', 'createTimeStart', 'createTimeEnd'], 'safe'],
+            [['createTimeRange'], 'match', 'pattern' => '/^.+\s\-\s.+$/']
         ];
     }
 
@@ -47,6 +68,14 @@ class AlarmSearch extends Alarm
         ]);
 
         $this->load($params);
+        if (empty($this->createTimeStart)) {
+            $today = getdate();
+            $this->createTimeStart = sprintf("%d-%02d-%02d", $today['year'] - 1, $today['mon'], $today['mday']);
+        }
+
+        if (empty($this->createTimeEnd)) {
+            $this->createTimeEnd = date('Y-m-d', strtotime('+3 days'));
+        }
 
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
@@ -59,6 +88,9 @@ class AlarmSearch extends Alarm
             '_id' => $this->_id,
             'entityUuid' => $this->entityUuid
         ]);
+
+        $query->andFilterWhere(['>=', 'createdAt', $this->createTimeStart])
+            ->andFilterWhere(['<', 'createdAt', $this->createTimeEnd]);
 
         $query->andFilterWhere(['like', 'title', $this->title])
             ->orderBy(['changedAt' => SORT_DESC]);

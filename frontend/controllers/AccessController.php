@@ -8,9 +8,8 @@ use kartik\grid\GridView;
 use Yii;
 use yii\base\Exception;
 use yii\filters\AccessControl;
-use yii\web\Controller;
 
-class AccessController extends Controller
+class AccessController extends PoliterController
 {
     /**
      * @param $permission

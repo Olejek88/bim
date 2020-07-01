@@ -3,6 +3,7 @@
 namespace frontend\models;
 
 use common\models\ActionRegister;
+use kartik\daterange\DateRangeBehavior;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
@@ -11,13 +12,33 @@ use yii\data\ActiveDataProvider;
  */
 class ActionRegisterSearch extends ActionRegister
 {
+    public $createTimeRange;
+    public $createTimeStart;
+    public $createTimeEnd;
+
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => DateRangeBehavior::class,
+                'attribute' => 'createTimeRange',
+                'dateStartAttribute' => 'createTimeStart',
+                'dateEndAttribute' => 'createTimeEnd',
+            ]
+        ];
+    }
+
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
-            [['title', 'userId', 'type'], 'safe']
+            [['title', 'userId', 'type', 'createTimeStart', 'createTimeEnd'], 'safe'],
+            [['createTimeRange'], 'match', 'pattern' => '/^.+\s\-\s.+$/']
         ];
     }
 
@@ -26,7 +47,6 @@ class ActionRegisterSearch extends ActionRegister
      */
     public function scenarios()
     {
-        // bypass scenarios() implementation in the parent class
         return Model::scenarios();
     }
 
@@ -46,6 +66,15 @@ class ActionRegisterSearch extends ActionRegister
             'sort' => ['defaultOrder' => ['createdAt' => SORT_DESC]]
         ]);
 
+        if (empty($this->createTimeStart)) {
+            $today = getdate();
+            $this->createTimeStart = sprintf("%d-%02d-%02d", $today['year'] - 1, $today['mon'], $today['mday']);
+        }
+
+        if (empty($this->createTimeEnd)) {
+            $this->createTimeEnd = date('Y-m-d', strtotime('+3 days'));
+        }
+
         $this->load($params);
 
         if (!$this->validate()) {
@@ -58,6 +87,8 @@ class ActionRegisterSearch extends ActionRegister
             'entityUuid' => $this->entityUuid,
             'type' => $this->type
         ]);
+        $query->andFilterWhere(['>=', 'createdAt', $this->createTimeStart])
+            ->andFilterWhere(['<', 'createdAt', $this->createTimeEnd]);
 
         return $dataProvider;
     }

@@ -26,7 +26,7 @@ class AttributeTypeController extends PoliterController
                 ->where(['_id' => $_POST['editableKey']])
                 ->one();
             if ($_POST['editableAttribute'] == 'title') {
-                $model['name'] = $_POST['AttributeType'][$_POST['editableIndex']]['name'];
+                $model['title'] = $_POST['AttributeType'][$_POST['editableIndex']]['title'];
             }
             $model->save();
             return json_encode('');
@@ -122,7 +122,7 @@ class AttributeTypeController extends PoliterController
         $model = new AttributeType();
         if ($model->load(Yii::$app->request->post())) {
             if ($model->save(false)) {
-                return $this->redirect('index');
+                return $this->redirect('../attribute-type/index');
             } else {
                 $message = '';
                 foreach ($model->errors as $key => $error) {

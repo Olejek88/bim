@@ -26,7 +26,7 @@ use yii\helpers\Html;
     <?php
     echo $form->field($event, 'title')->textInput(['maxlength' => true]);
 
-    if ($model['objectUuid'] != null) {
+    if ($event['objectUuid'] != null) {
         echo $form->field($event, 'objectUuid')->hiddenInput(['value' => $model['uuid']])->label(false);
     } else {
         echo $form->field($event, 'objectUuid')->widget(Select2::class,

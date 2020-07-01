@@ -3,6 +3,7 @@
 namespace frontend\controllers;
 
 use common\models\Attribute;
+use common\models\AttributeType;
 use frontend\models\AttributeSearch;
 use Yii;
 use yii\db\StaleObjectException;
@@ -25,11 +26,13 @@ class AttributeController extends PoliterController
         $searchModel = new AttributeSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 15;
+        $attributeTypes = AttributeType::find()->orderBy('title')->all();
         return $this->render(
             'index',
             [
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
+                'attributeTypes' => $attributeTypes
             ]
         );
     }

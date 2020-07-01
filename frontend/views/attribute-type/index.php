@@ -1,6 +1,8 @@
 <?php
 /* @var $searchModel AttributeSearchType */
 
+/* @var $dataProvider */
+
 use frontend\models\AttributeSearchType;
 use kartik\grid\GridView;
 use yii\helpers\Html;
@@ -8,7 +10,19 @@ use yii\helpers\Html;
 $this->title = Yii::t('app', 'ПолиТЭР::Типы атрибутов');
 
 $gridColumns = [
-    ['class' => 'yii\grid\SerialColumn'],
+    [
+        'attribute' => '_id',
+        'hAlign' => 'center',
+        'vAlign' => 'middle',
+        'contentOptions' => [
+            'class' => 'table_class',
+            'style' => 'width: 50px'
+        ],
+        'headerOptions' => ['class' => 'text-center'],
+        'content' => function ($data) {
+            return $data['_id'];
+        }
+    ],
     [
         'class' => 'kartik\grid\EditableColumn',
         'attribute' => 'title',
@@ -21,7 +35,7 @@ $gridColumns = [
         ],
         'headerOptions' => ['class' => 'text-center'],
         'content' => function ($data) {
-            return $data->name;
+            return $data->title;
         }
     ]
 ];
@@ -69,3 +83,15 @@ try {
 } catch (Exception $exception) {
 
 }
+$this->registerJs('$("#modalAdd").on("hidden.bs.modal",
+function () {
+    $(this).removeData();
+})');
+?>
+
+<div class="modal remote fade" id="modalAdd">
+    <div class="modal-dialog" style="width: 800px; height: 400px">
+        <div class="modal-content loader-lg" style="margin: 10px; padding: 10px">
+        </div>
+    </div>
+</div>

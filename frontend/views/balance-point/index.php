@@ -110,18 +110,15 @@ echo GridView::widget([
         '{toggleData}'
     ],
     'toolbar' => [
-        [
-            'content' => $formHtml,
-        ],
     ],
     'export' => [
         'target' => GridView::TARGET_BLANK,
-        'filename' => 'event'
+        'filename' => 'points'
     ],
     'pjax' => true,
     'pjaxSettings' => [
         'options' => [
-            'id' => 'defect-table',
+            'id' => 'point-table',
         ],
     ],
     'showPageSummary' => false,

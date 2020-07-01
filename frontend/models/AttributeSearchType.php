@@ -55,9 +55,7 @@ class AttributeSearchType extends AttributeType
 
         // grid filtering conditions
         $query->andFilterWhere([
-            '_id' => $this->_id,
-            'createdAt' => $this->createdAt,
-            'changedAt' => $this->changedAt,
+            '_id' => $this->_id
         ]);
 
         $query->andFilterWhere(['like', 'title', $this->title]);

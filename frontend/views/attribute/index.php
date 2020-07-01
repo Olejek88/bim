@@ -87,7 +87,6 @@ echo GridView::widget([
     ],
     'toolbar' => [
         [
-            'content' => $formHtml,
             'options' => ['style' => 'width:100%']
         ],
     ],

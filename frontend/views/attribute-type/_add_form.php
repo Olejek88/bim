@@ -10,6 +10,7 @@ use yii\helpers\Html;
 
 <?php $form = ActiveForm::begin([
     'enableAjaxValidation' => false,
+    //'action' => '../attribute-type/save',
     'options' => [
         'id' => 'attributeTypeForm',
         'enctype' => 'multipart/form-data'
@@ -35,20 +36,19 @@ use yii\helpers\Html;
     <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo Yii::t('app', 'Закрыть') ?></button>
 </div>
 <script>
-    var send = false;
-    $(document).on("beforeSubmit", "#addAttributeTypeForm", function (e) {
+    $(document).on("beforeSubmit", "#attributeTypeForm", function (e) {
         e.preventDefault();
-    }).on('submit', "#addAttributeTypeForm", function (e) {
+    }).one('submit', function (e) {
         e.preventDefault();
         $.ajax({
             type: "post",
-            data: $('#addAttributeTypeForm').serialize(),
+            data: $('#attributeTypeForm').serialize(),
             url: "../attribute-type/save",
             success: function (code) {
                 let message = JSON.parse(code);
                 if (message.code === 0) {
                     send = true;
-                    $('#addAttributeTypeForm').modal('hide');
+                    $('#attributeTypeForm').modal('hide');
                 } else {
                     let div = document.getElementById('error');
                     div.innerHTML = message.message;
