@@ -5,7 +5,6 @@ namespace common\models;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
-use yii\db\ActiveRecord;
 use yii\db\Expression;
 
 /**
@@ -30,7 +29,7 @@ use yii\db\Expression;
  * @property Objects $parent
  * @property ObjectSubType $objectSubType
  */
-class Objects extends ActiveRecord
+class Objects extends PoliterModel
 {
     /**
      * Название таблицы
@@ -41,7 +40,7 @@ class Objects extends ActiveRecord
      */
     public static function tableName()
     {
-        return 'objects';
+        return 'object';
     }
 
     /**

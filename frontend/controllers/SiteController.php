@@ -7,6 +7,8 @@ use common\models\ActionRegister;
 use common\models\Alarm;
 use common\models\Event;
 use common\models\LoginForm;
+use common\models\Measure;
+use common\models\MeasureChannel;
 use common\models\Objects;
 use common\models\ObjectType;
 use common\models\Register;
@@ -159,6 +161,9 @@ class SiteController extends Controller
     {
         $objectsCount = Objects::find()->where(['deleted' => 0])->count();
         $objectsTypeCount = ObjectType::find()->count();
+        $channelsCount = MeasureChannel::find()->where(['deleted' => 0])->count();
+        $measuresCount = Measure::find()->count();
+        $eventsCount = Event::find()->count();
         $layer = self::getLayers();
         // По числу в шаблоне
         $registers = ServiceRegister::find()->orderBy('_id desc')->limit(8)->all();
@@ -168,7 +173,12 @@ class SiteController extends Controller
                 'layer' => $layer,
                 'registers' => $registers,
                 'objectsTypeCount' => $objectsTypeCount,
-                'objectsCount' => $objectsCount
+                'objectsCount' => $objectsCount,
+                'channelsCount' => $channelsCount,
+                'measuresCount' => $measuresCount,
+                'eventsCount' => $eventsCount,
+                'categories' => [],
+                'values' => []
             ]
         );
     }
@@ -418,17 +428,6 @@ class SiteController extends Controller
      */
     public function getLayers()
     {
-        $userData = array();
-        $lats = array();
-        $wayUsers = [];
-
-        /**
-         * [userList description]
-         *
-         * @var $userList - Список активных пользователей за сутки
-         * @var $uuid - Uuid пользователя
-         * @var $connectionDate - Дата последнего соединения
-         */
         $objectsGroup = new SubGroup();
         $objectsGroup->setTitle(Yii::t('app', 'Объекты'));
         $alarmGroup = new SubGroup();
@@ -451,7 +450,7 @@ class SiteController extends Controller
          * Вывод точек фиксации показаний и неисправности (measuredValue/defect -> equipment -> object)
          */
         $alarms = Alarm::find()
-            ->orderBy('date desc')
+            ->orderBy('createdAt desc')
             ->limit(30)
             ->all();
 

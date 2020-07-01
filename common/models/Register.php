@@ -5,7 +5,6 @@ namespace common\models;
 use common\components\MainFunctions;
 use Exception;
 use Yii;
-use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "register".
@@ -19,7 +18,7 @@ use yii\db\ActiveRecord;
  * @property string $changedAt [datetime]
  *
  */
-class Register extends ActiveRecord
+class Register extends PoliterModel
 {
     const TYPE_INFO = 0;
     const TYPE_WARNING = 1;

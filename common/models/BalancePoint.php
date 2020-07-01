@@ -5,7 +5,6 @@ namespace common\models;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
-use yii\db\ActiveRecord;
 use yii\db\Expression;
 
 /**
@@ -22,7 +21,7 @@ use yii\db\Expression;
  * @property Objects $object
  * @property MeasureChannel $measureChannel
  */
-class BalancePoint extends ActiveRecord
+class BalancePoint extends PoliterModel
 {
     const CONSUMER = 0;
     const INPUT = 1;

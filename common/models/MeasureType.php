@@ -3,7 +3,6 @@
 namespace common\models;
 
 use Yii;
-use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "measure_type"
@@ -14,7 +13,7 @@ use yii\db\ActiveRecord;
  * @property string $createdAt
  * @property string $changedAt
  */
-class MeasureType extends ActiveRecord
+class MeasureType extends PoliterModel
 {
     const COMMON = 'E9ADE49A-3C31-42F8-A751-AAEB890C2190';
 

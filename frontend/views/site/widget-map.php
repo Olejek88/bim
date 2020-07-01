@@ -45,10 +45,7 @@ $this->registerJs('$(window).on("resize", function () { $("#w1").height(400);}).
 
                     $subGroupPlugin = new SubgroupCluster();
                     $subGroupPlugin->addSubGroup($layer['objectGroup']);
-                    $subGroupPlugin->addSubGroup($layer['waysGroup']);
-
-                    $js[] = 'map.removeLayer(waysGroup);';
-                    $leaflet->setJs($js);
+                    $subGroupPlugin->addSubGroup($layer['alarmGroup']);
 
                     $layers->setOverlays([]);
                     $layers->setName('ctrlLayer');

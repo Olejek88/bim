@@ -13,6 +13,7 @@
  * @var $objectsTypeCount
  * @var $services
  * @var $channelsCount
+ * @var $measuresCount
  * @var $eventsCount
  * @var $layer
  * @var $values
@@ -27,8 +28,8 @@ use common\models\Equipment;
 
 <!-- Info boxes -->
 <div class="row">
-    <?= $this->render('widget-full-stats', ['objectsCount' => $objectsCount,
-        'channelsCount' => $channelsCount, 'eventsCount' => $eventsCount]); ?>
+    <?= $this->render('widget-full-stats', ['objectsCount' => $objectsCount, 'objectsTypeCount' => $objectsTypeCount,
+        'channelsCount' => $channelsCount, 'eventsCount' => $eventsCount, 'measuresCount' => $measuresCount]); ?>
 </div>
 <!-- /.row -->
 
@@ -36,13 +37,15 @@ use common\models\Equipment;
 
 <div class="row">
     <div class="col-md-7">
-        <?= $this->render('widget-events-stats',
+        <?= /*$this->render('widget-events-stats',
             ['categories' => $categories,
-                'values' => $values]); ?>
+                'values' => $values]);*/
+        "" ?>
     </div>
     <!-- /.col -->
     <div class="col-md-5">
-        <?= $this->render('widget-equipments', ['equipments' => $equipments]); ?>
+        <?= /*$this->render('widget-equipments', ['equipments' => $equipments]);*/
+        "" ?>
     </div>
 </div>
 <!-- /.row -->
@@ -59,11 +62,10 @@ use common\models\Equipment;
                 ?>
             </div>
         </div>
-        <?= $this->render('widget-orders', ['orders' => $orders]); ?>
     </div>
 
     <div class="col-md-4">
-        <?= $this->render('widget-objects', ['objects' => $objects]); ?>
+        <?php /*echo $this->render('widget-objects', ['objects' => $objects]);*/ ?>
     </div>
 </div>
 

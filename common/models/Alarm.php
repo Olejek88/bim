@@ -5,7 +5,6 @@ namespace common\models;
 use common\components\MainFunctions;
 use Exception;
 use Yii;
-use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "alarm".
@@ -18,7 +17,7 @@ use yii\db\ActiveRecord;
  * @property string $changedAt [datetime]
  *
  */
-class Alarm extends ActiveRecord
+class Alarm extends PoliterModel
 {
     /**
      * @inheritdoc

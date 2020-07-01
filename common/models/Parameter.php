@@ -5,7 +5,6 @@ namespace common\models;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
-use yii\db\ActiveRecord;
 use yii\db\Expression;
 
 /**
@@ -22,7 +21,7 @@ use yii\db\Expression;
  *
  * @property ParameterType $parameterType
  */
-class Parameter extends ActiveRecord
+class Parameter extends PoliterModel
 {
     /**
      * Название таблицы

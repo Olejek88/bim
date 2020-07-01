@@ -5,7 +5,6 @@ namespace common\models;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
-use yii\db\ActiveRecord;
 use yii\db\Expression;
 
 /**
@@ -20,7 +19,7 @@ use yii\db\Expression;
  * @property string $createdAt
  * @property string $changedAt
  */
-class ActionRegister extends ActiveRecord
+class ActionRegister extends PoliterModel
 {
     /**
      * @inheritdoc

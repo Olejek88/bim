@@ -4,7 +4,6 @@ namespace common\models;
 
 use Yii;
 use yii\behaviors\TimestampBehavior;
-use yii\db\ActiveRecord;
 use yii\db\Expression;
 
 /**
@@ -16,7 +15,7 @@ use yii\db\Expression;
  * @property string $createdAt
  * @property string $changedAt
  */
-class ObjectSubType extends ActiveRecord
+class ObjectSubType extends PoliterModel
 {
     const GENERAL = "42686CFC-34D0-45FF-95A4-04B0D865EC35";
     const MKD = "6A131086-AEAA-4513-8C9D-3CEAA979A2EC";

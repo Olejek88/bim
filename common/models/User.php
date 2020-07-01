@@ -6,7 +6,6 @@ use Yii;
 use yii\base\Exception;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
-use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
 
 /**
@@ -27,15 +26,21 @@ use yii\web\IdentityInterface;
  * @property integer $updated_at
  * @property string $password write-only password
  * @property boolean $deleted
+ *
+ * @property string $imageUrl
+ * @property string $imageDir
  */
-
-class User extends ActiveRecord implements IdentityInterface
+class User extends PoliterModel implements IdentityInterface
 {
+    private static $_IMAGE_ROOT = 'users';
+
     const PERMISSION_ADMIN = 'accessAdmin';
     const PERMISSION_OPERATOR = 'accessOperator';
+    const PERMISSION_USER = 'accessUser';
 
     const ROLE_ADMIN = 'admin';
     const ROLE_OPERATOR = 'operator';
+    const ROLE_USER = 'user';
 
     const STATUS_DELETED = 0;
     const STATUS_INACTIVE = 9;
@@ -223,5 +228,44 @@ class User extends ActiveRecord implements IdentityInterface
     public function removePasswordResetToken()
     {
         $this->password_reset_token = null;
+    }
+
+    /**
+     * URL изображения.
+     *
+     * @return string | null
+     */
+    public function getImageUrl()
+    {
+        $dbName = Yii::$app->session->get('user.dbname');
+        $noFileUrl = Yii::$app->request->baseUrl . '/images/unknown2.png';
+        if ($this->image) {
+            $localPath = 'storage/' . $dbName . '/' . self::$_IMAGE_ROOT . '/' . $this->image;
+            if (file_exists($localPath)) {
+                /** @var User $identity */
+                $identity = Yii::$app->user->identity;
+                $userName = $identity->username;
+                $dir = 'storage/' . $userName . '/' . self::$_IMAGE_ROOT . '/'
+                    . $this->image;
+                return Yii::$app->request->getBaseUrl() . '/' . $dir;
+            } else {
+                return $noFileUrl;
+                // такого в штатном режиме быть не должно!
+            }
+        }
+        return $noFileUrl;
+    }
+
+    /**
+     * Возвращает каталог в котором должен находится файл изображения,
+     * относительно папки web.
+     *
+     * @return string
+     */
+    public function getImageDir()
+    {
+        $dbName = Yii::$app->session->get('user.dbname');
+        $dir = 'storage/' . $dbName . '/' . self::$_IMAGE_ROOT . '/';
+        return $dir;
     }
 }

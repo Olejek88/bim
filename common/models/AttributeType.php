@@ -3,7 +3,6 @@
 namespace common\models;
 
 use Yii;
-use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "attribute_type"
@@ -14,7 +13,7 @@ use yii\db\ActiveRecord;
  * @property string $createdAt
  * @property string $changedAt
  */
-class AttributeType extends ActiveRecord
+class AttributeType extends PoliterModel
 {
     /**
      * @inheritdoc

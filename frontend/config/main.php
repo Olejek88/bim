@@ -21,7 +21,7 @@ return [
         'view' => [
             'theme' => [
                 'pathMap' => [
-                    '@app/views' => '@backend/views/yii2-app'
+                    '@app/views' => '@frontend/views/yii2-app'
                 ],
             ],
         ],
