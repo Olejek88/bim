@@ -2,6 +2,7 @@
 
 namespace common\components;
 
+use common\models\ActionRegister;
 use common\models\User;
 use Yii;
 
@@ -28,24 +29,25 @@ class MainFunctions
     /**
      * Logs message to journal register in db
      * @param string $description сообщение в журнал
-     * @return integer код ошибкиы
+     * @param $type
+     * @param $entityUuid
+     * @return void код ошибки
+     * @throws \Exception
      */
-    public static function register($description)
+    public static function register($description, $type, $entityUuid)
     {
         $accountUser = Yii::$app->user->identity;
         $currentUser = User::find()
             ->where(['id' => $accountUser['id']])
             ->asArray()
             ->one();
-        /*        $journal = new Journal();
-                $journal->userUuid = $currentUser['uuid'];
-                $journal->description = $description;
-                $journal->date = date('Y-m-d H:i:s');
-                if ($journal->save())
-                    return Errors::OK;
-                else {
-                    return Errors::ERROR_SAVE;
-                }*/
+        $register = new ActionRegister();
+        $register->uuid = MainFunctions::GUID();
+        $register->title = $description;
+        $register->userId = $currentUser['id'];
+        $register->type = $type;
+        $register->entityUuid = $entityUuid;
+        $register->save();
     }
 
     /**

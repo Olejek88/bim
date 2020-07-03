@@ -1,8 +1,8 @@
 <?php
 
-use backend\controllers\AccessController;
-use backend\models\AccessSearch;
+use frontend\controllers\AccessController;
 use frontend\models\AccessModel;
+use frontend\models\AccessSearch;
 use kartik\grid\GridView;
 use kartik\popover\PopoverX;
 
@@ -109,12 +109,12 @@ try {
                 ],
                 [
                     'class' => 'kartik\grid\EditableColumn',
-                    'attribute' => 'contractor',
-                    'header' => Yii::t('app', 'Заказчик'),
+                    'attribute' => 'user',
+                    'header' => Yii::t('app', 'Пользователь'),
                     'format' => 'html',
                     'value' => function ($model) {
                         /* @var AccessModel $model */
-                        return $model->getValue($model, 'contractor');
+                        return $model->getValue($model, 'user');
                     },
                     'editableOptions' => $editableOptions,
                 ],

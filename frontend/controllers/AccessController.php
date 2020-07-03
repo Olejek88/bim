@@ -2,14 +2,16 @@
 
 namespace frontend\controllers;
 
-use backend\models\AccessSearch;
 use common\models\User;
+use frontend\models\AccessSearch;
 use kartik\grid\GridView;
 use Yii;
 use yii\base\Exception;
 use yii\filters\AccessControl;
+use yii\web\BadRequestHttpException;
+use yii\web\Controller;
 
-class AccessController extends PoliterController
+class AccessController extends Controller
 {
     /**
      * @param $permission
@@ -112,7 +114,7 @@ class AccessController extends PoliterController
     /**
      * @param $action
      * @return bool
-     * @throws \yii\web\BadRequestHttpException
+     * @throws BadRequestHttpException
      */
     public function beforeAction($action)
     {

@@ -15,6 +15,8 @@ $currentUser = Yii::$app->view->params['currentUser'];
 
 $events = Yii::$app->view->params['events'];
 
+$register_unread = Yii::$app->view->params['register_unread'];
+
 $deleted = Yii::$app->view->params['deleted'];
 $userImage = Yii::$app->view->params['userImage'];
 $userImage = $currentUser->getImageUrl();
@@ -24,7 +26,6 @@ $userImage = $currentUser->getImageUrl();
 
     <?= Html::a('<span class="logo-mini">П</span><span class="logo-lg">' . Yii::$app->name = '' . Yii::t('app', 'ПолиТЭР') . '</span>',
         Yii::$app->homeUrl, ['class' => 'logo']) ?>
-    <!-- Header Navbar: style can be found in header.less -->
     <nav class="navbar navbar-static-top">
         <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button" style="padding: 10px 15px">
             <span class="sr-only"><?php echo Yii::t('app', 'Навигация') ?></span>
@@ -34,6 +35,8 @@ $userImage = $currentUser->getImageUrl();
                 <?php
                 if (Yii::$app->user->can(User::PERMISSION_ADMIN) || Yii::$app->user->can(User::PERMISSION_OPERATOR))
                     echo $this->render('header_timeline');
+                if (Yii::$app->user->can(User::PERMISSION_ADMIN))
+                    echo $this->render('header_register', ['register_unread' => $register_unread]);
                 ?>
                 <?= $this->render('header_events', ['events' => $events]); ?>
                 <li class="dropdown user user-menu">
@@ -62,7 +65,7 @@ $userImage = $currentUser->getImageUrl();
                         <!-- Menu Footer-->
                         <li class="user-footer">
                             <div class="pull-left">
-                                <?= Html::a(Yii::t('app', 'Профиль'), ['users/view', 'id' => $currentUser['id']],
+                                <?= Html::a(Yii::t('app', 'Профиль'), ['user/view', 'id' => $currentUser['id']],
                                     ['class' => 'btn btn-default btn-flat']) ?>
                             </div>
                             <div class="pull-right">

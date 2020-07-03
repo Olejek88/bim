@@ -4,6 +4,7 @@ use common\models\ParameterType;
 use frontend\models\ParameterSearch;
 use kartik\editable\Editable;
 use kartik\grid\GridView;
+use yii\helpers\ArrayHelper;
 
 /* @var $searchModel ParameterSearch
  * /* @var $dataProvider
@@ -21,6 +22,7 @@ $gridColumns = [
             'style' => 'width: 100px; text-align: center;'
         ],
         'mergeHeader' => true,
+        'header' => Yii::t('app', 'Дата'),
         'headerOptions' => ['class' => 'text-center'],
     ],
     [
@@ -29,7 +31,7 @@ $gridColumns = [
         'hAlign' => 'center',
         'vAlign' => 'middle',
         'filterType' => GridView::FILTER_SELECT2,
-        'filter' => $attributeTypes,
+        'filter' => ArrayHelper::map($parameterTypes, 'uuid', 'title'),
         'filterWidgetOptions' => [
             'pluginOptions' => ['allowClear' => true],
         ],
@@ -38,16 +40,18 @@ $gridColumns = [
         'contentOptions' => [
             'class' => 'table_class'
         ],
+        'header' => Yii::t('app', 'Тип параметра'),
         'value' => function ($data) {
             return $data['title'];
         },
         'editableOptions' => function () use ($parameterTypes) {
+            $types = ArrayHelper::map($parameterTypes, 'uuid', 'title');
             return [
                 'header' => Yii::t('app', 'Типы атрибутов'),
                 'size' => 'lg',
                 'inputType' => Editable::INPUT_DROPDOWN_LIST,
-                'displayValueConfig' => $parameterTypes,
-                'data' => $parameterTypes
+                'displayValueConfig' => $types,
+                'data' => $types
             ];
         },
     ],
@@ -59,6 +63,7 @@ $gridColumns = [
             'class' => 'table_class',
             'style' => 'width: 100px; text-align: center;'
         ],
+        'header' => Yii::t('app', 'Значение'),
         'mergeHeader' => true,
         'headerOptions' => ['class' => 'text-center'],
     ],
@@ -88,10 +93,6 @@ echo GridView::widget([
         '{toggleData}'
     ],
     'toolbar' => [
-        [
-            'content' => $formHtml,
-            'options' => ['style' => 'width:100%']
-        ],
     ],
     'pjax' => true,
     'pjaxSettings' => [
@@ -110,6 +111,6 @@ echo GridView::widget([
     'floatHeader' => false,
     'panel' => [
         'type' => GridView::TYPE_PRIMARY,
-        'heading' => '<i class="fa fa-equation"></i>&nbsp; ' . Yii::t('app', 'Вычисляемые параметры')
+        'heading' => '<i class="fa fa-equation"></i>&nbsp;Вычисляемые параметры'
     ]
 ]);

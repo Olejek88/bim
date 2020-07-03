@@ -12,7 +12,7 @@ class AccessModel extends Model
     public $model;
     public $permission;
     public $admin = false;
-    public $contractor = false;
+    public $user = false;
     public $operator = false;
     public $description;
 

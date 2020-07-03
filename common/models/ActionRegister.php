@@ -8,7 +8,7 @@ use yii\db\ActiveQuery;
 use yii\db\Expression;
 
 /**
- * This is the model class for table "action_register".
+ * Действия пользователей в интерфейсе системы
  *
  * @property integer $_id
  * @property string $uuid
@@ -21,6 +21,12 @@ use yii\db\Expression;
  */
 class ActionRegister extends PoliterModel
 {
+    const TYPE_DELETE = 4;
+    const TYPE_UPDATE = 1;
+    const TYPE_ADD = 2;
+    const TYPE_EDIT = 3;
+    const TYPE_UNKNOWN = 0;
+
     /**
      * @inheritdoc
      */
@@ -93,6 +99,11 @@ class ActionRegister extends PoliterModel
             $equipment = Equipment::find()->where(['uuid' => $this->entityUuid])->one();
             if ($equipment) {
                 return $equipment->title;
+            }
+            /** @var User $user */
+            $user = User::find()->where(['id' => $this->entityUuid])->one();
+            if ($user) {
+                return $user->username;
             }
         }
         return "-";

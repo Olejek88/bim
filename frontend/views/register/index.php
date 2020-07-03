@@ -1,12 +1,12 @@
 <?php
 /* @var $searchModel frontend\models\RegisterSearch */
 
-use common\models\ServiceRegister;
+use common\models\Register;
 use kartik\date\DatePicker;
 use kartik\grid\GridView;
 use yii\widgets\ActiveForm;
 
-$this->title = Yii::t('app', 'ПолиТЭР::Журнал ');
+$this->title = Yii::t('app', 'ПолиТЭР::Журнал объектов');
 
 $gridColumns = [
     [
@@ -37,20 +37,20 @@ $gridColumns = [
         'headerOptions' => ['class' => 'text-center'],
         'filterType' => GridView::FILTER_SELECT2,
         'filter' => [
-            ServiceRegister::TYPE_INFO => Yii::t('app', 'Информация'),
-            ServiceRegister::TYPE_WARNING => Yii::t('app', 'Предупреждение'),
-            ServiceRegister::TYPE_ERROR => Yii::t('app', 'Ошибка')
+            Register::TYPE_INFO => Yii::t('app', 'Информация'),
+            Register::TYPE_WARNING => Yii::t('app', 'Предупреждение'),
+            Register::TYPE_ERROR => Yii::t('app', 'Ошибка')
         ],
         'filterWidgetOptions' => [
             'pluginOptions' => ['allowClear' => true],
         ],
         'filterInputOptions' => ['placeholder' => Yii::t('app', 'Любой')],
         'content' => function ($data) {
-            if ($data->type == ServiceRegister::TYPE_INFO)
+            if ($data->type == Register::TYPE_INFO)
                 return "<span class='badge' style='background-color: green; height: 12px; margin-top: -3px'> </span>&nbsp;Информация";
-            if ($data->type == ServiceRegister::TYPE_WARNING)
+            if ($data->type == Register::TYPE_WARNING)
                 return "<span class='badge' style='background-color: orange; height: 12px; margin-top: -3px'> </span>&nbsp;Предупреждение";
-            if ($data->type == ServiceRegister::TYPE_ERROR)
+            if ($data->type == Register::TYPE_ERROR)
                 return "<span class='badge' style='background-color: red; height: 12px; margin-top: -3px'> </span>&nbsp;Ошибка";
             return "тип не определен";
         }
@@ -135,7 +135,7 @@ echo GridView::widget([
     'pjax' => true,
     'pjaxSettings' => [
         'options' => [
-            'id' => 'service-register',
+            'id' => 'register',
         ],
     ],
     'showPageSummary' => false,
@@ -149,6 +149,6 @@ echo GridView::widget([
     'floatHeader' => false,
     'panel' => [
         'type' => GridView::TYPE_PRIMARY,
-        'heading' => '<i class="fa fa-list"></i>&nbsp; ' . Yii::t('app', 'Журнал событий')
+        'heading' => '<i class="fa fa-list"></i>&nbsp; ' . Yii::t('app', 'Журнал событий объектов системы')
     ]
 ]);

@@ -118,3 +118,100 @@ a.desc:after {
 .nav > li > form > button.logout:focus {
     outline: none;
 }
+
+/**
+ * wrapper-login
+ */
+
+.wrapper-block {
+    padding-top: 100px;
+    height: 100vh;
+    background-size: 100%;
+}
+
+.wrapper-login-panel {
+    width: 400px;
+    margin: 0px auto;
+    padding: 10px;
+}
+
+.wrapper-login-footer {
+    width: 400px;
+    margin: -20px auto;
+    padding: 10px;
+    text-align: center;
+}
+
+#wrapper-login-footer-list, #wrapper-login-footer-list li {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+}
+
+.wrapper-block {
+    padding-top: 100px;
+    height: 100vh;
+    background: url('/images/back1.jpg') no-repeat 100% 100%;
+    background-size: cover;
+}
+
+#wrapper-login-footer-list {
+    font-weight: normal;
+}
+
+#wrapper-login-footer-list li {
+    display: inline-block;
+    text-align: center;
+}
+
+#wrapper-login-footer-list a {
+    padding: 5px 15px;
+    color: #fff;
+    text-decoration: none;
+}
+
+#wrapper-login-footer-list a:hover {
+    color: #eee;
+}
+
+.btn-report {
+    color: #ffffff;
+    background-color: #00ff66;
+    border-color: transparent
+}
+
+.fc-event-time, .fc-event-title {
+    padding: 0 1px;
+}
+
+.fc-day-grid-event > .fc-content {
+    white-space: normal;
+}
+
+.modal-dashboard-1 {
+    width: 300px;
+    height: 200px;
+    position: absolute;
+    z-index: 1000;
+    top: 80px;
+    left: 170px;
+    margin-left: -150px;
+}
+
+.navbar-nav > li > a {
+    padding-top: 15px;
+    padding-bottom: 10px;
+}
+
+.select2-container .select2-selection--single .select2-selection__rendered {
+    margin-top: 0 !important;
+
+}
+
+.user-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin: 0 auto;
+}

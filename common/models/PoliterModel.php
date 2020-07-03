@@ -43,7 +43,7 @@ class PoliterModel extends ActiveRecord
             'new' => ['name' => 'create' . $class, 'description' => 'Создание'],
             'index' => ['name' => 'index' . $class, 'description' => 'Просмотр списка'],
             'tree' => ['name' => 'tree' . $class, 'description' => 'Дерево'],
-            'save' => ['name' => 'view' . $class, 'description' => 'Сохранение'],
+            'save' => ['name' => 'save' . $class, 'description' => 'Сохранение'],
             'delete' => ['name' => 'delete' . $class, 'description' => 'Удаление'],
         ];
     }

@@ -122,7 +122,7 @@ $defects = Defect::find()
                             try {
                                 echo '<img src="' . $qrCode->writeDataUri() . '"/>';
                             } catch (Exception $e) {
-                                Yii::error($e->getMessage(), 'backend/views/equipment/equipment-details.php');
+                                Yii::error($e->getMessage(), 'frontend/views/equipment/equipment-details.php');
                             }
                         }
                     }

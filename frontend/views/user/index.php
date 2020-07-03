@@ -12,7 +12,7 @@ $this->title = Yii::t('app', 'ПолиТЭР::Управление пользо�
 
 $gridColumns = [
     [
-        'attribute' => '_id',
+        'attribute' => 'id',
         'hAlign' => 'center',
         'vAlign' => 'middle',
         'contentOptions' => [
@@ -22,7 +22,22 @@ $gridColumns = [
         'headerOptions' => ['class' => 'text-center'],
         'mergeHeader' => true,
         'content' => function ($data) {
-            return Html::a($data->_id, ['timeline', 'id' => $data['_id']]);
+            return Html::a($data->id, ['timeline', 'id' => $data['id']]);
+        }
+    ],
+    [
+        'attribute' => 'image',
+        'hAlign' => 'center',
+        'vAlign' => 'middle',
+        'contentOptions' => [
+            'class' => 'table_class',
+            'style' => 'width: 50px; text-align: center;'
+        ],
+        'headerOptions' => ['class' => 'text-center'],
+        'header' => Yii::t('app', 'Аватар'),
+        'mergeHeader' => true,
+        'content' => function ($data) {
+            return '<img src="' . $data->getImageUrl() . '" class="user-image" alt="U">';
         }
     ],
     [
@@ -33,6 +48,7 @@ $gridColumns = [
             'class' => 'table_class'
         ],
         'headerOptions' => ['class' => 'text-center'],
+        'header' => Yii::t('app', 'Логин'),
         'editableOptions' => [
             'size' => 'lg',
         ],
@@ -61,7 +77,7 @@ $gridColumns = [
         'mergeHeader' => true,
         'headerOptions' => ['class' => 'text-center'],
         'content' => function ($data) {
-            $assignments = Yii::$app->getAuthManager()->getAssignments($data['userId']);
+            $assignments = Yii::$app->getAuthManager()->getAssignments($data['id']);
             $rights = '';
             foreach ($assignments as $value) {
                 if ($value->roleName == User::ROLE_ADMIN)
@@ -96,24 +112,24 @@ $gridColumns = [
         'attribute' => 'status',
         'format' => 'raw',
         'hAlign' => 'center',
+        'vAlign' => 'middle',
         'filter' => [
-            0 => 'Не активен',
-            1 => 'Активен',
+            9 => 'Не активен',
+            10 => 'Активен',
+            0 => 'Удален'
         ],
         'filterWidgetOptions' => [
             'pluginOptions' => ['allowClear' => true],
         ],
         'filterInputOptions' => ['placeholder' => Yii::t('app', 'Любой')],
         'filterType' => GridView::FILTER_SELECT2,
+        'header' => Yii::t('app', 'Статус'),
         'value' => function ($model, $key, $index, $column) {
-            $active = $model->{$column->attribute} == 1;
-            return Html::tag(
-                'span',
-                $active ? 'Активен' : 'Не активен',
-                [
-                    'class' => 'label label-' . ($active ? 'success' : 'danger'),
-                ]
-            );
+            if ($model->status == User::STATUS_DELETED)
+                return Html::tag('span', 'Удален', ['class' => 'label label-danger']);
+            if ($model->status == User::STATUS_ACTIVE)
+                return Html::tag('span', 'Активен', ['class' => 'label label-success']);
+            return Html::tag('span', 'Не активен', ['class' => 'label label-warning']);
         },
     ],
     [
@@ -121,7 +137,7 @@ $gridColumns = [
         'header' => Yii::t('app', 'Действия'),
         'buttons' => [
             'edit' => function ($url, $model) {
-                $url = Yii::$app->getUrlManager()->createUrl(['../users/edit', 'id' => $model['_id']]);
+                $url = Yii::$app->getUrlManager()->createUrl(['../user/edit', 'id' => $model['id']]);
                 return Html::a('<span class="fa fa-edit"></span>', $url,
                     [
                         'title' => Yii::t('app', 'Редактировать'),
@@ -148,11 +164,14 @@ echo GridView::widget([
     ],
     'toolbar' => [
         ['content' =>
-            Html::a(
-                Yii::t('app', 'Создать'),
-                ['/user-arm/create'],
-                ['class' => 'btn btn-success']
-            )
+            Html::a(Yii::t('app', 'Новый'),
+                ['/user/new'],
+                [
+                    'class' => 'btn btn-success',
+                    'title' => Yii::t('app', 'Новый'),
+                    'data-toggle' => 'modal',
+                    'data-target' => '#modalEditUsers'
+                ])
         ],
         '{export}',
     ],

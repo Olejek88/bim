@@ -3,7 +3,7 @@
 
 /*  @var $name string */
 
-use backend\assets\AdminLteAsset;
+use frontend\assets\AdminLteAsset;
 
 AdminLteAsset::register($this);
 ?>

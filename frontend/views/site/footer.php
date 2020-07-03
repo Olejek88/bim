@@ -1,5 +1,5 @@
 <div class="pull-right hidden-xs">
-    <b><?php echo Yii::t('app', 'Версия') ?></b> 0.0.5
+    <b><?php echo Yii::t('app', 'Версия') ?></b> 0.1
 </div>
 <?php use yii\helpers\Html;
 

@@ -1,13 +1,15 @@
 <?php
 
-use common\components\MainFunctions;
 use common\models\User;
+use frontend\models\Role;
+use kartik\file\FileInput;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\User */
 /* @var $roleList */
+/* @var $role Role */
 /* @var $form yii\widgets\ActiveForm */
 
 ?>
@@ -15,8 +17,9 @@ use yii\widgets\ActiveForm;
 <?php $form = ActiveForm::begin([
     'enableAjaxValidation' => false,
     'options' => [
-        'id' => 'editUserForm'
-    ],
+        'id' => 'editUserForm',
+        'enctype' => 'multipart/form-data'
+    ]
 ]);
 ?>
 <div class="modal-header">
@@ -26,14 +29,8 @@ use yii\widgets\ActiveForm;
 <div class="modal-body">
     <?php
     if (!$model->isNewRecord) {
-        echo $form->field($model, 'uuid')->hiddenInput(['maxlength' => true, 'readonly' => true])->label(false);
-    } else {
-        echo $form->field($model, 'uuid')->hiddenInput(['maxlength' => true, 'value' => (new MainFunctions)->GUID()])->label(false);
+        echo $form->field($model, 'id')->hiddenInput(['maxlength' => true, 'readonly' => true])->label(false);
     }
-    ?>
-
-    <?php echo $form->field($model, 'login')->textInput(['maxlength' => true, 'readonly' => !$model->isNewRecord]) ?>
-    <?php
     echo $form->field($model, 'pass')->passwordInput(['maxlength' => true, 'value' => '']);
     ?>
 
@@ -43,10 +40,10 @@ use yii\widgets\ActiveForm;
 
     <?php
     $items = [
-        '1' => Yii::t('app', 'Активный'),
-        '0' => Yii::t('app', 'Отключен'),
-        '2' => Yii::t('app', 'Удален')];
-    echo $form->field($model, 'active')->dropDownList($items);
+        '10' => Yii::t('app', 'Активный'),
+        '9' => Yii::t('app', 'Отключен'),
+        '0' => Yii::t('app', 'Удален')];
+    echo $form->field($model, 'status')->dropDownList($items);
     ?>
 
     <?php
@@ -77,12 +74,22 @@ use yii\widgets\ActiveForm;
 
 <script>
     $(document).on("beforeSubmit", "#editUserForm", function () {
-    }).on('submit', '#editUserForm', function (e) {
+    }).one('submit', function (e) {
         e.preventDefault();
+        let form = document.getElementById("editUserForm");
+        let fd = new FormData(form);
         $.ajax({
-            url: "../users/update<?= "?id=" . $model['_id']; ?>",
+            url: <?php
+            if (!$model->isNewRecord) {
+                echo '"../user/update?id=' . $model["id"] . '"';
+            } else {
+                echo '"../user/new"';
+            }
+            ?>,
+            data: fd,
+            processData: false,
+            contentType: false,
             type: "post",
-            data: $('#editUserForm').serialize(),
             success: function () {
                 $('#modalUser').modal('hide');
             },

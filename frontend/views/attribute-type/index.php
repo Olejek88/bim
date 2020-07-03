@@ -37,6 +37,12 @@ $gridColumns = [
         'content' => function ($data) {
             return $data->title;
         }
+    ],
+    [
+        'class' => 'kartik\grid\ActionColumn',
+        'headerOptions' => ['class' => 'kartik-sheet-style'],
+        'header' => Yii::t('app', 'Действия'),
+        'template' => '{delete}'
     ]
 ];
 try {

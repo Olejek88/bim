@@ -132,6 +132,23 @@ class User extends PoliterModel implements IdentityInterface
     }
 
     /**
+     * Labels.
+     *
+     * @return array
+     *
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return [
+            'username' => Yii::t('app', 'Имя пользователя'),
+            'name' => Yii::t('app', 'Логин'),
+            'status' => Yii::t('app', 'Статус'),
+            'type' => Yii::t('app', 'Тип'),
+        ];
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function behaviors()
@@ -237,20 +254,13 @@ class User extends PoliterModel implements IdentityInterface
      */
     public function getImageUrl()
     {
-        $dbName = Yii::$app->session->get('user.dbname');
         $noFileUrl = Yii::$app->request->baseUrl . '/images/unknown2.png';
         if ($this->image) {
-            $localPath = 'storage/' . $dbName . '/' . self::$_IMAGE_ROOT . '/' . $this->image;
+            $localPath = 'storage/' . self::$_IMAGE_ROOT . '/' . $this->image;
             if (file_exists($localPath)) {
-                /** @var User $identity */
-                $identity = Yii::$app->user->identity;
-                $userName = $identity->username;
-                $dir = 'storage/' . $userName . '/' . self::$_IMAGE_ROOT . '/'
-                    . $this->image;
-                return Yii::$app->request->getBaseUrl() . '/' . $dir;
+                return Yii::$app->request->getBaseUrl() . '/' . $localPath;
             } else {
                 return $noFileUrl;
-                // такого в штатном режиме быть не должно!
             }
         }
         return $noFileUrl;
@@ -264,8 +274,25 @@ class User extends PoliterModel implements IdentityInterface
      */
     public function getImageDir()
     {
-        $dbName = Yii::$app->session->get('user.dbname');
-        $dir = 'storage/' . $dbName . '/' . self::$_IMAGE_ROOT . '/';
+        $dir = 'storage/' . self::$_IMAGE_ROOT . '/';
         return $dir;
     }
+
+    /**
+     * @return array
+     */
+    public function getPermissions()
+    {
+        $class = explode('\\', get_class($this));
+        $class = $class[count($class) - 1];
+
+        $perm = parent::getPermissions();
+        $perm['new'] = 'new' . $class;
+        $perm['view'] = 'view' . $class;
+        $perm['edit'] = 'edit' . $class;
+        $perm['update'] = 'update' . $class;
+        $perm['timeline'] = 'timeline' . $class;
+        return $perm;
+    }
+
 }

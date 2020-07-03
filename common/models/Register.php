@@ -8,7 +8,7 @@ use Yii;
 
 /**
  * This is the model class for table "register".
- *
+ * журналы узлов учета содержат записи о всех событиях, которые связаны как с ними, так и с оборудованием, которое входит в их состав
  * @property int $_id [int(11)]
  * @property string $uuid
  * @property string $title

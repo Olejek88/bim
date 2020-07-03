@@ -1,8 +1,7 @@
 <?php
 
-namespace backend\models;
+namespace frontend\models;
 
-use frontend\models\AccessModel;
 use Yii;
 use yii\data\ArrayDataProvider;
 
