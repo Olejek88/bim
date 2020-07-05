@@ -21,7 +21,7 @@ class MeasureChannelSearch extends MeasureChannel
     {
         return [
             [['_id'], 'integer'],
-            [['uuid', 'title', 'equipmentUuid', 'measureTypeUuid', 'path', 'original_name', 'param_id', 'type'], 'safe'],
+            [['uuid', 'title', 'objectUuid', 'measureTypeUuid', 'path', 'original_name', 'param_id', 'type'], 'safe'],
         ];
     }
 
@@ -60,7 +60,7 @@ class MeasureChannelSearch extends MeasureChannel
             '_id' => $this->_id,
             'measureTypeUuid' => $this->measureTypeUuid,
             'type' => $this->type,
-            'equipmentUuid' => $this->equipmentUuid
+            'objectUuid' => $this->objectUuid
         ]);
 
         $query->andFilterWhere(['like', 'path', $this->path])

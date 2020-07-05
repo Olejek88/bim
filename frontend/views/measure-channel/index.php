@@ -1,6 +1,7 @@
 <?php
 /* @var $searchModel frontend\models\MeasureChannelSearch */
-
+/* @var $types */
+/* @var $objects */
 /* @var $dataProvider */
 
 use common\models\MeasureType;
@@ -23,21 +24,20 @@ $gridColumns = [
         'headerOptions' => ['class' => 'text-center'],
     ],
     [
-        'attribute' => 'equipmentUuid',
+        'attribute' => 'objectUuid',
         'vAlign' => 'middle',
-        'mergeHeader' => true,
         'contentOptions' => [
             'class' => 'table_class'
         ],
         'headerOptions' => ['class' => 'text-center'],
         'filterType' => GridView::FILTER_SELECT2,
-        'filter' => ArrayHelper::map($equipment, 'uuid', 'title'),
+        'filter' => ArrayHelper::map($objects, 'uuid', 'title'),
         'filterWidgetOptions' => [
             'pluginOptions' => ['allowClear' => true],
         ],
         'filterInputOptions' => ['placeholder' => 'Любой'],
         'content' => function ($data) {
-            return $data['equipment']->getFullTitle();
+            return $data['object']->getFullTitle();
         }
     ],
     [
@@ -151,10 +151,10 @@ echo GridView::widget([
     'toolbar' => [
         ['content' =>
             Html::a(Yii::t('app', 'Новый'),
-                ['/measure-channel/new', 'reference' => 'table'],
+                ['/measure-channel/new'],
                 [
                     'class' => 'btn btn-success',
-                    'title' => Yii::t('app', 'Новое'),
+                    'title' => Yii::t('app', 'Новый'),
                     'data-toggle' => 'modal',
                     'data-target' => '#modalAdd'
                 ])
@@ -183,13 +183,13 @@ echo GridView::widget([
     ],
 ]);
 
-$this->registerJs('$("#modalEdit").on("hidden.bs.modal",
+$this->registerJs('$("#modalAdd").on("hidden.bs.modal",
 function () {
     $(this).removeData();
 })');
 ?>
 
-<div class="modal remote fade" id="modalEdit">
+<div class="modal remote fade" id="modalAdd">
     <div class="modal-dialog" style="width: 700px">
         <div class="modal-content loader-lg" id="modalContent">
         </div>

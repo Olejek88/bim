@@ -13,7 +13,7 @@ use yii\db\Expression;
  * @property integer $_id
  * @property string $uuid
  * @property string $title
- * @property string $equipmentUuid
+ * @property string $objectUuid
  * @property string $measureTypeUuid
  * @property string $createdAt
  * @property string $changedAt
@@ -24,7 +24,7 @@ use yii\db\Expression;
  * @property integer $type
  *
  * @property MeasureType $measureType
- * @property Equipment $equipment
+ * @property Objects $object
  */
 class MeasureChannel extends PoliterModel
 {
@@ -60,9 +60,9 @@ class MeasureChannel extends PoliterModel
     public function rules()
     {
         return [
-            [['uuid', 'title', 'equipmentUuid', 'measureTypeUuid'], 'required'],
+            [['uuid', 'title', 'objectUuid', 'measureTypeUuid'], 'required'],
             [['createdAt', 'changedAt'], 'safe'],
-            [['uuid', 'equipmentUuid', 'measureTypeUuid'], 'string', 'max' => 50],
+            [['uuid', 'objectUuid', 'measureTypeUuid'], 'string', 'max' => 50],
             [['type'], 'integer'],
             [['title'], 'string', 'max' => 250],
         ];
@@ -77,8 +77,8 @@ class MeasureChannel extends PoliterModel
             '_id' => Yii::t('app', '№'),
             'uuid' => Yii::t('app', 'Uuid'),
             'title' => Yii::t('app', 'Название'),
-            'equipment' => Yii::t('app', 'Устройство'),
-            'equipmentUuid' => Yii::t('app', 'Устройство'),
+            'object' => Yii::t('app', 'Объект'),
+            'objectUuid' => Yii::t('app', 'Объект'),
             'measureType' => Yii::t('app', 'Тип измерения'),
             'measureTypeUuid' => Yii::t('app', 'Тип измерения'),
             'type' => Yii::t('app', 'Тип значений'),
@@ -98,8 +98,8 @@ class MeasureChannel extends PoliterModel
     /**
      * @return ActiveQuery
      */
-    public function getEquipment()
+    public function getObject()
     {
-        return $this->hasOne(Equipment::class, ['uuid' => 'equipmentUuid']);
+        return $this->hasOne(Objects::class, ['uuid' => 'objectUuid']);
     }
 }

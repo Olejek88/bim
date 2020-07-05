@@ -1,10 +1,10 @@
 <?php
 
-use common\models\Equipment;
-
-/* @var $model Equipment
- * @var $equipment
+/* @var $model Objects
+ * @var $object
  */
+
+use common\models\Objects;
 
 $measures = [];
 $categories = "[";
@@ -28,7 +28,7 @@ $categories .= "]";
     <div class="kv-expand-detail skip-export kv-grid-demo">
         <div class="skip-export kv-expanded-row kv-grid-demo" data-index="0" data-key="1">
             <div class="kv-detail-content">
-                <h3><?php echo $equipment['deviceType']->title ?></h3>
+                <h3><?php echo $object['deviceType']->title ?></h3>
                 <div class="row">
                     <div class="col-sm-2">
                         <table class="table table-bordered table-condensed table-hover small kv-table">

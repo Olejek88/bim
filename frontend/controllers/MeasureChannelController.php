@@ -3,6 +3,8 @@
 namespace frontend\controllers;
 
 use common\models\MeasureChannel;
+use common\models\MeasureType;
+use common\models\Objects;
 use common\models\User;
 use Exception;
 use frontend\models\MeasureChannelSearch;
@@ -11,6 +13,7 @@ use Yii;
 use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
+use yii\helpers\ArrayHelper;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -68,11 +71,14 @@ class MeasureChannelController extends Controller
     {
         $searchModel = new MeasureChannelSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
+        $objects = Objects::find()->orderBy('title DESC')->all();
+        $types = MeasureType::find()->orderBy('title DESC')->all();
         return $this->render(
             'index', [
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
+                'types' => $types,
+                'objects' => $objects
             ]
         );
     }
@@ -86,8 +92,16 @@ class MeasureChannelController extends Controller
     function actionNew()
     {
         $measureChannel = new MeasureChannel();
-        return $this->renderAjax('_add_form', [
-            'model' => $measureChannel
+        $objects = Objects::find()->orderBy('title DESC')->all();
+        $types = MeasureType::find()->orderBy('title DESC')->all();
+        $objects = ArrayHelper::map($objects, 'uuid', function ($data) {
+            return $data->getFullName();
+        });
+        $types = ArrayHelper::map($types, 'uuid', 'title');
+        return $this->renderAjax('_add_sensor_channel', [
+            'model' => $measureChannel,
+            'types' => $types,
+            'objects' => $objects
         ]);
     }
 

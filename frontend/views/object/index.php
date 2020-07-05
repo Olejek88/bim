@@ -1,11 +1,9 @@
 <?php
 /* @var $searchModel ObjectsSearch */
-/* @var $equipments Equipment[] */
 /* @var $objectTypes */
-
 /* @var $objectSubTypes */
 
-use common\models\Equipment;
+use common\models\MeasureChannel;
 use frontend\models\ObjectsSearch;
 use kartik\editable\Editable;
 use kartik\grid\GridView;
@@ -36,9 +34,11 @@ $gridColumns = [
         'value' => function () {
             return GridView::ROW_COLLAPSED;
         },
-        'detail' => function ($model) use ($equipments) {
-            return Yii::$app->controller->renderPartial('equipment-details', ['model' => $model,
-                'equipments' => $equipments]);
+        'detail' => function ($model) {
+            // TODO перенести в контроллер
+            $channels = MeasureChannel::find()->where(['objectUuid' => $model->uuid])->all();
+            return Yii::$app->controller->renderPartial('channels-details', ['model' => $model,
+                'channels' => $channels]);
         },
         'expandIcon' => '<span class="glyphicon glyphicon-expand"></span>',
         'headerOptions' => ['class' => 'kartik-sheet-style'],
@@ -212,7 +212,7 @@ echo GridView::widget([
     'toolbar' => [
         ['content' =>
             Html::a(Yii::t('app', 'Новый'),
-                ['/object/new', 'reference' => 'table'],
+                ['/object/new'],
                 [
                     'class' => 'btn btn-success',
                     'title' => Yii::t('app', 'Новое'),
