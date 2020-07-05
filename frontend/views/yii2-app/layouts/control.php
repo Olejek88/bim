@@ -64,10 +64,14 @@ foreach ($settings as $setting) {
             <div class="form-group">
                 <a href="../../object-type" style="color: white"><i class="fa fa-building"></i>&nbsp;
                     <?= Yii::t('app', 'Типы объектов'); ?></a><br/>
+                <a href="../../object-sub-type" style="color: white"><i class="fa fa-building"></i>&nbsp;
+                    <?= Yii::t('app', 'Подтипы объектов'); ?></a><br/>
                 <a href="../../attribute-type" style="color: white"><i class="fa fa-list"></i>&nbsp;
                     <?= Yii::t('app', 'Типы атрибутов'); ?></a><br/>
                 <a href="../../parameter-type" style="color: white"><i class="fa fa-paste"></i>&nbsp;
                     <?= Yii::t('app', 'Типы параметров'); ?></a><br/>
+                <a href="../../measure-type" style="color: white"><i class="fa fa-bar-chart"></i>&nbsp;
+                    <?= Yii::t('app', 'Типы измерений'); ?></a><br/>
             </div>
             <br/>
         </div>

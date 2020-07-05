@@ -43,7 +43,7 @@ use yii\helpers\Html;
         $.ajax({
             type: "post",
             data: $('#addMeasureTypeForm').serialize(),
-            url: "../measure-save/save",
+            url: "../measure-type/save",
             success: function (code) {
                 let message = JSON.parse(code);
                 if (message.code === 0) {

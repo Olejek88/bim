@@ -31,18 +31,7 @@ $gridColumns = [
     [
         'class' => 'kartik\grid\ActionColumn',
         'header' => 'Действия',
-        'buttons' => [
-            'edit' => function ($url, $model) {
-                $url = Yii::$app->getUrlManager()->createUrl(['../object-type/edit', 'id' => $model['_id']]);
-                return Html::a('<span class="fa fa-edit"></span>', $url,
-                    [
-                        'title' => Yii::t('app', 'Редактировать'),
-                        'data-toggle' => 'modal',
-                        'data-target' => '#modalAdd',
-                    ]);
-            },
-        ],
-        'template' => '{delete} {edit}',
+        'template' => '{delete}',
         'headerOptions' => ['class' => 'kartik-sheet-style'],
     ]
 ];

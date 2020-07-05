@@ -28,7 +28,7 @@ class ObjectSubType extends PoliterModel
      */
     public static function tableName()
     {
-        return '{{%object_type}}';
+        return '{{%object_sub_type}}';
     }
 
     public function behaviors()

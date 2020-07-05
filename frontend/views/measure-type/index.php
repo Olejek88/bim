@@ -29,18 +29,7 @@ $gridColumns = [
     [
         'class' => 'kartik\grid\ActionColumn',
         'header' => 'Действия',
-        'buttons' => [
-            'edit' => function ($url, $model) {
-                $url = Yii::$app->getUrlManager()->createUrl(['../measure-type/edit', 'id' => $model['_id']]);
-                return Html::a('<span class="fa fa-edit"></span>', $url,
-                    [
-                        'title' => Yii::t('app', 'Редактировать'),
-                        'data-toggle' => 'modal',
-                        'data-target' => '#modalAdd',
-                    ]);
-            },
-        ],
-        'template' => '{delete} {edit}',
+        'template' => '{delete}',
         'headerOptions' => ['class' => 'kartik-sheet-style'],
     ]
 ];
@@ -48,7 +37,6 @@ $gridColumns = [
 echo GridView::widget([
     'id' => 'requests-table',
     'dataProvider' => $dataProvider,
-    'filterModel' => $searchModel,
     'columns' => $gridColumns,
     'containerOptions' => ['style' => 'overflow: auto'], // only set when $responsive = false
     'headerRowOptions' => ['class' => 'kartik-sheet-style'],
@@ -86,7 +74,7 @@ echo GridView::widget([
     'hover' => true,
     'panel' => [
         'type' => GridView::TYPE_PRIMARY,
-        'heading' => '<i class="glyphicon glyphicon-wrench"></i>&nbsp; Измерения',
+        'heading' => '<i class="glyphicon glyphicon-wrench"></i>&nbsp; Типы измерений',
         'headingOptions' => ['style' => 'background: #337ab7']
     ],
 ]);

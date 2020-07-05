@@ -43,7 +43,7 @@ use yii\helpers\Html;
         $.ajax({
             type: "post",
             data: $('#addObjectTypeForm').serialize(),
-            url: "../object-type/save",
+            url: "../object-sub-type/save",
             success: function (code) {
                 let message = JSON.parse(code);
                 if (message.code === 0) {
