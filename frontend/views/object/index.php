@@ -263,6 +263,13 @@ $this->registerJs('$("#modalEvents").on("hidden.bs.modal",
 function () {
     $(this).removeData();
 })');
+$this->registerJs('$("#modalAdd").on("show.bs.modal",
+function () {
+    var w0 = document.getElementById(\'w0\');
+    if (w0) {
+      w0.id = \'w1\';
+    }
+})');
 $this->registerJs('$("#modalAdd").on("hidden.bs.modal",
 function () {
     $(this).removeData();

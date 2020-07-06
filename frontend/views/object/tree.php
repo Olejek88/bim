@@ -121,11 +121,12 @@ $this->title = Yii::t('app', 'Дерево объектов системы');
         </div>
     </div>
 <?php
-$this->registerJsFile('/js/custom/modules/list/jquery.fancytree.contextMenu.js', ['depends' => ['wbraganca\fancytree\FancytreeAsset']]);
-$this->registerJsFile('/js/custom/modules/list/jquery.contextMenu.min.js',
+$this->registerJsFile('/js/jquery.fancytree.contextMenu.js',
+    ['depends' => ['wbraganca\fancytree\FancytreeAsset']]);
+$this->registerJsFile('/js/jquery.contextMenu.min.js',
     ['depends' => ['yii\jui\JuiAsset']]);
-$this->registerCssFile('/css/custom/modules/list/ui.fancytree.css');
-$this->registerCssFile('/css/custom/modules/list/jquery.contextMenu.min.css');
+$this->registerCssFile('/css/ui.fancytree.css');
+$this->registerCssFile('/css/jquery.contextMenu.min.css');
 
 echo FancytreeWidget::widget(
     [

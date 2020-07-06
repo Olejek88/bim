@@ -110,13 +110,13 @@ class Objects extends PoliterModel
             '_id' => Yii::t('app', '№'),
             'uuid' => Yii::t('app', 'ID'),
             'title' => Yii::t('app', 'Название'),
-            'parentUuid' => Yii::t('app', 'Тип параметра'),
+            'parentUuid' => Yii::t('app', 'Родительский объект'),
             'objectTypeUuid' => Yii::t('app', 'Тип объекта'),
             'objectSubTypeUuid' => Yii::t('app', 'Подтип объекта'),
             'latitude' => Yii::t('app', 'Широта'),
             'longitude' => Yii::t('app', 'Долгота'),
-            'fiasGuid' => Yii::t('app', 'ID Fias'),
-            'fiasParentGuid' => Yii::t('app', 'ID Fias'),
+            'fiasGuid' => Yii::t('app', 'ID ФИАС'),
+            'fiasParentGuid' => Yii::t('app', 'ID Род.ФИАС'),
             'okato' => Yii::t('app', 'ОКАТО'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
@@ -186,4 +186,25 @@ class Objects extends PoliterModel
         return null;
     }
 
+    /**
+     * @return array
+     */
+    public function getPermissions()
+    {
+        $class = explode('\\', get_class($this));
+        $class = $class[count($class) - 1];
+
+        $perm = parent::getPermissions();
+        $perm['tree'] = 'tree' . $class;
+        $perm['save'] = 'save' . $class;
+        return $perm;
+    }
+
+    public function getFullTitle()
+    {
+        if ($this->objectType == ObjectType::REGION)
+            return $this->title;
+        return "не задано";
+        //return 'ул.' . $house->street->title . ', д.' . $house->number . ' - ' . $this->title;
+    }
 }

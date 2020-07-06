@@ -1,5 +1,6 @@
 <?php
 /* @var $object Objects */
+/* @var $objects Objects [] */
 /* @var $object_uuid */
 /* @var $objectTypes */
 
@@ -54,16 +55,12 @@ use yii\helpers\Html;
     if (isset($object_uuid) && $object_uuid) {
         echo $form->field($object, 'parentUuid')->hiddenInput(['value' => $object_uuid])->label(false);
     } else {
-        $objects = Objects::find()->where(['deleted' => 0])->all();
-        $items = array(
-            '00000000-0000-0000-0000-000000000000' => Yii::t('app', 'Область'),
-        );
         echo $form->field($object, 'parentUuid')->widget(Select2::class,
             [
-                'data' => $items,
+                'data' => $objects,
                 'language' => Yii::t('app', 'ru'),
                 'options' => [
-                    'placeholder' => Yii::t('app', 'Выберите тип..')
+                    'placeholder' => Yii::t('app', 'Не заполнять, если регион..')
                 ],
                 'pluginOptions' => [
                     'allowClear' => true
@@ -85,7 +82,7 @@ use yii\helpers\Html;
 
     echo $form->field($object, 'objectSubTypeUuid')->widget(Select2::class,
         [
-            'data' => $objectTypes,
+            'data' => $objectSubTypes,
             'language' => Yii::t('app', 'ru'),
             'options' => [
                 'placeholder' => Yii::t('app', 'Выберите подтип..')
@@ -190,6 +187,7 @@ use yii\helpers\Html;
         echo '<div id="map"/>';
     }
     ?>
+
 </div>
 <div class="modal-footer">
     <?php echo Html::submitButton(Yii::t('app', 'Отправить'), ['class' => 'btn btn-success']) ?>
@@ -206,7 +204,7 @@ use yii\helpers\Html;
             $.ajax({
                 type: "post",
                 data: $('#form-object').serialize(),
-                url: "../objects/save",
+                url: "../object/save",
                 success: function () {
                     $('#modalAdd').modal('hide');
                 },

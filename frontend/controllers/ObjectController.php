@@ -194,48 +194,73 @@ class ObjectController extends PoliterController
      * Build tree of equipment by user
      *
      * @return mixed
-     * @throws InvalidConfigException
      */
     public function actionTree()
     {
+        //const REGION = '4F7BC1D4-EA62-400F-9EC2-1BA289C7FCE2';
+        //const DISTRICT = '40876BDE-4933-443E-B3D1-5E8610DE8E24';
+        //const CITY = '9270E308-6125-42D3-93AD-A976E3DD5D2F';
+        //const CITY_DISTRICT = '461CDEBF-A320-4A96-BE6E-788B3E9267CF';
+        //const SUB_DISTRICT = '6A131086-AEAA-4513-8C9D-3CEAA979A2EC';
+        //const STREET = 'B23955CC-13AC-4D17-9394-5928C3D0A321';
+        //const OBJECT = 'A20871DA-A65D-42CB-983F-0B106C507F29';
+        $search = (isset($_GET['sq']) && !empty($_GET['sq'])) ? $_GET['sq'] : null;
+
         $fullTree = array();
-        $streets = Street::find()
-            ->select('*')
+        $districts = Objects::find()
+            ->where(['objectTypeUuid' => ObjectType::DISTRICT])
             ->andWhere(['deleted' => 0])
             ->orderBy('title')
             ->all();
-        foreach ($streets as $street) {
+        foreach ($districts as $district) {
             $fullTree['children'][] = [
-                'title' => $street['title'],
+                'title' => $district['title'],
                 'folder' => true
             ];
-            $houses = House::find()
-                ->where(['streetUuid' => $street['uuid']])
+            $cities = Objects::find()
+                ->where(['objectTypeUuid' => ObjectType::CITY])
+                ->andWhere(['parentUuid' => $district['uuid']])
                 ->andWhere(['deleted' => 0])
-                ->orderBy('number')
+                ->orderBy('title')
                 ->all();
-            foreach ($houses as $house) {
+            foreach ($cities as $city) {
                 $childIdx = count($fullTree['children']) - 1;
                 $fullTree['children'][$childIdx]['children'][] = [
-                    'title' => $house->getFullTitle(),
+                    'title' => $city['title'],
                     'folder' => true
                 ];
-                $objects = Objects::find()
-                    ->where(['houseUuid' => $house['uuid']])
+                $city_districts = Objects::find()
+                    ->where(['objectTypeUuid' => ObjectType::CITY_DISTRICT])
+                    ->andWhere(['parentUuid' => $city['uuid']])
                     ->andWhere(['deleted' => 0])
                     ->all();
-                foreach ($objects as $object) {
+                foreach ($city_districts as $city_district) {
                     $childIdx2 = count($fullTree['children'][$childIdx]['children']) - 1;
                     $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][] = [
-                        'title' => $object['objectType']['title'] . ' ' . $object['title'],
+                        'title' => $city_district['title'],
                         'folder' => true
                     ];
+                    $objects = Objects::find()
+                        ->where(['objectTypeUuid' => ObjectType::OBJECT])
+                        ->andWhere(['parentUuid' => $city_districts['uuid']])
+                        ->andWhere(['deleted' => 0])
+                        ->all();
+                    foreach ($objects as $object) {
+                        $childIdx3 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children']) - 1;
+                        $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][] = [
+                            'title' => $object->getFullTitle(),
+                            'folder' => false
+                        ];
+                    }
                 }
             }
         }
         return $this->render(
             'tree',
-            ['contragents' => $fullTree]
+            [
+                'objects' => $fullTree,
+                'sq' => $search
+            ]
         );
     }
 
@@ -249,14 +274,17 @@ class ObjectController extends PoliterController
         $object = new Objects();
         $objectTypes = ObjectType::find()->orderBy('title desc')->all();
         $objectSubTypes = ObjectSubType::find()->orderBy('title desc')->all();
+        $objects = Objects::find()->orderBy('title desc')->all();
 
         $objectSubTypes = ArrayHelper::map($objectSubTypes, 'uuid', 'title');
         $objectTypes = ArrayHelper::map($objectTypes, 'uuid', 'title');
+        $objects = ArrayHelper::map($objects, 'uuid', 'title');
 
         return $this->renderAjax('_add_form', [
             'object' => $object,
-            'objectTypes' => $objectTypes,
-            'objectSubTypes' => $objectSubTypes
+            'objects' => $objects,
+            'objectSubTypes' => $objectSubTypes,
+            'objectTypes' => $objectTypes
         ]);
     }
 
@@ -406,59 +434,22 @@ class ObjectController extends PoliterController
     /**
      * Creates a new Object model.
      * @return mixed
-     * @throws InvalidConfigException
      */
     public function actionSave()
     {
-        if (isset($_POST["type"]))
-            $type = $_POST["type"];
-        else $type = 0;
-        if (isset($_POST["source"]))
-            $source = $_POST["source"];
-        else $source = 0;
-
-        if ($type) {
-            if ($type == 'street') {
-                if (isset($_POST['streetUuid'])) {
-                    $model = Street::find()->where(['uuid' => $_POST['streetUuid']])->one();
-                    if ($model->load(Yii::$app->request->post())) {
-                        if ($model->save(false)) {
-                            if ($source)
-                                return $this->redirect([$source]);
-                            return $this->redirect(['/object/tree']);
-                        }
-                    }
-                }
-            }
-            if ($type == 'house') {
-                if (isset($_POST['houseUuid']))
-                    $model = House::find()->where(['uuid' => $_POST['houseUuid']])->limit(1)->one();
-                else
-                    $model = new House();
-                if ($model->load(Yii::$app->request->post())) {
-                    if ($model->save(false)) {
-                        if ($source)
-                            return $this->redirect([$source]);
-                        return $this->redirect(['/object/tree']);
-                    }
-                }
-            }
-            if ($type == 'object') {
-                if (isset($_POST['objectUuid']))
-                    $model = Objects::find()->where(['uuid' => $_POST['objectUuid']])->limit(1)->one();
-                else
-                    $model = new Objects();
-                if ($model->load(Yii::$app->request->post())) {
-                    if ($model->save(false)) {
-                        if ($source)
-                            return $this->redirect([$source]);
-                        return $this->redirect(['/object/tree']);
-                    }
-                }
+        if (isset($_POST['objectUuid']))
+            $model = Objects::find()->where(['uuid' => $_POST['objectUuid']])->limit(1)->one();
+        else
+            $model = new Objects();
+        if ($model->load(Yii::$app->request->post())) {
+            if ($model->save(false)) {
+                return $this->redirect(parse_url($_SERVER["HTTP_REFERER"], PHP_URL_PATH) . '?node=' . $model['_id'] . 'k');
+            } else {
+                $return['code'] = -1;
+                $return['message'] = json_encode($model->errors);
+                return json_encode($return);
             }
         }
-        if ($source)
-            return $this->redirect([$source]);
-        return $this->redirect(['/device/tree']);
+        return false;
     }
 }
