@@ -2,12 +2,15 @@
 /* @var $object Objects */
 /* @var $objects Objects [] */
 /* @var $object_uuid */
+/* @var $object_type */
 /* @var $objectTypes */
 
 /* @var $objectSubTypes */
 
 use common\components\MainFunctions;
 use common\models\Objects;
+use common\models\ObjectSubType;
+use common\models\ObjectType;
 use dosamigos\leaflet\layers\Marker;
 use dosamigos\leaflet\layers\TileLayer;
 use dosamigos\leaflet\LeafLet;
@@ -55,42 +58,58 @@ use yii\helpers\Html;
     if (isset($object_uuid) && $object_uuid) {
         echo $form->field($object, 'parentUuid')->hiddenInput(['value' => $object_uuid])->label(false);
     } else {
-        echo $form->field($object, 'parentUuid')->widget(Select2::class,
+        if ($object['uuid']) {
+            echo $form->field($object, 'parentUuid')->hiddenInput(['value' => $object['parentUuid']])->label(false);
+        } else {
+            echo $form->field($object, 'parentUuid')->widget(Select2::class,
+                [
+                    'data' => $objects,
+                    'language' => Yii::t('app', 'ru'),
+                    'options' => [
+                        'placeholder' => Yii::t('app', 'Не заполнять, если регион..')
+                    ],
+                    'pluginOptions' => [
+                        'allowClear' => true
+                    ],
+                ]);
+        }
+    }
+
+    if (isset($object_type) && $object_type) {
+        echo $form->field($object, 'objectTypeUuid')->hiddenInput(['value' => $object_type])->label(false);
+    } else {
+        if ($object['uuid']) {
+            echo $form->field($object, 'objectTypeUuid')->hiddenInput(['value' => $object['objectTypeUuid']])->label(false);
+        } else {
+            echo $form->field($object, 'objectTypeUuid')->widget(Select2::class,
+                [
+                    'data' => $objectTypes,
+                    'language' => Yii::t('app', 'ru'),
+                    'options' => [
+                        'placeholder' => Yii::t('app', 'Выберите тип..')
+                    ],
+                    'pluginOptions' => [
+                        'allowClear' => true
+                    ],
+                ]);
+        }
+    }
+
+    if (isset($object_type) && $object_type != ObjectType::OBJECT) {
+        echo $form->field($object, 'objectSubTypeUuid')->hiddenInput(['value' => ObjectSubType::GENERAL])->label(false);
+    } else {
+        echo $form->field($object, 'objectSubTypeUuid')->widget(Select2::class,
             [
-                'data' => $objects,
+                'data' => $objectSubTypes,
                 'language' => Yii::t('app', 'ru'),
                 'options' => [
-                    'placeholder' => Yii::t('app', 'Не заполнять, если регион..')
+                    'placeholder' => Yii::t('app', 'Выберите подтип..')
                 ],
                 'pluginOptions' => [
                     'allowClear' => true
                 ],
             ]);
     }
-
-    echo $form->field($object, 'objectTypeUuid')->widget(Select2::class,
-        [
-            'data' => $objectTypes,
-            'language' => Yii::t('app', 'ru'),
-            'options' => [
-                'placeholder' => Yii::t('app', 'Выберите тип..')
-            ],
-            'pluginOptions' => [
-                'allowClear' => true
-            ],
-        ]);
-
-    echo $form->field($object, 'objectSubTypeUuid')->widget(Select2::class,
-        [
-            'data' => $objectSubTypes,
-            'language' => Yii::t('app', 'ru'),
-            'options' => [
-                'placeholder' => Yii::t('app', 'Выберите подтип..')
-            ],
-            'pluginOptions' => [
-                'allowClear' => true
-            ],
-        ]);
 
     echo $form->field($object, 'fiasGuid')->textInput(['maxlength' => true]);
     echo $form->field($object, 'fiasParentGuid')->textInput(['maxlength' => true]);

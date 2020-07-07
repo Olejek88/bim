@@ -2,6 +2,8 @@
 
 namespace frontend\controllers;
 
+use common\models\MeasureChannel;
+use common\models\MeasureType;
 use common\models\Objects;
 use common\models\ObjectSubType;
 use common\models\ObjectType;
@@ -186,8 +188,56 @@ class ObjectController extends PoliterController
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
-        return $this->redirect(['index']);
+        $object = $this->findModel($id);
+        if ($object) {
+            $object->deleted = true;
+            $object->save();
+        }
+        return $this->redirect(parse_url($_SERVER["HTTP_REFERER"], PHP_URL_PATH) . '?node=' . $object['_id'] . 'k');
+    }
+
+    /**
+     * функция отрабатывает сигналы от дерева и выполняет отвязывание выбранного оборудования от пользователя
+     * @return mixed
+     */
+    public function actionDeleted()
+    {
+        $request = Yii::$app->request;
+        $selected_node = $request->post('selected_node');
+        $type = $request->post('type');
+
+        if ($selected_node && $type) {
+            if (is_numeric($selected_node)) {
+                if ($type == 'channel') {
+                    $channelById = MeasureChannel::find()->where(['_id' => $selected_node])
+                        ->andWhere(['deleted' => 0])
+                        ->limit(1)
+                        ->one();
+                    if ($channelById) {
+                        $channelById['deleted'] = true;
+                        $channelById->save();
+                        $return['code'] = 0;
+                        $return['message'] = '';
+                        return json_encode($return);
+                    }
+                } else {
+                    $objectById = Objects::find()->where(['_id' => $selected_node])
+                        ->andWhere(['deleted' => 0])
+                        ->limit(1)
+                        ->one();
+                    if ($objectById) {
+                        $objectById['deleted'] = true;
+                        $objectById->save();
+                        $return['code'] = 0;
+                        $return['message'] = '';
+                        return json_encode($return);
+                    }
+                }
+            }
+        }
+        $return['code'] = -1;
+        $return['message'] = 'Неправильно заданы параметры';
+        return json_encode($return);
     }
 
     /**
@@ -197,13 +247,6 @@ class ObjectController extends PoliterController
      */
     public function actionTree()
     {
-        //const REGION = '4F7BC1D4-EA62-400F-9EC2-1BA289C7FCE2';
-        //const DISTRICT = '40876BDE-4933-443E-B3D1-5E8610DE8E24';
-        //const CITY = '9270E308-6125-42D3-93AD-A976E3DD5D2F';
-        //const CITY_DISTRICT = '461CDEBF-A320-4A96-BE6E-788B3E9267CF';
-        //const SUB_DISTRICT = '6A131086-AEAA-4513-8C9D-3CEAA979A2EC';
-        //const STREET = 'B23955CC-13AC-4D17-9394-5928C3D0A321';
-        //const OBJECT = 'A20871DA-A65D-42CB-983F-0B106C507F29';
         $search = (isset($_GET['sq']) && !empty($_GET['sq'])) ? $_GET['sq'] : null;
 
         $fullTree = array();
@@ -215,6 +258,9 @@ class ObjectController extends PoliterController
         foreach ($districts as $district) {
             $fullTree['children'][] = [
                 'title' => $district['title'],
+                'key' => $district['_id'],
+                'type' => 'district',
+                'expanded' => true,
                 'folder' => true
             ];
             $cities = Objects::find()
@@ -227,6 +273,9 @@ class ObjectController extends PoliterController
                 $childIdx = count($fullTree['children']) - 1;
                 $fullTree['children'][$childIdx]['children'][] = [
                     'title' => $city['title'],
+                    'key' => $city['_id'],
+                    'type' => 'city',
+                    'expanded' => true,
                     'folder' => true
                 ];
                 $city_districts = Objects::find()
@@ -238,19 +287,58 @@ class ObjectController extends PoliterController
                     $childIdx2 = count($fullTree['children'][$childIdx]['children']) - 1;
                     $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][] = [
                         'title' => $city_district['title'],
+                        'type' => 'city_district',
+                        'key' => $city_district['_id'],
+                        'expanded' => true,
                         'folder' => true
                     ];
-                    $objects = Objects::find()
-                        ->where(['objectTypeUuid' => ObjectType::OBJECT])
-                        ->andWhere(['parentUuid' => $city_districts['uuid']])
+                    $streets = Objects::find()
+                        ->where(['objectTypeUuid' => ObjectType::STREET])
+                        ->andWhere(['parentUuid' => $city_district['uuid']])
                         ->andWhere(['deleted' => 0])
                         ->all();
-                    foreach ($objects as $object) {
+                    foreach ($streets as $street) {
                         $childIdx3 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children']) - 1;
                         $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][] = [
-                            'title' => $object->getFullTitle(),
-                            'folder' => false
+                            'title' => $street['title'],
+                            'type' => 'street',
+                            'key' => $street['_id'],
+                            'folder' => true
                         ];
+                        $objects = Objects::find()
+                            ->where(['objectTypeUuid' => ObjectType::OBJECT])
+                            ->andWhere(['parentUuid' => $street['uuid']])
+                            ->andWhere(['deleted' => 0])
+                            ->all();
+                        foreach ($objects as $object) {
+                            $childIdx4 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children']) - 1;
+                            $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children'][] = [
+                                'title' => $object->getFullTitle(),
+                                'type' => 'object',
+                                'type_title' => $object->objectSubType->title,
+                                'key' => $object['_id'],
+                                'folder' => true
+                            ];
+                            /** @var MeasureChannel[] $channels */
+                            $channels = MeasureChannel::find()
+                                ->where(['objectUuid' => $object['uuid']])
+                                ->andWhere(['deleted' => 0])
+                                ->all();
+                            foreach ($channels as $channel) {
+                                $childIdx5 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children']) - 1;
+                                $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children'][$childIdx5]['children'][] = [
+                                    'title' => $channel->title,
+                                    'type' => 'channel',
+                                    'type_title' => $channel->measureType->title,
+                                    'value' => $channel->getLastMeasure(),
+                                    'measure_type' => $channel->getTypeName(),
+                                    'original' => $channel->original_name,
+                                    'parameter' => $channel->param_id,
+                                    'key' => $channel['_id'] . 'k',
+                                    'folder' => false
+                                ];
+                            }
+                        }
                     }
                 }
             }
@@ -280,155 +368,86 @@ class ObjectController extends PoliterController
         $objectTypes = ArrayHelper::map($objectTypes, 'uuid', 'title');
         $objects = ArrayHelper::map($objects, 'uuid', 'title');
 
-        return $this->renderAjax('_add_form', [
-            'object' => $object,
-            'objects' => $objects,
-            'objectSubTypes' => $objectSubTypes,
-            'objectTypes' => $objectTypes
-        ]);
-    }
+        $object_uuid = null;
+        $object_type = null;
+        if ($_POST['selected_node']) {
+            /** @var Objects $currentObject */
+            $currentObject = Objects::find()->where(['_id' => $_POST['selected_node']])->one();
+            if ($currentObject) {
+                $object_uuid = $currentObject['uuid'];
+                $object_type = $currentObject->getChildObjectType();
+                if ($object_type == 1) {
+                    $measureChannel = new MeasureChannel();
+                    $types = MeasureType::find()->orderBy('title DESC')->all();
+                    $types = ArrayHelper::map($types, 'uuid', 'title');
 
-    /**
-     * функция отрабатывает сигналы от дерева и выполняет добавление нового оборудования или объекта
-     *
-     * @return mixed
-     */
-    public function actionAdd()
-    {
-        if (isset($_POST["selected_node"])) {
-            $folder = $_POST["folder"];
-            if (isset($_POST["uuid"]))
-                $uuid = $_POST["uuid"];
-            else $uuid = 0;
-            if (isset($_POST["type"]))
-                $type = $_POST["type"];
-            else $type = 0;
-
-            if ($folder == "true" && $uuid && $type) {
-                if ($type == 'street') {
-                    $house = new House();
-                    return $this->renderAjax('_add_house_form', [
-                        'streetUuid' => $uuid,
-                        'house' => $house
-                    ]);
-                }
-                if ($type == 'house') {
-                    $object = new Objects();
-                    return $this->renderAjax('_add_object_form', [
-                        'houseUuid' => $uuid,
-                        'object' => $object
+                    return $this->renderAjax('../measure-channel/_add_sensor_channel', [
+                        'model' => $measureChannel,
+                        'types' => $types,
+                        'object_uuid' => $object_uuid,
+                        'objects' => null
                     ]);
                 }
             }
         }
-        return 'Нельзя добавить объект в этом месте';
+        //return 'Нельзя добавить объект в этом месте';
+
+        return $this->renderAjax('_add_form', [
+            'object' => $object,
+            'objects' => $objects,
+            'objectSubTypes' => $objectSubTypes,
+            'objectTypes' => $objectTypes,
+            'object_uuid' => $object_uuid,
+            'object_type' => $object_type
+        ]);
     }
 
     /**
      * функция отрабатывает сигналы от дерева и выполняет редактирование оборудования
      *
      * @return mixed
-     * @throws InvalidConfigException
      */
     public function actionEdit()
     {
-        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
-            return 'Нет прав.';
-        }
+        $objectTypes = ObjectType::find()->orderBy('title desc')->all();
+        $objectSubTypes = ObjectSubType::find()->orderBy('title desc')->all();
+        $objects = Objects::find()->orderBy('title desc')->all();
 
-        if (isset($_POST["selected_node"])) {
-            if (isset($_POST["uuid"]))
-                $uuid = $_POST["uuid"];
-            else $uuid = 0;
-            if (isset($_POST["type"]))
-                $type = $_POST["type"];
-            else $type = 0;
+        $objectSubTypes = ArrayHelper::map($objectSubTypes, 'uuid', 'title');
+        $objectTypes = ArrayHelper::map($objectTypes, 'uuid', 'title');
+        $objects = ArrayHelper::map($objects, 'uuid', 'title');
 
-            if ($uuid && $type) {
-                if ($type == 'street') {
-                    $street = Street::find()->where(['uuid' => $uuid])->one();
-                    if ($street) {
-                        return $this->renderAjax('_add_street_form', [
-                            'street' => $street,
-                            'streetUuid' => $uuid
-                        ]);
-                    }
-                }
-                if ($type == 'house') {
-                    $house = House::find()->where(['uuid' => $uuid])->one();
-                    if ($house) {
-                        return $this->renderAjax('_add_house_form', [
-                            'houseUuid' => $uuid,
-                            'house' => $house
-                        ]);
-                    }
-                }
+        $request = Yii::$app->request;
+        $type = $request->post('type');
 
-                if ($type == 'object') {
-                    $object = Objects::find()->where(['uuid' => $uuid])->limit(1)->one();
-                    if ($object) {
-                        return $this->renderAjax('_add_object_form', [
-                            'objectUuid' => $uuid,
-                            'object' => $object
-                        ]);
-                    }
-                }
+        $object_uuid = null;
+        $object_type = null;
+        if ($_POST['selected_node'] && $type) {
+            /** @var Objects $currentObject */
+            $object = Objects::find()->where(['_id' => $_POST['selected_node']])->one();
+            if ($type == 'object' && $object) {
+                return $this->renderAjax('_add_form', [
+                    'object' => $object,
+                    'objects' => $objects,
+                    'objectSubTypes' => $objectSubTypes,
+                    'objectTypes' => $objectTypes,
+                    'object_type' => $object_type
+                ]);
+            }
+
+            /** @var MeasureChannel $measureChannel */
+            $measureChannel = MeasureChannel::find()->where(['_id' => $_POST['selected_node']])->one();
+            if ($type == 'channel' && $measureChannel) {
+                $types = MeasureType::find()->orderBy('title DESC')->all();
+                $types = ArrayHelper::map($types, 'uuid', 'title');
+                return $this->renderAjax('../measure-channel/_add_sensor_channel', [
+                    'model' => $measureChannel,
+                    'types' => $types,
+                    'object_uuid' => $object_uuid,
+                    'objects' => null
+                ]);
             }
         }
-        return 'Нельзя отредактировать этот объект';
-    }
-
-    /**
-     * функция отрабатывает сигналы от дерева и выполняет удаление
-     *
-     * @return mixed
-     * @throws StaleObjectException
-     * @throws Throwable
-     */
-    public function actionRemove()
-    {
-        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
-            return 'Нет прав.';
-        }
-
-        if (isset($_POST["selected_node"])) {
-            if (isset($_POST["uuid"]))
-                $uuid = $_POST["uuid"];
-            else $uuid = 0;
-            if (isset($_POST["type"]))
-                $type = $_POST["type"];
-            else $type = 0;
-
-            if ($uuid && $type) {
-                if ($type == 'street') {
-                    $street = Street::find()->where(['uuid' => $uuid])->limit(1)->one();
-                    if ($street) {
-                        $house = House::find()->where(['streetUuid' => $street['uuid']])->limit(1)->one();
-                        if (!$house) {
-                            $street->delete();
-                        }
-                    }
-                }
-                if ($type == 'house') {
-                    $house = House::find()->where(['uuid' => $uuid])->limit(1)->one();
-                    if ($house) {
-                        $object = Objects::find()->where(['houseUuid' => $house['uuid']])->limit(1)->one();
-                        if (!$object) {
-                            $house->delete();
-                        }
-                    }
-                }
-                if ($type == 'object') {
-                    $object = Objects::find()->where(['uuid' => $uuid])->one();
-                    if ($object) {
-                        $object['deleted'] = true;
-                        $object->save();
-                    }
-
-                }
-            }
-        }
-        return 'Нельзя удалить этот объект';
     }
 
     /**

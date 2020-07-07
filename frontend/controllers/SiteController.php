@@ -471,7 +471,6 @@ class SiteController extends Controller
         $objectSelect = Objects::find()
             ->select('_id, title, latitude, longitude')
             ->where(['deleted' => 0])
-            ->asArray()
             ->all();
 
         $default_coordinates = new LatLng(['lat' => 55.54, 'lng' => 61.36]);

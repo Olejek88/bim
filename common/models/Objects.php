@@ -196,15 +196,42 @@ class Objects extends PoliterModel
 
         $perm = parent::getPermissions();
         $perm['tree'] = 'tree' . $class;
+        $perm['deleted'] = 'deleted' . $class;
         $perm['save'] = 'save' . $class;
+        $perm['edit'] = 'edit' . $class;
         return $perm;
     }
 
     public function getFullTitle()
     {
-        if ($this->objectType == ObjectType::REGION)
+        if ($this->objectTypeUuid == ObjectType::REGION)
             return $this->title;
+        if ($this->objectTypeUuid == ObjectType::OBJECT) {
+            return 'ул.' . $this->parent->title . ', ' . $this->title;
+        }
         return "не задано";
         //return 'ул.' . $house->street->title . ', д.' . $house->number . ' - ' . $this->title;
     }
+
+    /**
+     * @return string|null
+     */
+    public function getChildObjectType()
+    {
+        if ($this->objectTypeUuid == ObjectType::REGION)
+            return ObjectType::DISTRICT;
+        if ($this->objectTypeUuid == ObjectType::DISTRICT)
+            return ObjectType::CITY;
+        if ($this->objectTypeUuid == ObjectType::CITY)
+            return ObjectType::CITY_DISTRICT;
+        if ($this->objectTypeUuid == ObjectType::CITY_DISTRICT)
+            return ObjectType::STREET;
+        if ($this->objectTypeUuid == ObjectType::STREET)
+            return ObjectType::OBJECT;
+        if ($this->objectTypeUuid == ObjectType::OBJECT)
+            return 1;
+        return null;
+        //return 'ул.' . $house->street->title . ', д.' . $house->number . ' - ' . $this->title;
+    }
+
 }

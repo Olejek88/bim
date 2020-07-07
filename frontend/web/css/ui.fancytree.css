@@ -563,3 +563,7 @@ table.fancytree-ext-columnview span.fancytree-node.fancytree-expanded {
 table.fancytree-ext-columnview span.fancytree-node.fancytree-active {
     background-color: royalblue;
 }
+
+span.fancytree-title {
+    padding-top: 2px !important;
+}

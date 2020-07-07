@@ -112,10 +112,14 @@ class MeasureChannelController extends Controller
     public
     function actionSave()
     {
-        $model = new MeasureChannel();
+        if (isset($_POST['channelUuid'])) {
+            $model = MeasureChannel::find()->where(['uuid' => $_POST['channelUuid']])->limit(1)->one();
+        } else {
+            $model = new MeasureChannel();
+        }
         if ($model->load(Yii::$app->request->post())) {
             if ($model->save(false)) {
-                return $this->redirect('../measure-channel/index');
+                return $this->redirect(parse_url($_SERVER["HTTP_REFERER"], PHP_URL_PATH) . '?node=' . $model['_id'] . 'k');
             } else {
                 $message = '';
                 foreach ($model->errors as $key => $error) {

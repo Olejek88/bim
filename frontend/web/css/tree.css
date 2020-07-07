@@ -175,3 +175,7 @@ a.description {
 .all-tables td:first-child, .all-tables th:first-child {
     border-left: 0;
 }
+
+.span.fancytree-title {
+    padding-top: 2px !important;
+}

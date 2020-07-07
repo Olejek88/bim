@@ -1,6 +1,7 @@
 <?php
 /* @var $model common\models\MeasureChannel */
 /* @var $objects */
+/* @var $object_uuid */
 /* @var $measureChannels */
 
 /* @var $types */
@@ -21,12 +22,12 @@ use yii\helpers\Html;
 ?>
 <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal">&times;</button>
-    <h4 class="modal-title">Добавить канал измерения</h4>
+    <h4 class="modal-title">Канал измерения</h4>
 </div>
 <div class="modal-body">
     <?php
     if ($model['uuid']) {
-        echo Html::hiddenInput("sensorUuid", $model['uuid']);
+        echo Html::hiddenInput("channelUuid", $model['uuid']);
         echo $form->field($model, 'uuid')->hiddenInput(['value' => $model['uuid']])->label(false);
     } else
         echo $form->field($model, 'uuid')->hiddenInput(['value' => MainFunctions::GUID()])->label(false);
@@ -34,14 +35,22 @@ use yii\helpers\Html;
 
     <?php
     echo $form->field($model, 'title')->textInput(['maxlength' => true]);
-    echo $form->field($model, 'objectUuid')->widget(Select2::class,
-        [
-            'data' => $objects,
-            'options' => ['placeholder' => Yii::t('app', 'Выберите объект ...')],
-            'pluginOptions' => [
-                'allowClear' => true
-            ],
-        ])->label(false);
+    if (isset($object_uuid)) {
+        echo $form->field($model, 'objectUuid')->hiddenInput(['value' => $object_uuid])->label(false);
+    } else {
+        if ($model['uuid']) {
+            echo $form->field($model, 'objectUuid')->hiddenInput(['value' => $model['objectUuid']])->label(false);
+        } else {
+            echo $form->field($model, 'objectUuid')->widget(Select2::class,
+                [
+                    'data' => $objects,
+                    'options' => ['placeholder' => Yii::t('app', 'Выберите объект ...')],
+                    'pluginOptions' => [
+                        'allowClear' => true
+                    ],
+                ]);
+        }
+    }
     echo $form->field($model, 'measureTypeUuid')->widget(Select2::class,
         [
             'data' => $types,
@@ -49,7 +58,7 @@ use yii\helpers\Html;
             'pluginOptions' => [
                 'allowClear' => true
             ],
-        ])->label(false);
+        ]);
 
     echo $form->field($model, 'type')->widget(Select2::class,
         [
@@ -58,7 +67,7 @@ use yii\helpers\Html;
             'pluginOptions' => [
                 'allowClear' => true
             ],
-        ])->label(false);
+        ]);
     echo $form->field($model, 'path')->textInput(['maxlength' => true]);
     echo $form->field($model, 'original_name')->textInput(['maxlength' => true]);
     echo $form->field($model, 'param_id')->textInput(['maxlength' => true]);
@@ -69,7 +78,10 @@ use yii\helpers\Html;
     <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
 </div>
 <script>
-    $(document).on("beforeSubmit", "#formMeasureChannel", function () {
+    $(document).one("beforeSubmit", "#formMeasureChannel", function (e) {
+        e.preventDefault();
+    }).one('submit', function (e) {
+        e.preventDefault();
         $.ajax({
             url: "../measure-channel/save",
             type: "post",
@@ -79,9 +91,7 @@ use yii\helpers\Html;
             },
             error: function () {
             }
-        })
-    }).on('submit', function (e) {
-        e.preventDefault();
+        });
     });
 </script>
 <?php ActiveForm::end(); ?>

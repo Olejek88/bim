@@ -12,7 +12,7 @@ $this->title = Yii::t('app', 'Дерево объектов системы');
     <table id="tree" style="width: 100%">
         <colgroup>
             <col width="*">
-            <col width="140px">
+            <col width="*">
             <col width="100px">
             <col width="90px">
             <col width="125px">
@@ -21,7 +21,7 @@ $this->title = Yii::t('app', 'Дерево объектов системы');
         </colgroup>
         <thead style="color: white" class="thead_tree">
         <tr>
-            <th style="vertical-align: center" colspan="2">
+            <th style="vertical-align: center" colspan="1">
                 <table>
                     <tr>
                         <td>
@@ -58,33 +58,34 @@ $this->title = Yii::t('app', 'Дерево объектов системы');
                     </tr>
                 </table>
             </th>
-            <th style="vertical-align: center" colspan="3">
+            <!--            <th style="vertical-align: center" colspan="3">
                 <form action="" class="form-inline">
                     <table style="vertical-align: center">
                         <tr>
                             <td>
                                 <?php
-                                echo Html::textInput('sq', $sq, [
-                                    'class' => 'form-control',
-                                    'style' => 'background-color: white',
-                                    'id' => 'sq',
-                                ]);
-                                ?>
+            /*                                echo Html::textInput('sq', $sq, [
+                                                'class' => 'form-control',
+                                                'style' => 'background-color: white',
+                                                'id' => 'sq',
+                                            ]);
+                                            */ ?>
                             </td>
                             <td>
                                 <?php
-                                if (!empty($sq)) {
-                                    echo '<a class="btn btn-info" href="/objects/tree">x</a>';
-                                }
-                                ?>
+            /*                                if (!empty($sq)) {
+                                                echo '<a class="btn btn-info" href="/objects/tree">x</a>';
+                                            }
+                                            */ ?>
                                 <button class="btn btn-info"
-                                        type="submit"><?php echo Yii::t('app', 'Искать') ?></button>
+                                        type="submit"><?php /*echo Yii::t('app', 'Искать') */ ?></button>
                             </td>
                         </tr>
                     </table>
                 </form>
             </th>
-            <th align="center" colspan="5"><?php echo Yii::t('app', 'Объекты системы - каналы') ?></th>
+-->
+            <th align="center" colspan="6"><?php echo Yii::t('app', 'Объекты системы - каналы') ?></th>
         </tr>
         <tr>
             <th align="center"><?php echo Yii::t('app', 'Объект') ?></th>
@@ -116,7 +117,7 @@ $this->title = Yii::t('app', 'Дерево объектов системы');
     </div>
     <div class="modal remote fade" id="modalAdd">
         <div class="modal-dialog" style="width: 800px; height: 400px">
-            <div class="modal-content loader-lg" style="margin: 10px; padding: 10px">
+            <div class="modal-content loader-lg" style="margin: 10px; padding: 10px" id="modalContent">
             </div>
         </div>
     </div>
@@ -153,36 +154,11 @@ echo FancytreeWidget::widget(
                                 data: {
                                     selected_node: node.key,
                                     folder: node.folder,
-                                    uuid: node.data.uuid,
-                                    reference: "objects"
+                                    uuid: node.data.uuid
                                 },
                                 success: function (data) { 
                                     $(\'#modalAdd\').modal(\'show\');
                                     $(\'#modalContent\').html(data);
-                                }
-                           }); 
-                        }                        
-                    }')
-                    ],
-                    'new2' => [
-                        'name' => Yii::t('app', 'Добавить новый канал'),
-                        'icon' => 'add',
-                        'callback' => new JsExpression('function(key, opt) {
-                        var node = $.ui.fancytree.getNode(opt.$trigger);
-                        if (node.folder==true) {
-                            $.ajax({
-                                url: "../measure-channel/new",
-                                type: "post",
-                                data: {
-                                    selected_node: node.key,
-                                    folder: node.folder,
-                                    uuid: node.data.uuid,
-                                    type: node.type,
-                                    type_uuid: node.data.type_uuid
-                                },
-                                success: function (data) { 
-                                    $(\'#modalAddChannel\').modal(\'show\');
-                                    $(\'#modalContentChannel\').html(data);
                                 }
                            }); 
                         }                        
@@ -211,8 +187,8 @@ echo FancytreeWidget::widget(
                            }); 
                         } else {
                             $.ajax({
-                                url: "../objects/edit",
-                                type: "get",
+                                url: "../object/edit",
+                                type: "post",
                                 data: {
                                     selected_node: node.key,
                                     folder: node.folder,
@@ -229,8 +205,8 @@ echo FancytreeWidget::widget(
                                         var message = JSON.parse(data);
                                         alert(message.message);
                                     } else {
-                                        $(\'#modalAddChannel\').modal(\'show\');
-                                        $(\'#modalContentChannel\').html(data);
+                                        $(\'#modalAdd\').modal(\'show\');
+                                        $(\'#modalContent\').html(data);
                                     }
                                 }
                             });  
@@ -291,10 +267,10 @@ echo FancytreeWidget::widget(
             'table' => [
                 'indentation' => 20,
                 "titleColumnIdx" => "1",
-                "measureTypeColumnIdx" => "2",
+                "type_titleColumnIdx" => "2",
                 "valueColumnIdx" => "3",
-                "typeColumnIdx" => "4",
-                "nameColumnIdx" => "5",
+                "measure_typeColumnIdx" => "4",
+                "originalColumnIdx" => "5",
                 "parameterColumnIdx" => "6",
                 "linksColumnIdx" => "7"
             ],
@@ -302,10 +278,10 @@ echo FancytreeWidget::widget(
                 'function(event, data) {
                     var node = data.node;
                     $tdList = $(node.tr).find(">td");
-                    $tdList.eq(1).text(node.data.measureType);
+                    $tdList.eq(1).text(node.data.type_title);
                     $tdList.eq(2).html(node.data.value);           
-                    $tdList.eq(3).html(node.data.type);
-                    $tdList.eq(4).html(node.data.name);
+                    $tdList.eq(3).html(node.data.measure_type);
+                    $tdList.eq(4).html(node.data.original);
                     $tdList.eq(5).html(node.data.parameter);
                     $tdList.eq(6).html(node.data.links);
                 }'
@@ -388,7 +364,7 @@ $this->registerJs('$("#expandButton").on("click",function() {
 
 $this->registerJs('$("#expandButton2").on("click",function() {
     $("#tree").fancytree("getRootNode").visit(function(node){
-        if(node.getLevel() < 4) {
+        if(node.getLevel() < 6) {
             node.setExpanded(true);
         } else node.setExpanded(false);
     });
@@ -455,7 +431,6 @@ $this->registerJs('
         .forEach(function (item) {
             tmp = item.split("=");
             if (tmp[0] === "node") {
-                console.log(decodeURIComponent(tmp[1])); 
                 $.ui.fancytree.getTree().activateKey(decodeURIComponent(tmp[1]));
                 var node = $.ui.fancytree.getTree("#tree").getActiveNode();
                 node.setFocus();
@@ -467,4 +442,11 @@ $this->registerJs('
             }            
         });
 ');
+$this->registerJs('$("#modalAdd").on("show.bs.modal",
+function () {
+    var w0 = document.getElementById(\'w0\');
+    if (w0) {
+      w0.id = \'w1\';
+    }
+})');
 ?>
