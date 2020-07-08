@@ -8,7 +8,7 @@
 use kartik\select2\Select2;
 use yii\helpers\Html;
 
-$this->title = Yii::t('app', 'ПолиТЭР::Новости');
+$this->title = Yii::t('app', 'ПолиТЭР::Лента событий');
 $type = htmlspecialchars(Yii::$app->request->getQueryParam('type', 0));
 ?>
 
@@ -17,7 +17,7 @@ $type = htmlspecialchars(Yii::$app->request->getQueryParam('type', 0));
     <section class="content-header">
         <h1>
             <?php echo Yii::t('app', 'Лента событий') ?>
-            <small><?php echo Yii::t('app', 'зарегистрированные дефекты, выполненные наряды, события системы') ?></small>
+            <small><?php echo Yii::t('app', 'изменение параметров объектов, запланированные мероприятия, действия операторов') ?></small>
         </h1>
         <form action="">
             <table style="width: 400px; padding: 3px">
@@ -32,7 +32,8 @@ $type = htmlspecialchars(Yii::$app->request->getQueryParam('type', 0));
                                 'data' => [
                                     Yii::t('app', 'Все события'),
                                     Yii::t('app', 'Объекты'),
-                                    Yii::t('app', 'Параметры')
+                                    Yii::t('app', 'Мероприятия'),
+                                    Yii::t('app', 'Действия операторов')
                                 ],
                                 'options' => ['placeholder' => Yii::t('app', 'Тип события')],
                                 'pluginOptions' => [

@@ -21,13 +21,12 @@ $gridColumns = [
         'headerOptions' => ['class' => 'text-center'],
         'mergeHeader' => true,
         'content' => function ($data) {
-            return date("d-m-Y", strtotime($data->date));
+            return date("d-m-Y h:i:s", strtotime($data->date));
         }
     ],
     [
         'attribute' => 'measureChannelUuid',
         'vAlign' => 'middle',
-        'mergeHeader' => true,
         'contentOptions' => [
             'class' => 'table_class'
         ],
@@ -40,13 +39,14 @@ $gridColumns = [
         ],
         'filterInputOptions' => ['placeholder' => 'Любой'],
         'content' => function ($data) {
-            return $data['measureChannel']->getFullTitle();
+            return $data['measureChannel']['object']->getFullTitle() . '/' . $data['measureChannel']['title'];
         }
     ],
     [
         'vAlign' => 'middle',
         'width' => '150px',
         'header' => 'Тип измерения',
+        'mergeHeader' => true,
         'format' => 'raw',
         'contentOptions' => [
             'class' => 'table_class'
@@ -87,7 +87,14 @@ echo GridView::widget([
     ],
     'toolbar' => [
         ['content' =>
-            Html::a('Новый', ['/measure/create'], ['class' => 'btn btn-success'])
+            Html::a(Yii::t('app', 'Новый'),
+                ['/measure/new'],
+                [
+                    'class' => 'btn btn-success',
+                    'title' => Yii::t('app', 'Новое'),
+                    'data-toggle' => 'modal',
+                    'data-target' => '#modalAdd'
+                ])
         ],
         '{export}',
     ],
@@ -112,3 +119,17 @@ echo GridView::widget([
         'headingOptions' => ['style' => 'background: #337ab7']
     ],
 ]);
+
+$this->registerJs('$("#modalAdd").on("hidden.bs.modal",
+function () {
+    $(this).removeData();
+})');
+
+?>
+<div class="modal remote fade" id="modalAdd">
+    <div class="modal-dialog" style="width: 800px; height: 400px">
+        <div class="modal-content loader-lg" style="margin: 10px; padding: 10px">
+        </div>
+    </div>
+</div>
+

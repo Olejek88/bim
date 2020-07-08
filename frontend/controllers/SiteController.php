@@ -260,42 +260,48 @@ class SiteController extends Controller
             $type = null;
         }
 
-        if ($type == 2) {
-        }
-
-        $events = Event::find()
-            ->orderBy('date DESC')
-            ->limit(5)
-            ->all();
-        if ($type == null) {
-            foreach ($events as $event) {
-                $text = '<i class="fa fa-desktop"></i>&nbsp; ' . Yii::t('app', 'Система') . ': 
-                <span class="btn btn-default btn-xs">' . $event['externalTag']['externalSystem']->title .
-                    ' [' . $event['externalTag']['externalSystem']->address . ']</span><br/>
-                <i class="fa fa-exclamation"></i>&nbsp' . Yii::t('app', 'Тег') . ': 
-                    <span class="btn btn-primary btn-xs">' . $event['externalTag']->tag .
-                    ' [' . $event['externalTag']->value . ']</span><br/>
-                <i class="fa fa-cogs"></i>&nbsp;' . Yii::t('app', 'Оборудование') . ': 
-                    <span class="btn btn-default btn-xs">' . $event['externalTag']['equipment']->title . '</span><br/>
-                <i class="fa fa-plug"></i>&nbsp;' . Yii::t('app', 'Действие') . ': 
-                    <span class="btn btn-default btn-xs">' . $event['externalTag']['actionType']->title . '</span>';
-                $events[] = ['date' => $event['date'], 'event' => self::formEvent($event['date'],
-                    'event', 0, '', $text, '')];
-            }
-        }
-
-        $registers = Register::find()
-            ->orderBy('date DESC')
-            ->limit(20)
-            ->all();
-        if ($type == null) {
+        if ($type == null || $type == 1) {
+            $registers = Register::find()
+                ->orderBy('createdAt DESC')
+                ->limit(20)
+                ->all();
             foreach ($registers as $register) {
-                $text .= '<i class="fa fa-cogs"></i>&nbsp;
+                $text = '<i class="fa fa-cogs"></i>&nbsp;
                 <a class="btn btn-default btn-xs">' . $register->getFullTitle() . '</a><br/>
                 <i class="fa fa-clipboard"></i>&nbsp;' . Yii::t('app', 'Изменил параметр') . ': <a class="btn btn-default btn-xs">'
                     . $register['title'] . '</a>';
                 $events[] = ['date' => $register['date'], 'event' => self::formEvent($register['date'],
                     'register', 0, '', $text, $register['user']->name)];
+            }
+        }
+
+        if ($type == null || $type == 2) {
+            $object_events = Event::find()
+                ->orderBy('createdAt DESC')
+                ->limit(5)
+                ->all();
+            foreach ($object_events as $object_event) {
+                $text = '<i class="fa fa-desktop"></i>&nbsp; ' . Yii::t('app', 'Система') . ': 
+                <span class="btn btn-default btn-xs">' . $object_event->title . '</span><br/>
+                <i class="fa fa-cogs"></i>&nbsp;' . Yii::t('app', 'Объект') . ': 
+                    <span class="btn btn-default btn-xs">' . $object_event->object->getFullTitle() . '</span><br/>';
+                $events[] = ['date' => $object_event['createdAt'], 'event' => self::formEvent($object_event['createdAt'],
+                    'event', 0, '', $text, '')];
+            }
+        }
+
+        if ($type == null || $type == 3) {
+            $registers = ActionRegister::find()
+                ->orderBy('createdAt DESC')
+                ->limit(20)
+                ->all();
+            foreach ($registers as $register) {
+                $text = '<i class="fa fa-user"></i>&nbsp;
+                <a class="btn btn-default btn-xs">' . $register['title'] . '</a><br/>
+                <i class="fa fa-clipboard"></i>&nbsp;' . Yii::t('app', 'Изменил сущность') . ': <a class="btn btn-default btn-xs">'
+                    . $register->getEntityName() . '</a>';
+                $events[] = ['date' => $register['createdAt'], 'event' => self::formEvent($register['createdAt'],
+                    'register', 0, '', $text, $register['user']->username)];
             }
         }
 
@@ -342,7 +348,7 @@ class SiteController extends Controller
         if ($type == 'register')
             $event .= '&nbsp;<span class="btn btn-primary btn-xs">' . $user . '</span>&nbsp;
                     <span class="timeline-header" style="vertical-align: middle">' .
-                Yii::t('app', 'В системе &nbsp;') . " " . $title . '</span>';
+                Yii::t('app', 'Действие в системе &nbsp;') . " " . $title . '</span>';
 
         if ($type == 'attribute')
             $event .= '&nbsp;<span class="btn btn-primary btn-xs">' . $user . '</span>&nbsp; 
@@ -374,7 +380,7 @@ class SiteController extends Controller
     public function actionTrash()
     {
         $events = [];
-
+        $type = null;
         $objects = Objects::find()
             ->where(['deleted' => 1])
             ->orderBy('changedAt DESC')
@@ -469,8 +475,9 @@ class SiteController extends Controller
         }
 
         $objectSelect = Objects::find()
-            ->select('_id, title, latitude, longitude')
+            ->select('_id, title, latitude, longitude, objectTypeUuid, parentUuid')
             ->where(['deleted' => 0])
+            ->andWhere(['objectTypeUuid' => ObjectType::OBJECT])
             ->all();
 
         $default_coordinates = new LatLng(['lat' => 55.54, 'lng' => 61.36]);

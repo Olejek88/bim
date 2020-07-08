@@ -116,7 +116,7 @@ class MeasureChannel extends PoliterModel
             ->limit(1)
             ->one();
         if ($measure) {
-            return $measure->value . ' [' . date("Y-m-d h:i:s", $measure->date) . ']';
+            return $measure->value . ' [' . date("Y-m-d h:i:s", strtotime($measure->date)) . ']';
         }
         return '-';
     }
@@ -141,5 +141,18 @@ class MeasureChannel extends PoliterModel
         if ($this->type == MeasureType::MEASURE_TYPE_TOTAL_CURRENT)
             return 'Текущий итог';
         return 'Неизвестен';
+    }
+
+    /**
+     * @return array
+     */
+    public function getPermissions()
+    {
+        $class = explode('\\', get_class($this));
+        $class = $class[count($class) - 1];
+
+        $perm = parent::getPermissions();
+        $perm['trend'] = 'trend' . $class;
+        return $perm;
     }
 }

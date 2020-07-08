@@ -15,6 +15,7 @@ use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -312,9 +313,19 @@ class ObjectController extends PoliterController
                             ->all();
                         foreach ($objects as $object) {
                             $childIdx4 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children']) - 1;
+                            $links = Html::a('<span class="fa fa-list"></span>&nbsp',
+                                ['/event/list', 'objectUuid' => $object['uuid']],
+                                [
+                                    'title' => Yii::t('app', 'События объекта'),
+                                    'data-toggle' => 'modal',
+                                    'data-target' => '#modalRegister',
+                                ]
+                            );
+
                             $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children'][] = [
                                 'title' => $object->getFullTitle(),
                                 'type' => 'object',
+                                'links' => $links,
                                 'type_title' => $object->objectSubType->title,
                                 'key' => $object['_id'],
                                 'folder' => true
@@ -326,15 +337,34 @@ class ObjectController extends PoliterController
                                 ->all();
                             foreach ($channels as $channel) {
                                 $childIdx5 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children']) - 1;
+                                $links = Html::a('<span class="fa fa-plus-square"></span>&nbsp',
+                                    ['/measure/new', 'measureChannelUuid' => $channel['uuid']],
+                                    [
+                                        'title' => Yii::t('app', 'Добавить измерение'),
+                                        'data-toggle' => 'modal',
+                                        'data-target' => '#modalAddMeasure',
+                                    ]
+                                );
+                                $links .= Html::a('<span class="fa fa-line-chart"></span>&nbsp',
+                                    ['/measure-channel/trend', 'measureChannelUuid' => $channel['uuid']],
+                                    [
+                                        'title' => Yii::t('app', 'Измерения'),
+                                        'data-toggle' => 'modal',
+                                        'data-target' => '#modalChart',
+                                    ]
+                                );
+                                $value = $channel->getLastMeasure() . "&nbsp;" . $links;
+
                                 $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children'][$childIdx5]['children'][] = [
                                     'title' => $channel->title,
                                     'type' => 'channel',
                                     'type_title' => $channel->measureType->title,
-                                    'value' => $channel->getLastMeasure(),
+                                    'value' => $value,
                                     'measure_type' => $channel->getTypeName(),
                                     'original' => $channel->original_name,
                                     'parameter' => $channel->param_id,
                                     'key' => $channel['_id'] . 'k',
+                                    'links' => $links,
                                     'folder' => false
                                 ];
                             }

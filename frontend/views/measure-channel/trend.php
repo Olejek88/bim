@@ -1,20 +1,24 @@
 <?php
 /*  @var $values */
-
 /*  @var $name string */
-
-use frontend\assets\AdminLteAsset;
-
-AdminLteAsset::register($this);
 ?>
 
-<div class="measured-value-index" style="height: 700px">
-    <div id="container" style="min-width:500px; width:49%; height:90%; float:left"></div>
-    <div id="container2" style="min-width:500px; width:49%; height:90%; float:right"></div>
+<div class="measured-value-index" style="height: 600px">
+    <div id="container" style="width:99%; height:50%; float:top"></div>
+    <div id="container2" style="width:99%; height:50%; float:bottom">
+        <table class="table table-bordered table-condensed table-hover small kv-table">
+            <?php
+            foreach ($values as $value) {
+                echo '<tr><td>' . $value['date'] . '</td>
+                      <td class="text-right">' . $value['value'] . '</td></tr>';
+            }
+            ?>
+        </table>
+    </div>
 </div>
 
-<script src="/js/vendor/lib/HighCharts/highcharts.js"></script>
-<script src="/js/vendor/lib/HighCharts/modules/exporting.js"></script>
+<script src="/js/HighCharts/highcharts.js"></script>
+<script src="/js/HighCharts/modules/exporting.js"></script>
 
 <script type="text/javascript">
     Highcharts.chart('container', {
@@ -65,5 +69,3 @@ AdminLteAsset::register($this);
         }]
     });
 </script>
-
-<div id="container" style="width:99%; height: 400px; margin: 0 auto"></div>

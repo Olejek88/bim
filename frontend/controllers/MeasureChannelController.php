@@ -2,9 +2,11 @@
 
 namespace frontend\controllers;
 
+use common\models\Measure;
 use common\models\MeasureChannel;
 use common\models\MeasureType;
 use common\models\Objects;
+use common\models\ObjectType;
 use common\models\User;
 use Exception;
 use frontend\models\MeasureChannelSearch;
@@ -71,7 +73,7 @@ class MeasureChannelController extends Controller
     {
         $searchModel = new MeasureChannelSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        $objects = Objects::find()->orderBy('title DESC')->all();
+        $objects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->orderBy('title DESC')->all();
         $types = MeasureType::find()->orderBy('title DESC')->all();
         return $this->render(
             'index', [
@@ -92,7 +94,7 @@ class MeasureChannelController extends Controller
     function actionNew()
     {
         $measureChannel = new MeasureChannel();
-        $objects = Objects::find()->orderBy('title DESC')->all();
+        $objects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->orderBy('title DESC')->all();
         $types = MeasureType::find()->orderBy('title DESC')->all();
         $objects = ArrayHelper::map($objects, 'uuid', function ($data) {
             return $data->getFullName();
@@ -103,6 +105,34 @@ class MeasureChannelController extends Controller
             'types' => $types,
             'objects' => $objects
         ]);
+    }
+
+    /**
+     * функция рисует график и таблицу значений канала
+     *
+     * @return mixed
+     */
+    public
+    function actionTrend()
+    {
+        $request = Yii::$app->request;
+        $measureChannelUuid = $request->get('measureChannelUuid');
+        if ($measureChannelUuid) {
+            /** @var MeasureChannel $measureChannel */
+            $measureChannel = MeasureChannel::find()->where(['uuid' => $measureChannelUuid])->limit(1)->one();
+            if ($measureChannel) {
+                $name = $measureChannel->title;
+                $values = Measure::find()
+                    ->where(['measureChannelUuid' => $measureChannelUuid])
+                    ->orderBy('date')
+                    ->all();
+                return $this->renderAjax('trend', [
+                    'model' => $measureChannel,
+                    'name' => $name,
+                    'values' => $values
+                ]);
+            }
+        }
     }
 
     /**

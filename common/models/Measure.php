@@ -123,6 +123,7 @@ class Measure extends PoliterModel
      */
     public function getMeasureChannel()
     {
-        return $this->hasOne(MeasureChannel::class, ['uuid' => 'sensorChannelUuid']);
+        return $this->hasOne(MeasureChannel::class, ['uuid' => 'measureChannelUuid']);
     }
+
 }

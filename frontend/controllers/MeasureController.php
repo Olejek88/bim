@@ -7,6 +7,7 @@ use common\models\MeasureChannel;
 use frontend\models\MeasureSearch;
 use Yii;
 use yii\db\StaleObjectException;
+use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -79,9 +80,13 @@ class MeasureController extends PoliterController
     function actionNew()
     {
         $measure = new Measure();
+        $request = Yii::$app->request;
+        $measureChannelUuid = $request->getQueryParam('measureChannelUuid');
         $channels = MeasureChannel::find()->orderBy('title')->all();
+        $channels = ArrayHelper::map($channels, 'uuid', 'title');
         return $this->renderAjax('_add_form', [
             'measure' => $measure,
+            'measureChannelUuid' => $measureChannelUuid,
             'channels' => $channels
         ]);
     }
@@ -96,7 +101,7 @@ class MeasureController extends PoliterController
         $model = new Measure();
         if ($model->load(Yii::$app->request->post())) {
             if ($model->save(false)) {
-                return $this->redirect('../measure/index');
+                return $this->redirect(parse_url($_SERVER["HTTP_REFERER"], PHP_URL_PATH) . '?node=' . $model['_id'] . 'k');
             } else {
                 $message = '';
                 foreach ($model->errors as $key => $error) {

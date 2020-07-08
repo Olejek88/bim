@@ -4,9 +4,11 @@ namespace frontend\controllers;
 
 use common\models\Event;
 use common\models\Objects;
+use common\models\ObjectType;
 use frontend\models\EventSearch;
 use Yii;
 use yii\db\StaleObjectException;
+use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -79,7 +81,9 @@ class EventController extends PoliterController
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 50;
 
-        $objects = Objects::find()->orderBy('title')->all();
+        $objects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->orderBy('title')->all();
+        $objects = ArrayHelper::map($objects, 'uuid', 'title');
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -96,10 +100,13 @@ class EventController extends PoliterController
     function actionNew()
     {
         $event = new Event();
-        $objects = Objects::find()->orderBy('title')->all();
+        $objects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->orderBy('title')->all();
+        $request = Yii::$app->request;
+        $objectUuid = $request->get('objectUuid');
         return $this->renderAjax('_add_form', [
             'event' => $event,
-            'objects' => $objects
+            'objects' => $objects,
+            'objectUuid' => $objectUuid
         ]);
     }
 
@@ -126,4 +133,28 @@ class EventController extends PoliterController
             'model' => $model
         ]);
     }
+
+    /**
+     * Lists all Events for Object
+     * @return mixed
+     */
+    public function actionList()
+    {
+        $searchModel = new EventSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider->pagination->pageSize = 50;
+
+        $request = Yii::$app->request;
+        $objectUuid = $request->get('objectUuid');
+
+        $dataProvider->query->where(['objectUuid' => $objectUuid]);
+
+        return $this->renderAjax('_list', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'objectUuid' => $objectUuid
+        ]);
+    }
+
+
 }

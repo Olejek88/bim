@@ -13,11 +13,11 @@ $this->title = Yii::t('app', 'Дерево объектов системы');
         <colgroup>
             <col width="*">
             <col width="*">
-            <col width="100px">
-            <col width="90px">
-            <col width="125px">
-            <col width="135px">
-            <col width="85px">
+            <col width="220px">
+            <col width="80px">
+            <col width="*">
+            <col width="60px">
+            <col width="70px">
         </colgroup>
         <thead style="color: white" class="thead_tree">
         <tr>
@@ -121,6 +121,19 @@ $this->title = Yii::t('app', 'Дерево объектов системы');
             </div>
         </div>
     </div>
+    <div class="modal remote fade" id="modalAddMeasure">
+        <div class="modal-dialog" style="width: 800px; height: 400px">
+            <div class="modal-content loader-lg" style="margin: 10px; padding: 10px" id="modalContent">
+            </div>
+        </div>
+    </div>
+    <div class="modal remote fade" id="modalChart">
+        <div class="modal-dialog" style="width: 1200px; height: 600px">
+            <div class="modal-content loader-lg" style="margin: 10px; padding: 10px" id="modalContent">
+            </div>
+        </div>
+    </div>
+
 <?php
 $this->registerJsFile('/js/jquery.fancytree.contextMenu.js',
     ['depends' => ['wbraganca\fancytree\FancytreeAsset']]);
@@ -291,7 +304,11 @@ echo FancytreeWidget::widget(
 );
 ?>
 <?php
-$this->registerJs('$("#modalTitle").on("hidden.bs.modal",
+$this->registerJs('$("#modalAddMeasure").on("hidden.bs.modal",
+function () {
+    $(this).removeData();
+})');
+$this->registerJs('$("#modalChart").on("hidden.bs.modal",
 function () {
     $(this).removeData();
 })');

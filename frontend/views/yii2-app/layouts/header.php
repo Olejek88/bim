@@ -27,7 +27,7 @@ $userImage = $currentUser->getImageUrl();
     <?= Html::a('<span class="logo-mini">П</span><span class="logo-lg">' . Yii::$app->name = '' . Yii::t('app', 'ПолиТЭР') . '</span>',
         Yii::$app->homeUrl, ['class' => 'logo']) ?>
     <nav class="navbar navbar-static-top">
-        <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button" style="padding: 10px 15px">
+        <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button" style="padding: 15px 15px">
             <span class="sr-only"><?php echo Yii::t('app', 'Навигация') ?></span>
         </a>
         <div class="navbar-custom-menu" style="padding-top: 0; padding-bottom: 0">

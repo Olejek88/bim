@@ -15,6 +15,20 @@ $this->title = Yii::t('app', 'ПолиТЭР::События объектов с
 $gridColumns = [
     ['class' => 'yii\grid\SerialColumn'],
     [
+        'attribute' => 'createdAt',
+        'hAlign' => 'center',
+        'vAlign' => 'middle',
+        'contentOptions' => [
+            'class' => 'table_class',
+            'style' => 'width: 50px; text-align: center'
+        ],
+        'headerOptions' => ['class' => 'text-center'],
+        'mergeHeader' => true,
+        'content' => function ($data) {
+            return date("d-m-Y h:i:s", strtotime($data->createdAt));
+        }
+    ],
+    [
         'class' => 'kartik\grid\EditableColumn',
         'attribute' => 'title',
         'contentOptions' => [
@@ -31,7 +45,7 @@ $gridColumns = [
         'vAlign' => 'middle',
         'width' => '180px',
         'value' => function ($data) {
-            return $data['objectUuid']['title'];
+            return $data->object->getFullTitle();
         },
         'filterType' => GridView::FILTER_SELECT2,
         'header' => Yii::t('app', 'Объект'),

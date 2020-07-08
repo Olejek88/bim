@@ -18,9 +18,9 @@
                 foreach ($events as $event) {
                     echo '<li style="line-height: 1.3; padding: 0 5px 0 0">
                                           <a href="/event/view?id=' . $event['_id'] . '">
-                                          <small><i class="fa fa-clock-o"></i> ' . $event['date'] . '</small>
+                                          <small><i class="fa fa-clock-o"></i> ' . $event['createdAt'] . '</small>
                                           <p style="white-space: normal">
-                                          <i class="fa fa-users text-aqua" style="margin: 3px"></i>' . $event['name'];
+                                          <i class="fa fa-users text-aqua" style="margin: 3px"></i>' . $event['title'];
                     echo '</p></a></li>';
                 }
                 ?>

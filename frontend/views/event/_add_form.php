@@ -1,8 +1,10 @@
 <?php
 /* @var $event Event */
+/* @var $objectUuid */
 
 /* @var Objects[] $objects */
 
+use common\components\MainFunctions;
 use common\models\Event;
 use common\models\Objects;
 use kartik\select2\Select2;
@@ -24,23 +26,33 @@ use yii\helpers\Html;
 </div>
 <div class="modal-body">
     <?php
+    if (!$event->isNewRecord) {
+        echo $form->field($event, 'uuid')->textInput(['maxlength' => true, 'readonly' => true]);
+    } else {
+        echo $form->field($event, 'uuid')->hiddenInput(['value' => (new MainFunctions)->GUID()])->label(false);
+    }
+
     echo $form->field($event, 'title')->textInput(['maxlength' => true]);
 
     if ($event['objectUuid'] != null) {
         echo $form->field($event, 'objectUuid')->hiddenInput(['value' => $model['uuid']])->label(false);
     } else {
-        echo $form->field($event, 'objectUuid')->widget(Select2::class,
-            [
-                'data' => $objects,
-                'language' => Yii::t('app', 'ru'),
-                'options' => [
-                    'placeholder' => Yii::t('app', 'Выберите объект..'),
-                    'style' => ['height' => '42px', 'padding-top' => '10px']
-                ],
-                'pluginOptions' => [
-                    'allowClear' => true
-                ],
-            ]);
+        if ($objectUuid) {
+            echo $form->field($event, 'objectUuid')->hiddenInput(['value' => $objectUuid])->label(false);
+        } else {
+            echo $form->field($event, 'objectUuid')->widget(Select2::class,
+                [
+                    'data' => $objects,
+                    'language' => Yii::t('app', 'ru'),
+                    'options' => [
+                        'placeholder' => Yii::t('app', 'Выберите объект..'),
+                        'style' => ['height' => '42px', 'padding-top' => '10px']
+                    ],
+                    'pluginOptions' => [
+                        'allowClear' => true
+                    ],
+                ]);
+        }
     }
     echo $form->field($event, 'description')->textInput(['maxlength' => true]);
     ?>

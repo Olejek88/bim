@@ -82,4 +82,17 @@ class Event extends PoliterModel
             Objects::class, ['uuid' => 'objectUuid']
         );
     }
+
+    /**
+     * @return array
+     */
+    public function getPermissions()
+    {
+        $class = explode('\\', get_class($this));
+        $class = $class[count($class) - 1];
+
+        $perm = parent::getPermissions();
+        $perm['list'] = 'list' . $class;
+        return $perm;
+    }
 }
