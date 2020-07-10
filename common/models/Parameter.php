@@ -141,4 +141,33 @@ class Parameter extends PoliterModel
         return $this->hasOne(ParameterType::class, ['uuid' => 'parameterTypeUuid']);
     }
 
+    /**
+     * @return array
+     */
+    public function getPermissions()
+    {
+        $class = explode('\\', get_class($this));
+        $class = $class[count($class) - 1];
+
+        $perm = parent::getPermissions();
+        $perm['list'] = 'list' . $class;
+        return $perm;
+    }
+
+    /**
+     * Объект связанного поля.
+     *
+     * @return string
+     */
+    public function getEntityTitle()
+    {
+        if ($this->entityUuid) {
+            /** @var Objects $object */
+            $object = Objects::find()->where(['uuid' => $this->entityUuid])->one();
+            if ($object) {
+                return $object->getFullTitle();
+            }
+        }
+        return "";
+    }
 }

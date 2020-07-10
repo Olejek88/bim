@@ -42,7 +42,7 @@ $gridColumns = [
         ],
         'header' => Yii::t('app', 'Тип параметра'),
         'value' => function ($data) {
-            return $data['title'];
+            return $data['parameterType']['title'];
         },
         'editableOptions' => function () use ($parameterTypes) {
             $types = ArrayHelper::map($parameterTypes, 'uuid', 'title');
@@ -79,6 +79,12 @@ $gridColumns = [
         'content' => function ($data) {
             return $data->getEntityTitle();
         }
+    ],
+    [
+        'class' => 'kartik\grid\ActionColumn',
+        'headerOptions' => ['class' => 'kartik-sheet-style'],
+        'header' => Yii::t('app', 'Действия'),
+        'template' => '{delete}'
     ]
 ];
 

@@ -15,7 +15,6 @@ use yii\helpers\Html;
 
 <?php $form = ActiveForm::begin([
     'enableAjaxValidation' => false,
-    'action' => '../parameter/add',
     'options' => [
         'id' => 'formAddParameter',
         'enctype' => 'multipart/form-data'
@@ -23,11 +22,11 @@ use yii\helpers\Html;
 ?>
 <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal">&times;</button>
-    <h4 class="modal-title"><?php echo Yii::t('app', 'Добавить атрибут') ?></h4>
+    <h4 class="modal-title"><?php echo Yii::t('app', 'Добавить параметр') ?></h4>
 </div>
 <div class="modal-body">
     <?php
-    if (!$model->isNewRecord) {
+    if (!$parameter->isNewRecord) {
         echo $form->field($parameter, 'uuid')->textInput(['maxlength' => true, 'readonly' => true]);
     } else {
         echo $form->field($parameter, 'uuid')->hiddenInput(['value' => (new MainFunctions)->GUID()])->label(false);
@@ -36,8 +35,8 @@ use yii\helpers\Html;
         [
             'name' => 'kv_types',
             'language' => Yii::t('app', 'ru'),
-            'data' => $items,
-            'options' => ['placeholder' => Yii::t('app', 'Выберите тип атрибута ...')],
+            'data' => $parameterTypes,
+            'options' => ['placeholder' => Yii::t('app', 'Выберите тип параметра ...')],
             'pluginOptions' => [
                 'allowClear' => true
             ],
@@ -45,7 +44,7 @@ use yii\helpers\Html;
     echo $form->field($parameter, 'entityUuid')->hiddenInput(['value' => $entityUuid])->label(false);
     echo $form->field($parameter, 'value')->textInput(['maxlength' => true]);
     echo $form->field($parameter, 'date')
-        ->hiddenInput(['value' => date("Ymd")])
+        ->hiddenInput(['value' => date("Ymdhis")])
         ->label(false);
     ?>
 </div>
@@ -57,12 +56,13 @@ use yii\helpers\Html;
     $(document).on("beforeSubmit", "#formAddParameter", function (e) {
         e.preventDefault();
     }).on('submit', function (e) {
+        e.preventDefault();
         $.ajax({
             type: "post",
             data: $('#formAddParameter').serialize(),
-            url: "../parameter/add",
+            url: "../parameter/save",
             success: function () {
-                $('#modalAdd').modal('hide');
+                $('#modalAddParameter').modal('hide');
             },
             error: function () {
             }

@@ -237,7 +237,7 @@ class UserController extends PoliterController
             if ($model->save()) {
                 MainFunctions::register(Yii::t('app', 'Добавлен пользователь ') . $model->name,
                     ActionRegister::TYPE_ADD,
-                    $model->id);
+                    $model->id . "");
 
                 if (!empty($pass)) {
                     // обновляем пароль
@@ -326,7 +326,7 @@ class UserController extends PoliterController
             if ($model->save()) {
                 MainFunctions::register(Yii::t('app', 'Добавлен пользователь ') . $model->name,
                     ActionRegister::TYPE_ADD,
-                    $model->id);
+                    $model->id . "");
 
                 if (!empty($pass)) {
                     // обновляем пароль
@@ -389,7 +389,7 @@ class UserController extends PoliterController
             }
 
             if ($model->save()) {
-                MainFunctions::register(Yii::t('app', 'Обновлен профиль пользователя ') . $model->name, ActionRegister::TYPE_EDIT, $id);
+                MainFunctions::register(Yii::t('app', 'Обновлен профиль пользователя ') . $model->name, ActionRegister::TYPE_EDIT, $id . "");
                 if (!empty($pass)) {
                     // обновляем пароль для связанной записи из таблицы user
                     $user = User::findOne($model->userId);

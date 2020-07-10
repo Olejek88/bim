@@ -13,7 +13,12 @@ use yii\helpers\Html;
 $this->title = Yii::t('app', 'ПолиТЭР::События объектов системы');
 
 $gridColumns = [
-    ['class' => 'yii\grid\SerialColumn'],
+    [
+        'attribute' => '_id',
+        'mergeHeader' => true,
+        'hAlign' => 'center',
+        'vAlign' => 'middle',
+    ],
     [
         'attribute' => 'createdAt',
         'hAlign' => 'center',

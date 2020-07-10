@@ -61,7 +61,10 @@ $this->title = Yii::t('app', 'Профиль пользователя') . " " . 
                         else echo '<span class="label label-danger">' . Yii::t('app', 'Не активен') . '</span>';
                         ?>
                         <br/>
+                        <br/>
                         <p>
+                            <strong><i class="fa fa-users margin-r-5"></i><?php echo Yii::t('app', 'Роль') ?>
+                            </strong>
                             <?php
                             $assignments = Yii::$app->getAuthManager()->getAssignments($model['id']);
                             foreach ($assignments as $value) {

@@ -25,7 +25,7 @@ use yii\helpers\Html;
             ],
             'headerOptions' => ['class' => 'text-center'],
             'content' => function ($data) {
-                return date("d-m-Y h:i:s", $data->createdAt);
+                return date("d-m-Y h:i:s", strtotime($data->createdAt));
             }
         ],
         [

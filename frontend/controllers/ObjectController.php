@@ -321,6 +321,14 @@ class ObjectController extends PoliterController
                                     'data-target' => '#modalRegister',
                                 ]
                             );
+                            $links .= Html::a('<span class="fa fa-anchor"></span>&nbsp',
+                                ['/parameter/list', 'uuid' => $object['uuid']],
+                                [
+                                    'title' => Yii::t('app', 'Параметры объекта'),
+                                    'data-toggle' => 'modal',
+                                    'data-target' => '#modalParameter',
+                                ]
+                            );
 
                             $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children'][] = [
                                 'title' => $object->getFullTitle(),
@@ -354,6 +362,7 @@ class ObjectController extends PoliterController
                                     ]
                                 );
                                 $value = $channel->getLastMeasure() . "&nbsp;" . $links;
+                                $links = "";
 
                                 $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children'][$childIdx5]['children'][] = [
                                     'title' => $channel->title,
@@ -500,5 +509,24 @@ class ObjectController extends PoliterController
             }
         }
         return false;
+    }
+
+    /**
+     * Restore an existing Objects model.
+     *
+     * @return mixed
+     */
+    public
+    function actionRestore()
+    {
+        if (isset($_GET['uuid'])) {
+            $object = Objects::find()->where(['uuid' => $_GET['uuid']])->one();
+            if ($object) {
+                $object['deleted'] = false;
+                $object['changedAt'] = date("Y-m-d H:i:s");
+                $object->save();
+            }
+        }
+        return $this->redirect(['../site/trash']);
     }
 }

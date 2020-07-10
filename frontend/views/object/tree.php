@@ -115,6 +115,12 @@ $this->title = Yii::t('app', 'Дерево объектов системы');
             </div>
         </div>
     </div>
+    <div class="modal remote fade" id="modalParameter">
+        <div class="modal-dialog" style="width: 1000px">
+            <div class="modal-content loader-lg">
+            </div>
+        </div>
+    </div>
     <div class="modal remote fade" id="modalAdd">
         <div class="modal-dialog" style="width: 800px; height: 400px">
             <div class="modal-content loader-lg" style="margin: 10px; padding: 10px" id="modalContent">
@@ -156,7 +162,7 @@ echo FancytreeWidget::widget(
             'contextMenu' => [
                 'menu' => [
                     'new' => [
-                        'name' => Yii::t('app', 'Добавить новый объект'),
+                        'name' => Yii::t('app', 'Добавить новый объект/канал'),
                         'icon' => 'add',
                         'callback' => new JsExpression('function(key, opt) {
                         var node = $.ui.fancytree.getNode(opt.$trigger);
@@ -313,6 +319,10 @@ function () {
     $(this).removeData();
 })');
 $this->registerJs('$("#modalRegister").on("hidden.bs.modal",
+function () {
+    $(this).removeData();
+})');
+$this->registerJs('$("#modalParameter").on("hidden.bs.modal",
 function () {
     $(this).removeData();
 })');

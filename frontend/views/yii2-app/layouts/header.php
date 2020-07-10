@@ -58,7 +58,9 @@ $userImage = $currentUser->getImageUrl();
                             ?>
                             <p>
                                 <?php
-                                if ($currentUser) echo $currentUser['name'];
+                                if ($currentUser) echo $currentUser['username'];
+                                if ($currentUser) echo '<small>' . $currentUser['name'] . '</small>';
+
                                 ?>
                             </p>
                         </li>

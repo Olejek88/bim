@@ -2,10 +2,15 @@
 
 namespace frontend\controllers;
 
+use common\components\MainFunctions;
+use common\models\ActionRegister;
 use common\models\Parameter;
 use common\models\ParameterType;
+use Exception;
 use frontend\models\ParameterSearch;
+use Throwable;
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -22,6 +27,20 @@ class ParameterController extends PoliterController
      */
     public function actionIndex()
     {
+        if (isset($_POST['editableAttribute'])) {
+            $model = Parameter::find()
+                ->where(['_id' => $_POST['editableKey']])
+                ->one();
+            if ($_POST['editableAttribute'] == 'value') {
+                $model['value'] = $_POST['Parameter'][$_POST['editableIndex']]['value'];
+            }
+            if ($_POST['editableAttribute'] == 'parameterTypeUuid') {
+                $model['parameterTypeUuid'] = $_POST['Parameter'][$_POST['editableIndex']]['parameterTypeUuid'];
+            }
+            $model->save();
+            return json_encode('');
+        }
+
         $searchModel = new ParameterSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 15;
@@ -43,18 +62,26 @@ class ParameterController extends PoliterController
      *
      * @return mixed
      * @throws NotFoundHttpException
-     * @throws \Exception
-     * @throws \Throwable
+     * @throws Exception
+     * @throws Throwable
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
-
+        /** @var Parameter $parameter */
+        $parameter = $this->findModel($id);
+        if ($parameter) {
+            MainFunctions::register(Yii::t('app', 'Удален параметр ')
+                . $parameter->parameterType->title
+                . " для " . $parameter->getEntityTitle(),
+                ActionRegister::TYPE_DELETE,
+                $parameter->uuid);
+            $parameter->delete();
+        }
         return $this->redirect(['index']);
     }
 
     /**
-     * Finds the Paramater model based on its primary key value.
+     * Finds the Parameter model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      *
      * @param integer $id Id
@@ -78,28 +105,81 @@ class ParameterController extends PoliterController
      */
     public function actionList($uuid)
     {
-        $parameters = Parameter::find()
-            ->where(['uuid' => $uuid])
-            ->all();
-        return $this->renderAjax('_parameters_list', [
-            'parameters' => $parameters
+        if (isset($_POST['editableAttribute'])) {
+            $model = Parameter::find()
+                ->where(['_id' => $_POST['editableKey']])
+                ->one();
+            if ($_POST['editableAttribute'] == 'value') {
+                $model['value'] = $_POST['Parameter'][$_POST['editableIndex']]['value'];
+            }
+            if ($_POST['editableAttribute'] == 'parameterTypeUuid') {
+                $model['parameterTypeUuid'] = $_POST['Parameter'][$_POST['editableIndex']]['parameterTypeUuid'];
+            }
+            $model->save();
+            return json_encode('');
+        }
+
+        $searchModel = new ParameterSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider->pagination->pageSize = 15;
+        $dataProvider->query->where(['entityUuid' => $uuid]);
+        $parameterTypes = ParameterType::find()->orderBy('title')->all();
+
+        return $this->renderAjax('_parameter_list', [
+            'dataProvider' => $dataProvider,
+            'parameterTypes' => $parameterTypes,
+            'objectUuid' => $uuid
         ]);
     }
 
     /**
-     * Creates a new Parameter model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
+     * функция выполняет добавление нового параметра
      *
      * @return mixed
      */
-    public function actionAdd()
+    public
+    function actionNew()
+    {
+        $parameter = new Parameter();
+        $request = Yii::$app->request;
+        $objectUuid = $request->get('objectUuid');
+        $parameterTypes = ParameterType::find()->orderBy('title')->all();
+        $parameterTypes = ArrayHelper::map($parameterTypes, 'uuid', 'title');
+
+        return $this->renderAjax('_add_form', [
+            'parameter' => $parameter,
+            'entityUuid' => $objectUuid,
+            'parameterTypes' => $parameterTypes
+        ]);
+    }
+
+    /**
+     * Creates a new model.
+     * @return mixed
+     * @throws Exception
+     */
+    public
+    function actionSave()
     {
         $model = new Parameter();
         if ($model->load(Yii::$app->request->post())) {
             if ($model->save(false)) {
-                return true;
+                MainFunctions::register(Yii::t('app', 'Добавлен параметр ')
+                    . $model->parameterType->title
+                    . " для " . $model->getEntityTitle(),
+                    ActionRegister::TYPE_ADD,
+                    $model->uuid);
+                return $this->redirect('../parameter/index');
+            } else {
+                $message = '';
+                foreach ($model->errors as $key => $error) {
+                    $message .= $error[0] . '</br>';
+                }
+                return json_encode(['message' => $message]);
             }
         }
-        return false;
+        return $this->render('_add_form', [
+            'model' => $model
+        ]);
     }
 }

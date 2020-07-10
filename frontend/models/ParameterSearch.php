@@ -2,7 +2,6 @@
 
 namespace frontend\models;
 
-use common\models\Event;
 use common\models\Parameter;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -40,7 +39,7 @@ class ParameterSearch extends Parameter
      */
     public function search($params)
     {
-        $query = Event::find();
+        $query = Parameter::find();
 
         // add conditions that should always apply here
 

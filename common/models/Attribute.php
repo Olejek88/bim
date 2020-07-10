@@ -135,13 +135,9 @@ class Attribute extends PoliterModel
     public function getEntityName()
     {
         if ($this->entityUuid) {
-            $equipment = Equipment::find()->where(['uuid' => $this->entityUuid])->one();
-            if ($equipment) {
-                return $equipment['title'];
-            }
             $object = Objects::find()->where(['uuid' => $this->entityUuid])->one();
             if ($object) {
-                return $object['title'];
+                return $object->getFullTitle();
             }
         }
         return "";

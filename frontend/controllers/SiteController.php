@@ -387,7 +387,7 @@ class SiteController extends Controller
             ->all();
         if ($type == 2 || $type == null) {
             foreach ($objects as $object) {
-                $text = Html::a("<i class='fa fa-refresh'></i>", ['../objects/restore', 'uuid' => $object['uuid']]);
+                $text = Html::a("<i class='fa fa-refresh'></i>", ['../object/restore', 'uuid' => $object['uuid']]);
                 $text .= '&nbsp;' . Yii::t('app', 'Объект') . ': <a class="btn btn-primary btn-xs">' . $object['title'] . '</a>';
                 $events[] = ['date' => $object['changedAt'], 'event' => self::formTrashEvent($object['changedAt'],
                     'object', $text)];
@@ -446,7 +446,7 @@ class SiteController extends Controller
             'popupAnchor' => new Point (['x' => -3, 'y' => -76])
         ]);
         $objectIcon = new Icon([
-            'iconUrl' => '/images/marker_object_m.png',
+            'iconUrl' => '/images/marker-icon.png',
             'iconSize' => new Point(['x' => 28, 'y' => 43]),
             'iconAnchor' => new Point (['x' => 14, 'y' => 43]),
             'popupAnchor' => new Point (['x' => -3, 'y' => -76])
