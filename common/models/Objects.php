@@ -200,6 +200,8 @@ class Objects extends PoliterModel
         $perm['save'] = 'save' . $class;
         $perm['edit'] = 'edit' . $class;
         $perm['restore'] = 'restore' . $class;
+        $perm['save-district'] = 'save-district' . $class;
+        $perm['new-district'] = 'new-district' . $class;
         return $perm;
     }
 

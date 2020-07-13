@@ -2,6 +2,8 @@
 
 namespace frontend\controllers;
 
+use common\components\MainFunctions;
+use common\models\DistrictCoordinates;
 use common\models\MeasureChannel;
 use common\models\MeasureType;
 use common\models\Objects;
@@ -502,6 +504,67 @@ class ObjectController extends PoliterController
         if ($model->load(Yii::$app->request->post())) {
             if ($model->save(false)) {
                 return $this->redirect(parse_url($_SERVER["HTTP_REFERER"], PHP_URL_PATH) . '?node=' . $model['_id'] . 'k');
+            } else {
+                $return['code'] = -1;
+                $return['message'] = json_encode($model->errors);
+                return json_encode($return);
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Creates a new Object district model.
+     * @return mixed
+     */
+    public function actionNewDistrict()
+    {
+        $objectTypeUuid = ObjectType::SUB_DISTRICT;
+        $objectSubTypeUuid = ObjectSubType::GENERAL;
+        $objects = Objects::find()->where(['objectTypeUuid' => ObjectType::CITY])->orderBy('title desc')->all();
+        $objects = ArrayHelper::map($objects, 'uuid', 'title');
+
+        $request = Yii::$app->request;
+        $latlng = $request->post('latlng');
+
+        $object_uuid = null;
+        $object_type = null;
+        if ($latlng) {
+            $object = new Objects();
+            return $this->renderAjax('_add_sub_district', [
+                'object' => $object,
+                'objects' => $objects,
+                'latlng' => $latlng,
+                'objectSubTypeUuid' => $objectSubTypeUuid,
+                'objectTypeUuid' => $objectTypeUuid
+            ]);
+        }
+        return null;
+    }
+
+    /**
+     * Creates a new Object custom District model.
+     * @return mixed
+     * @throws \Exception
+     */
+    public function actionSaveDistrict()
+    {
+        $model = new Objects();
+        $request = Yii::$app->request;
+        $latlng = $request->post('latlng');
+        if ($model->load(Yii::$app->request->post())) {
+            if ($model->save(false)) {
+                $district = new DistrictCoordinates();
+                $district->uuid = MainFunctions::GUID();
+                $district->districtUuid = $model->uuid;
+                $district->coordinates = $latlng;
+                if ($district->save()) {
+                    return $this->redirect(parse_url($_SERVER["HTTP_REFERER"], PHP_URL_PATH) . '?node=' . $model['_id'] . 'k');
+                } else {
+                    $return['code'] = -1;
+                    $return['message'] = json_encode($district->errors);
+                    return json_encode($return);
+                }
             } else {
                 $return['code'] = -1;
                 $return['message'] = json_encode($model->errors);

@@ -19,8 +19,8 @@
  * @var $values
  */
 $this->title = Yii::t('app', 'ПолиТЭР::Сводная');
-$this->registerJsFile('/js/vendor/lib/HighCharts/highcharts.js');
-$this->registerJsFile('/js/vendor/lib/HighCharts/modules/exporting.js');
+$this->registerJsFile('/js/HighCharts/highcharts.js');
+$this->registerJsFile('/js/HighCharts/modules/exporting.js');
 
 use common\models\Equipment;
 

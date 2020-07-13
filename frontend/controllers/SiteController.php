@@ -110,6 +110,44 @@ class SiteController extends Controller
 
         $layers = new Layers();
 
+        $js[] = '$("#show-save").click(function(){
+                        var x = document.getElementById("polygon-control");
+                        var control = document.getElementById("show-save");
+                        if (x.style.display === "none") {
+                            x.style.display = "block";
+                            control.style.display = "none"; 
+                        } else {
+                            x.style.display = "none";
+                            control.style.display = "block";
+                        }
+                  });';
+        $js[] .= '$("#get-button-features-polygon").click(function(e){
+                       e.preventDefault();
+                       let selected_features = selectfeature.getFeaturesSelected(\'polygon\');
+                       let coordinates = selectfeature._ARR_latlon;
+	                   console.log(coordinates);
+	                   $.ajax({
+                           url: "../object/new-district",
+                           type: "post",
+                           data: {
+                               latlng: JSON.stringify(coordinates)
+                           },
+                           success: function (data) { 
+                               $(\'#modalAdd\').modal(\'show\');
+                               $(\'#modalContent\').html(data);
+                           }
+                       }); 
+	                });
+	                $("#disable-button").click(function(){
+	                    selectfeature = map.selectAreaFeature.disable();
+	                });
+	                $("#enable-button").click(function(){
+	                    selectfeature = map.selectAreaFeature.enable();
+	                    selectfeature.options.color = \'#663399\' ;
+	                    selectfeature.options.weight = 3 ;
+	             });';
+        $leaflet->setJs($js);
+
         // Different layers can be added to our map using the `addLayer` function.
         $leaflet->addLayer($tileLayer);
 

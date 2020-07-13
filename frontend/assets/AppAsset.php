@@ -16,6 +16,7 @@ class AppAsset extends AssetBundle
         'css/tree.css'
     ];
     public $js = [
+        '/js/Leaflet.SelectAreaFeature.js'
     ];
     public $depends = [
         'yii\web\YiiAsset',
