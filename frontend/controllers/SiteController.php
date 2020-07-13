@@ -5,6 +5,7 @@ namespace frontend\controllers;
 use common\components\MainFunctions;
 use common\models\ActionRegister;
 use common\models\Alarm;
+use common\models\DistrictCoordinates;
 use common\models\Event;
 use common\models\LoginForm;
 use common\models\Measure;
@@ -16,6 +17,7 @@ use common\models\ServiceRegister;
 use common\models\User;
 use dosamigos\leaflet\controls\Layers;
 use dosamigos\leaflet\layers\Marker;
+use dosamigos\leaflet\layers\Polygon;
 use dosamigos\leaflet\layers\TileLayer;
 use dosamigos\leaflet\LeafLet;
 use dosamigos\leaflet\types\Icon;
@@ -153,6 +155,8 @@ class SiteController extends Controller
 
         $subGroupPlugin = new SubgroupCluster();
         $subGroupPlugin->addSubGroup($layer['objectGroup']);
+        $subGroupPlugin->addSubGroup($layer['regionGroup']);
+        $subGroupPlugin->addSubGroup($layer['alarmGroup']);
         $layers->setOverlays([]);
 
         $layers->setName('ctrlLayer');
@@ -476,6 +480,8 @@ class SiteController extends Controller
         $objectsGroup->setTitle(Yii::t('app', 'Объекты'));
         $alarmGroup = new SubGroup();
         $alarmGroup->setTitle(Yii::t('app', 'Предупреждения'));
+        $regionGroup = new SubGroup();
+        $regionGroup->setTitle(Yii::t('app', 'Районы'));
 
         $alarmIcon = new Icon([
             'iconUrl' => '/images/marker_defect_m.png',
@@ -532,8 +538,22 @@ class SiteController extends Controller
             }
         }
 
+        $districts = DistrictCoordinates::find()->all();
+        /** @var DistrictCoordinates $district */
+        foreach ($districts as $district) {
+            $district_coordinates = json_decode($district->coordinates);
+            $coordinates_latlng = [];
+            foreach ($district_coordinates as $coordinate) {
+                $coordinates_latlng[] = new LatLng(['lat' => $coordinate->lat, 'lng' => $coordinate->lng]);
+            }
+            $polygon = new Polygon(['latLngs' => $coordinates_latlng, 'popupContent' => '<b>'
+                . htmlspecialchars($district->district->getFullTitle()) . '</b>']);
+            $regionGroup->addLayer($polygon);
+        }
+
         $layer['objectGroup'] = $objectsGroup;
         $layer['alarmGroup'] = $alarmGroup;
+        $layer['regionGroup'] = $regionGroup;
         $layer['coordinates'] = $coordinates;
         return $layer;
     }

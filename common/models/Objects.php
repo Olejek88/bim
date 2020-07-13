@@ -212,7 +212,10 @@ class Objects extends PoliterModel
         if ($this->objectTypeUuid == ObjectType::OBJECT) {
             return 'ул.' . $this->parent->title . ', ' . $this->title;
         }
-        return "не задано";
+        if ($this->objectTypeUuid == ObjectType::SUB_DISTRICT) {
+            return $this->title;
+        }
+        return $this->title;
         //return 'ул.' . $house->street->title . ', д.' . $house->number . ' - ' . $this->title;
     }
 
