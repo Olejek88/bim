@@ -3,6 +3,7 @@
 namespace frontend\models;
 
 use common\models\Event;
+use kartik\daterange\DateRangeBehavior;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
@@ -11,6 +12,25 @@ use yii\data\ActiveDataProvider;
  */
 class EventSearch extends Event
 {
+    public $createTimeRange;
+    public $createTimeStart;
+    public $createTimeEnd;
+
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => DateRangeBehavior::class,
+                'attribute' => 'createTimeRange',
+                'dateStartAttribute' => 'createTimeStart',
+                'dateEndAttribute' => 'createTimeEnd',
+            ]
+        ];
+    }
+
     /**
      * @inheritdoc
      */
@@ -18,7 +38,8 @@ class EventSearch extends Event
     {
         return [
             [['_id'], 'integer'],
-            [['uuid', 'title', 'description', 'objectUuid', 'createdAt', 'changedAt'], 'safe'],
+            [['uuid', 'title', 'description', 'objectUuid', 'createTimeStart', 'createTimeEnd', 'createdAt', 'changedAt'], 'safe'],
+            [['createTimeRange'], 'match', 'pattern' => '/^.+\s\-\s.+$/'],
         ];
     }
 
@@ -56,13 +77,23 @@ class EventSearch extends Event
             return $dataProvider;
         }
 
+        if (empty($this->createTimeStart)) {
+            $today = getdate();
+            $this->createTimeStart = sprintf("%d-%02d-%02d", $today['year'] - 1, $today['mon'], $today['mday']);
+        }
+
+        if (empty($this->createTimeEnd)) {
+            $this->createTimeEnd = date('Y-m-d', strtotime('+3 days'));
+        }
+
         // grid filtering conditions
         $query->andFilterWhere([
             '_id' => $this->_id,
-            'objectUuid' => $this->objectUuid,
-            'createdAt' => $this->createdAt,
-            'changedAt' => $this->changedAt,
+            'objectUuid' => $this->objectUuid
         ]);
+
+        $query->andFilterWhere(['>=', 'date', $this->createTimeStart])
+            ->andFilterWhere(['<', 'date', $this->createTimeEnd]);
 
         $query->andFilterWhere(['like', 'description', $this->description])
             ->andFilterWhere(['like', 'title', $this->title])

@@ -112,5 +112,6 @@ class MainFunctions
         fwrite($handle, $str);
         fclose($handle);
     }
+
 }
 

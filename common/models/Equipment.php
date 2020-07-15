@@ -24,7 +24,7 @@ use yii\db\Expression;
  * @property string $serial
  *
  * @property EquipmentStatus $equipmentStatus
- * @property EquipmentType $equipmentType
+ * @property EventType $equipmentType
  */
 class Equipment extends ActiveRecord
 {
@@ -183,7 +183,7 @@ class Equipment extends ActiveRecord
     public function getEquipmentType()
     {
         return $this->hasOne(
-            EquipmentType::class, ['uuid' => 'equipmentTypeUuid']
+            EventType::class, ['uuid' => 'equipmentTypeUuid']
         );
     }
 

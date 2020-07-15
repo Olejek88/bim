@@ -82,7 +82,7 @@ $form = ActiveForm::begin([
             <?php
             echo $form->field($searchModel, 'createTimeStart')->widget(DatePicker::class, [
                 'removeButton' => false,
-                'pjaxContainerId' => 'service-register',
+                'pjaxContainerId' => 'register',
                 'options' => [
                     'class' => 'add-filter',
                 ],
@@ -97,7 +97,7 @@ $form = ActiveForm::begin([
             <?php
             echo $form->field($searchModel, 'createTimeEnd')->widget(DatePicker::class, [
                 'removeButton' => false,
-                'pjaxContainerId' => 'service-register',
+                'pjaxContainerId' => 'register',
                 'options' => [
                     'class' => 'add-filter',
                 ],

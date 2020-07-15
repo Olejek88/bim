@@ -15,6 +15,9 @@ use Yii;
  */
 class ParameterType extends PoliterModel
 {
+    const TARGET_CONSUMPTION = '9716C884-3762-42EF-BF91-CE7B21E9D21A';
+    const ENERGY_EFFICIENCY = '444CBA6D-2082-4DD7-9CC2-6EB5EBF1C5E0';
+    const POWER_EQUIPMENT = '3EE2B734-B957-4191-82A7-60119C2C8556';
 
     /**
      * @inheritdoc

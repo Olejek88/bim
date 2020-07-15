@@ -13,6 +13,8 @@ use yii\db\ActiveQuery;
  * @property string $title
  * @property string $description
  * @property string $objectUuid
+ * @property string $date [datetime]
+ * @property int $status
  * @property boolean $deleted
  * @property string $createdAt [datetime]
  * @property string $changedAt [datetime]
@@ -34,9 +36,10 @@ class Event extends PoliterModel
     public function rules()
     {
         return [
-            [['uuid', 'title', 'objectUuid'], 'required'],
+            [['uuid', 'title', 'objectUuid', 'date'], 'required'],
             [['uuid', 'objectUuid'], 'string', 'max' => 50],
             [['title', 'description'], 'string'],
+            [['int'], 'integer'],
             [['uuid', 'objectUuid'], 'filter', 'filter' => function ($param) {
                 return htmlspecialchars($param, ENT_QUOTES | ENT_HTML401);
             }
@@ -56,6 +59,8 @@ class Event extends PoliterModel
         return [
             'uuid' => Yii::t('app', 'Uuid'),
             'objectUuid' => Yii::t('app', 'Объект'),
+            'date' => Yii::t('app', 'Дата назначения'),
+            'status' => Yii::t('app', 'Статус'),
             'title' => Yii::t('app', 'Мероприятие'),
             'description' => Yii::t('app', 'Описание'),
             'createdAt' => Yii::t('app', 'Создан'),
@@ -68,7 +73,7 @@ class Event extends PoliterModel
      */
     public function fields()
     {
-        return ['uuid', 'title', 'objectUuid', 'createdAt', 'changedAt', 'description', 'deleted'];
+        return ['uuid', 'title', 'date', 'status', 'objectUuid', 'createdAt', 'changedAt', 'description', 'deleted'];
     }
 
     /**

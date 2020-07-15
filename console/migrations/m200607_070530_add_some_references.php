@@ -1,7 +1,6 @@
 <?php
 
 use common\models\EquipmentStatus;
-use common\models\EquipmentType;
 use common\models\MeasureType;
 use common\models\ObjectSubType;
 use common\models\ObjectType;
@@ -52,10 +51,10 @@ class m200607_070530_add_some_references extends Migration
         self::insertRefs(self::OBJECT_TYPE, 'Улица', ObjectType::STREET);
         self::insertRefs(self::OBJECT_TYPE, 'Подрайон', ObjectType::SUB_DISTRICT);
 
-        self::insertRefs(self::EQUIPMENT_TYPE, 'Счетчик холодной воды', EquipmentType::COLD_WATER_COUNTER);
-        self::insertRefs(self::EQUIPMENT_TYPE, 'Счетчик горячей воды', EquipmentType::HOT_WATER_COUNTER);
-        self::insertRefs(self::EQUIPMENT_TYPE, 'Счетчик электроэнергии', EquipmentType::ENERGY_COUNTER);
-        self::insertRefs(self::EQUIPMENT_TYPE, 'Теплосчетчик', EquipmentType::HEAT_COUNTER);
+        //self::insertRefs(self::EQUIPMENT_TYPE, 'Счетчик холодной воды', EquipmentType::COLD_WATER_COUNTER);
+        //self::insertRefs(self::EQUIPMENT_TYPE, 'Счетчик горячей воды', EquipmentType::HOT_WATER_COUNTER);
+        //self::insertRefs(self::EQUIPMENT_TYPE, 'Счетчик электроэнергии', EquipmentType::ENERGY_COUNTER);
+        //self::insertRefs(self::EQUIPMENT_TYPE, 'Теплосчетчик', EquipmentType::HEAT_COUNTER);
 
         self::insertRefs(self::EQUIPMENT_STATUS, 'Все в порядке', EquipmentStatus::WORK);
         self::insertRefs(self::EQUIPMENT_STATUS, 'Нет связи', EquipmentStatus::NO_CONNECT);

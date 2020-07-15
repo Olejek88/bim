@@ -1,8 +1,6 @@
 <?php
 /* @var $dataProvider */
-
 /* @var $searchModel frontend\models\BalancePointSearch */
-
 
 use common\models\BalancePoint;
 use common\models\MeasureChannel;
@@ -132,7 +130,7 @@ echo GridView::widget([
     'hover' => true,
     'panel' => [
         'type' => GridView::TYPE_PRIMARY,
-        'heading' => '<i class="glyphicon glyphicon-calendar"></i>&nbsp; ' . Yii::t('app', 'Точки балансов')
+        'heading' => '<i class="fa fa-tasks"></i>&nbsp; ' . Yii::t('app', 'Точки балансов')
 
     ],
 ]);

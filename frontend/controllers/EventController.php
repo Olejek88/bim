@@ -140,6 +140,23 @@ class EventController extends PoliterController
      */
     public function actionList()
     {
+        if (isset($_POST['editableAttribute'])) {
+            $model = Event::find()
+                ->where(['_id' => $_POST['editableKey']])
+                ->one();
+            if ($_POST['editableAttribute'] == 'status') {
+                $model['status'] = $_POST['Event'][$_POST['editableIndex']]['status'];
+            }
+            if ($_POST['editableAttribute'] == 'title') {
+                $model['title'] = $_POST['Event'][$_POST['editableIndex']]['title'];
+            }
+            if ($_POST['editableAttribute'] == 'description') {
+                $model['description'] = $_POST['Event'][$_POST['editableIndex']]['description'];
+            }
+            if ($model->save())
+                return json_encode('success');
+            return json_encode('failed');
+        }
         $searchModel = new EventSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 50;

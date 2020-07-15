@@ -4,7 +4,9 @@
 /* @var $objectUuid */
 
 use common\models\Event;
+use kartik\editable\Editable;
 use kartik\grid\GridView;
+use kartik\popover\PopoverX;
 use yii\helpers\Html;
 
 ?>
@@ -16,7 +18,7 @@ use yii\helpers\Html;
     <?php
     $gridColumns = [
         [
-            'attribute' => 'createdAt',
+            'attribute' => 'date',
             'hAlign' => 'center',
             'vAlign' => 'middle',
             'contentOptions' => [
@@ -25,10 +27,11 @@ use yii\helpers\Html;
             ],
             'headerOptions' => ['class' => 'text-center'],
             'content' => function ($data) {
-                return date("d-m-Y h:i:s", strtotime($data->createdAt));
+                return date("d-m-Y h:i:s", strtotime($data->date));
             }
         ],
         [
+            'class' => 'kartik\grid\EditableColumn',
             'attribute' => 'title',
             'contentOptions' => [
                 'class' => 'table_class'
@@ -44,6 +47,40 @@ use yii\helpers\Html;
             },
             'header' => Yii::t('app', 'Объект'),
             'format' => 'raw',
+        ],
+        [
+            'class' => 'kartik\grid\EditableColumn',
+            'mergeHeader' => true,
+            'format' => 'raw',
+            'attribute' => 'status',
+            'vAlign' => 'middle',
+            'hAlign' => 'center',
+            'content' => function ($data) {
+                if ($data['status'])
+                    return '<span class="label label-success">Выполнено</span>';
+                else
+                    return '<span class="label label-info">В работе</span>';
+            },
+            'editableOptions' => function ($data) {
+                $types = array(
+                    '0' => Yii::t('app', 'Выполнено'),
+                    '1' => Yii::t('app', 'В работе')
+                );
+                return [
+                    'header' => Yii::t('app', 'Статус'),
+                    'size' => 'sm',
+                    'inputType' => Editable::INPUT_DROPDOWN_LIST,
+                    'placement' => PopoverX::ALIGN_LEFT,
+                    'displayValueConfig' => $types,
+                    'data' => $types,
+                    'formOptions' => [
+                        'id' => 'id_' . $data->_id
+                    ],
+                    'options' => [
+                        'id' => $data->_id,
+                    ]
+                ];
+            },
         ],
         [
             'attribute' => 'description',

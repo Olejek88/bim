@@ -8,7 +8,7 @@ use yii\db\ActiveRecord;
 use yii\db\Expression;
 
 /**
- * This is the model class for table "equipment_type".
+ * This is the model class for table "event_type".
  *
  * @property integer $_id
  * @property string $uuid
@@ -17,12 +17,9 @@ use yii\db\Expression;
  * @property string $changedAt
  *
  */
-class EquipmentType extends ActiveRecord
+class EventType extends ActiveRecord
 {
-    const HEAT_COUNTER = 'B23955CC-13AC-4D17-9394-5928C3D0A321';
-    const HOT_WATER_COUNTER = 'A20871DA-A65D-42CB-983F-0B106C507F29';
-    const COLD_WATER_COUNTER = '2F2F9BED-4FAC-43D6-A16B-FD59BD870146';
-    const ENERGY_COUNTER = '62333CB5-D064-44C5-8723-7B0983287613';
+    const COMMON = '3607A2C5-4930-4F92-A1C5-CC42131A3237';
 
     /**
      * Название таблицы.
@@ -33,7 +30,7 @@ class EquipmentType extends ActiveRecord
      */
     public static function tableName()
     {
-        return 'equipment_type';
+        return 'event_type';
     }
 
     /**

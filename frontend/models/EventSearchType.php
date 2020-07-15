@@ -3,14 +3,14 @@
 namespace frontend\models;
 
 
-use common\models\EquipmentType;
+use common\models\EventType;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
 /**
- * EquipmentSearchType represents the model behind the search form about `common\models\EquipmentType`.
+ * EventSearchType represents the model behind the search form about `common\models\EventType`.
  */
-class EquipmentSearchType extends EquipmentType
+class EventSearchType extends EventType
 {
     /**
      * @inheritdoc
@@ -41,7 +41,7 @@ class EquipmentSearchType extends EquipmentType
      */
     public function search($params)
     {
-        $query = EquipmentType::find();
+        $query = EventType::find();
 
         // add conditions that should always apply here
 

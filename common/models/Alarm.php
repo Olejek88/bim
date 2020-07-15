@@ -12,6 +12,7 @@ use Yii;
  * @property int $_id [int(11)]
  * @property string $uuid
  * @property string $title
+ * @property int $level
  * @property string $entityUuid
  * @property string $createdAt [datetime]
  * @property string $changedAt [datetime]
@@ -19,6 +20,12 @@ use Yii;
  */
 class Alarm extends PoliterModel
 {
+    const LEVEL_INFO = 1;
+    const LEVEL_WARNING = 2;
+    const LEVEL_PROBLEM = 3;
+    const LEVEL_ERROR = 4;
+    const LEVEL_CRITICAL = 5;
+
     /**
      * @inheritdoc
      */

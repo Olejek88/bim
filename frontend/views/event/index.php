@@ -5,10 +5,12 @@
 /* @var Objects[] $objects */
 
 use common\models\Objects;
+use kartik\date\DatePicker;
 use kartik\editable\Editable;
 use kartik\grid\GridView;
 use kartik\popover\PopoverX;
 use yii\helpers\Html;
+use yii\widgets\ActiveForm;
 
 $this->title = Yii::t('app', 'ПолиТЭР::События объектов системы');
 
@@ -20,7 +22,7 @@ $gridColumns = [
         'vAlign' => 'middle',
     ],
     [
-        'attribute' => 'createdAt',
+        'attribute' => 'date',
         'hAlign' => 'center',
         'vAlign' => 'middle',
         'contentOptions' => [
@@ -30,7 +32,7 @@ $gridColumns = [
         'headerOptions' => ['class' => 'text-center'],
         'mergeHeader' => true,
         'content' => function ($data) {
-            return date("d-m-Y h:i:s", strtotime($data->createdAt));
+            return date("d-m-Y h:i:s", strtotime($data->date));
         }
     ],
     [
@@ -73,6 +75,40 @@ $gridColumns = [
     ],
     [
         'class' => 'kartik\grid\EditableColumn',
+        'mergeHeader' => true,
+        'format' => 'raw',
+        'attribute' => 'status',
+        'vAlign' => 'middle',
+        'hAlign' => 'center',
+        'content' => function ($data) {
+            if ($data['status'])
+                return '<span class="label label-success">Выполнено</span>';
+            else
+                return '<span class="label label-info">В работе</span>';
+        },
+        'editableOptions' => function ($data) {
+            $types = array(
+                '0' => Yii::t('app', 'Выполнено'),
+                '1' => Yii::t('app', 'В работе')
+            );
+            return [
+                'header' => Yii::t('app', 'Статус'),
+                'size' => 'sm',
+                'inputType' => Editable::INPUT_DROPDOWN_LIST,
+                'placement' => PopoverX::ALIGN_LEFT,
+                'displayValueConfig' => $types,
+                'data' => $types,
+                'formOptions' => [
+                    'id' => 'id_' . $data->_id
+                ],
+                'options' => [
+                    'id' => $data->_id,
+                ]
+            ];
+        },
+    ],
+    [
+        'class' => 'kartik\grid\EditableColumn',
         'attribute' => 'description',
         'contentOptions' => [
             'class' => 'table_class'
@@ -87,7 +123,53 @@ $gridColumns = [
     ],
 ];
 
+ob_start();
+// форма указания периода
+$form = ActiveForm::begin([
+    'action' => ['event/index'],
+    'method' => 'get',
+]);
+?>
+<div class="row" style="margin-bottom: 8px; width:100%">
+    <div class="col-sm-4" style="width:36%">
+        <?php
+        echo $form->field($searchModel, 'createTimeStart')->widget(DatePicker::class, [
+            'removeButton' => false,
+            'pjaxContainerId' => 'event',
+            'options' => [
+                'class' => 'add-filter',
+            ],
+            'pluginOptions' => [
+                'autoclose' => true,
+                'format' => 'yyyy-mm-dd'
+            ]
+        ])->label(false);
+        ?>
+    </div>
+    <div class="col-sm-4" style="width:36%">
+        <?php
+        echo $form->field($searchModel, 'createTimeEnd')->widget(DatePicker::class, [
+            'removeButton' => false,
+            'pjaxContainerId' => 'event',
+            'options' => [
+                'class' => 'add-filter',
+            ],
+            'pluginOptions' => [
+                'autoclose' => true,
+                'format' => 'yyyy-mm-dd'
+            ]
+        ])->label(false);
+        ?>
+    </div>
+</div>
+
+<?php
+ActiveForm::end();
+$formHtml = ob_get_contents();
+ob_end_clean();
+
 echo GridView::widget([
+    'filterSelector' => '.add-filter',
     'dataProvider' => $dataProvider,
     'filterModel' => $searchModel,
     'columns' => $gridColumns,
@@ -113,6 +195,11 @@ echo GridView::widget([
         'filename' => 'event'
     ],
     'pjax' => true,
+    'pjaxSettings' => [
+        'options' => [
+            'id' => 'event',
+        ],
+    ],
     'showPageSummary' => false,
     'pageSummaryRowOptions' => ['style' => 'line-height: 0; padding: 0'],
     'summary' => '',
