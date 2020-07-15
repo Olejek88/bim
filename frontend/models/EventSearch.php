@@ -37,8 +37,8 @@ class EventSearch extends Event
     public function rules()
     {
         return [
-            [['_id'], 'integer'],
-            [['uuid', 'title', 'description', 'objectUuid', 'createTimeStart', 'createTimeEnd', 'createdAt', 'changedAt'], 'safe'],
+            [['_id', 'status'], 'integer'],
+            [['uuid', 'title', 'description', 'objectUuid', 'eventTypeUuid', 'createTimeStart', 'createTimeEnd', 'createdAt', 'changedAt'], 'safe'],
             [['createTimeRange'], 'match', 'pattern' => '/^.+\s\-\s.+$/'],
         ];
     }
@@ -83,13 +83,15 @@ class EventSearch extends Event
         }
 
         if (empty($this->createTimeEnd)) {
-            $this->createTimeEnd = date('Y-m-d', strtotime('+3 days'));
+            $this->createTimeEnd = date('Y-m-d', strtotime('+1 year'));
         }
 
         // grid filtering conditions
         $query->andFilterWhere([
             '_id' => $this->_id,
-            'objectUuid' => $this->objectUuid
+            'objectUuid' => $this->objectUuid,
+            'eventTypeUuid' => $this->eventTypeUuid,
+            'status' => $this->status
         ]);
 
         $query->andFilterWhere(['>=', 'date', $this->createTimeStart])

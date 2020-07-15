@@ -1,11 +1,13 @@
 <?php
 /* @var $searchModel frontend\models\EventSearch */
 /* @var $dataProvider */
+/* @var $types */
 
 /* @var Objects[] $objects */
 
 use common\models\Objects;
 use kartik\date\DatePicker;
+use kartik\datecontrol\DateControl;
 use kartik\editable\Editable;
 use kartik\grid\GridView;
 use kartik\popover\PopoverX;
@@ -22,6 +24,7 @@ $gridColumns = [
         'vAlign' => 'middle',
     ],
     [
+        'class' => 'kartik\grid\EditableColumn',
         'attribute' => 'date',
         'hAlign' => 'center',
         'vAlign' => 'middle',
@@ -32,8 +35,50 @@ $gridColumns = [
         'headerOptions' => ['class' => 'text-center'],
         'mergeHeader' => true,
         'content' => function ($data) {
-            return date("d-m-Y h:i:s", strtotime($data->date));
-        }
+            return date("d-m-Y", strtotime($data->date));
+        },
+        'editableOptions' => [
+            'header' => Yii::t('app', 'Дата назначения'),
+            'size' => 'md',
+            'inputType' => Editable::INPUT_WIDGET,
+            'widgetClass' => 'kartik\datecontrol\DateControl',
+            'options' => [
+                'type' => DateControl::FORMAT_DATE,
+                'displayFormat' => 'dd-MM-yyyy',
+                'saveFormat' => 'php:Y-m-d',
+                'options' => [
+                    'pluginOptions' => [
+                        'autoclose' => true
+                    ]
+                ]
+            ]
+        ]
+    ],
+    [
+        'class' => 'kartik\grid\EditableColumn',
+        'attribute' => 'eventTypeUuid',
+        'vAlign' => 'middle',
+        'value' => function ($data) {
+            return $data->eventType->title;
+        },
+        'filterType' => GridView::FILTER_SELECT2,
+        'header' => Yii::t('app', 'Тип'),
+        'filter' => $objects,
+        'filterWidgetOptions' => [
+            'pluginOptions' => ['allowClear' => true],
+        ],
+        'filterInputOptions' => ['placeholder' => Yii::t('app', 'Любой')],
+        'format' => 'raw',
+        'editableOptions' => function () use ($types) {
+            return [
+                'header' => Yii::t('app', 'Тип'),
+                'size' => 'lg',
+                'inputType' => Editable::INPUT_DROPDOWN_LIST,
+                'placement' => PopoverX::ALIGN_RIGHT,
+                'displayValueConfig' => $types,
+                'data' => $types
+            ];
+        },
     ],
     [
         'class' => 'kartik\grid\EditableColumn',
@@ -67,7 +112,7 @@ $gridColumns = [
                 'header' => Yii::t('app', 'Объект'),
                 'size' => 'lg',
                 'inputType' => Editable::INPUT_DROPDOWN_LIST,
-                'placement' => PopoverX::ALIGN_LEFT,
+                'placement' => PopoverX::ALIGN_RIGHT,
                 'displayValueConfig' => $objects,
                 'data' => $objects
             ];
@@ -75,27 +120,21 @@ $gridColumns = [
     ],
     [
         'class' => 'kartik\grid\EditableColumn',
-        'mergeHeader' => true,
-        'format' => 'raw',
         'attribute' => 'status',
         'vAlign' => 'middle',
         'hAlign' => 'center',
-        'content' => function ($data) {
-            if ($data['status'])
-                return '<span class="label label-success">Выполнено</span>';
-            else
-                return '<span class="label label-info">В работе</span>';
-        },
         'editableOptions' => function ($data) {
             $types = array(
-                '0' => Yii::t('app', 'Выполнено'),
-                '1' => Yii::t('app', 'В работе')
+                '1' => 'Выполнено',
+                '0' => 'В работе'
+                //'1' => '<span class="label label-success">Выполнено</span>',
+                //'0' => '<span class="label label-info">В работе</span>'
             );
             return [
                 'header' => Yii::t('app', 'Статус'),
                 'size' => 'sm',
                 'inputType' => Editable::INPUT_DROPDOWN_LIST,
-                'placement' => PopoverX::ALIGN_LEFT,
+                'placement' => PopoverX::ALIGN_BOTTOM_RIGHT,
                 'displayValueConfig' => $types,
                 'data' => $types,
                 'formOptions' => [
@@ -161,6 +200,17 @@ $form = ActiveForm::begin([
         ])->label(false);
         ?>
     </div>
+    <div class="col-sm-2" style="width:18%">
+        <?= Html::a(Yii::t('app', 'Новое'),
+            ['/event/new', 'reference' => 'table'],
+            [
+                'class' => 'btn btn-success',
+                'title' => Yii::t('app', 'Новое'),
+                'data-toggle' => 'modal',
+                'data-target' => '#modalAdd'
+            ]); ?>
+    </div>
+    <div class="col-sm-1" style="width:8%">{export}</div>
 </div>
 
 <?php
@@ -179,16 +229,8 @@ echo GridView::widget([
     ],
     'toolbar' => [
         ['content' =>
-            Html::a(Yii::t('app', 'Новое'),
-                ['/event/new', 'reference' => 'table'],
-                [
-                    'class' => 'btn btn-success',
-                    'title' => Yii::t('app', 'Новое'),
-                    'data-toggle' => 'modal',
-                    'data-target' => '#modalAdd'
-                ])
-        ],
-        '{export}',
+            $formHtml
+        ]
     ],
     'export' => [
         'target' => GridView::TARGET_BLANK,

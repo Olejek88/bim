@@ -13,6 +13,7 @@ use yii\db\ActiveQuery;
  * @property string $title
  * @property string $description
  * @property string $objectUuid
+ * @property string $eventTypeUuid
  * @property string $date [datetime]
  * @property int $status
  * @property boolean $deleted
@@ -37,10 +38,10 @@ class Event extends PoliterModel
     {
         return [
             [['uuid', 'title', 'objectUuid', 'date'], 'required'],
-            [['uuid', 'objectUuid'], 'string', 'max' => 50],
+            [['uuid', 'objectUuid', 'eventTypeUuid'], 'string', 'max' => 50],
             [['title', 'description'], 'string'],
-            [['int'], 'integer'],
-            [['uuid', 'objectUuid'], 'filter', 'filter' => function ($param) {
+            [['status'], 'integer'],
+            [['uuid', 'objectUuid', 'eventTypeUuid'], 'filter', 'filter' => function ($param) {
                 return htmlspecialchars($param, ENT_QUOTES | ENT_HTML401);
             }
             ],
@@ -63,6 +64,8 @@ class Event extends PoliterModel
             'status' => Yii::t('app', 'Статус'),
             'title' => Yii::t('app', 'Мероприятие'),
             'description' => Yii::t('app', 'Описание'),
+            'eventTypeUuid' => Yii::t('app', 'Тип'),
+            'eventType' => Yii::t('app', 'Тип'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
         ];
@@ -73,7 +76,7 @@ class Event extends PoliterModel
      */
     public function fields()
     {
-        return ['uuid', 'title', 'date', 'status', 'objectUuid', 'createdAt', 'changedAt', 'description', 'deleted'];
+        return ['uuid', 'title', 'date', 'status', 'objectUuid', 'eventTypeUuid', 'createdAt', 'changedAt', 'description', 'deleted'];
     }
 
     /**
@@ -85,6 +88,18 @@ class Event extends PoliterModel
     {
         return $this->hasOne(
             Objects::class, ['uuid' => 'objectUuid']
+        );
+    }
+
+    /**
+     * Объект связанного поля.
+     *
+     * @return ActiveQuery
+     */
+    public function getEventType()
+    {
+        return $this->hasOne(
+            EventType::class, ['uuid' => 'eventTypeUuid']
         );
     }
 

@@ -331,6 +331,22 @@ class ObjectController extends PoliterController
                                     'data-target' => '#modalParameter',
                                 ]
                             );
+                            $links .= Html::a('<span class="fa fa-warning"></span>&nbsp',
+                                ['/alarm/list', 'uuid' => $object['uuid']],
+                                [
+                                    'title' => Yii::t('app', 'Предупреждения по объекту'),
+                                    'data-toggle' => 'modal',
+                                    'data-target' => '#modalParameter',
+                                ]
+                            );
+                            $links .= Html::a('<span class="fa fa-list-ul"></span>&nbsp',
+                                ['/attribute/list', 'uuid' => $object['uuid']],
+                                [
+                                    'title' => Yii::t('app', 'Атрибуты объекта'),
+                                    'data-toggle' => 'modal',
+                                    'data-target' => '#modalParameter',
+                                ]
+                            );
 
                             $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children'][] = [
                                 'title' => $object->getFullTitle(),

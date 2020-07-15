@@ -3,6 +3,7 @@
 namespace frontend\controllers;
 
 use common\models\Event;
+use common\models\EventType;
 use common\models\Objects;
 use common\models\ObjectType;
 use frontend\models\EventSearch;
@@ -70,6 +71,12 @@ class EventController extends PoliterController
             if ($_POST['editableAttribute'] == 'title') {
                 $model['title'] = $_POST['Event'][$_POST['editableIndex']]['title'];
             }
+            if ($_POST['editableAttribute'] == 'status') {
+                $model['status'] = $_POST['Event'][$_POST['editableIndex']]['status'];
+            }
+            if ($_POST['editableAttribute'] == 'date') {
+                $model['date'] = $_POST['Event'][$_POST['editableIndex']]['date'];
+            }
             if ($_POST['editableAttribute'] == 'description') {
                 $model['description'] = $_POST['Event'][$_POST['editableIndex']]['description'];
             }
@@ -84,10 +91,14 @@ class EventController extends PoliterController
         $objects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->orderBy('title')->all();
         $objects = ArrayHelper::map($objects, 'uuid', 'title');
 
+        $types = EventType::find()->orderBy('title')->all();
+        $types = ArrayHelper::map($types, 'uuid', 'title');
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'objects' => $objects
+            'objects' => $objects,
+            'types' => $types
         ]);
     }
 
