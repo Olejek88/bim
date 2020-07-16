@@ -10,10 +10,8 @@ use common\models\Objects;
 use common\models\ObjectSubType;
 use common\models\ObjectType;
 use frontend\models\ObjectsSearch;
-use Throwable;
 use Yii;
 use yii\base\InvalidConfigException;
-use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
@@ -186,8 +184,6 @@ class ObjectController extends PoliterController
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException
-     * @throws Throwable
-     * @throws StaleObjectException
      */
     public function actionDelete($id)
     {

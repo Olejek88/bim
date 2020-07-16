@@ -116,12 +116,18 @@ $this->title = Yii::t('app', 'Дерево объектов системы');
         </div>
     </div>
     <div class="modal remote fade" id="modalParameter">
-        <div class="modal-dialog" style="width: 1000px">
-            <div class="modal-content loader-lg">
+        <div class="modal-dialog" style="width: 1000px; height: 500px">
+            <div class="modal-content loader-lg" id="modalParameterContent">
             </div>
         </div>
     </div>
     <div class="modal remote fade" id="modalAdd">
+        <div class="modal-dialog" style="width: 800px; height: 400px">
+            <div class="modal-content loader-lg" style="margin: 10px; padding: 10px" id="modalContent">
+            </div>
+        </div>
+    </div>
+    <div class="modal remote fade" id="modalAlarm">
         <div class="modal-dialog" style="width: 800px; height: 400px">
             <div class="modal-content loader-lg" style="margin: 10px; padding: 10px" id="modalContent">
             </div>
@@ -325,10 +331,24 @@ function () {
 $this->registerJs('$("#modalParameter").on("hidden.bs.modal",
 function () {
     $(this).removeData();
+    $("#modalAddAlarm").modal("hide");
+    $("#modalAddEvent").modal("hide");
+    $("#modalAddAttribute").modal("hide");
+})');
+$this->registerJs('$("#modalAddAlarm").on("hidden.bs.modal",
+function () {
+    $(this).removeData();
+    $("#modalParameter").modal("hide");
 })');
 $this->registerJs('$("#modalAddEvent").on("hidden.bs.modal",
 function () {
     $(this).removeData();
+    $("#modalParameter").modal("hide");
+})');
+$this->registerJs('$("#modalAddAttribute").on("hidden.bs.modal",
+function () {
+    $(this).removeData();
+    $("#modalParameter").modal("hide");
 })');
 $this->registerJs('$("#modalAdd").on("hidden.bs.modal",
 function () {

@@ -55,6 +55,8 @@ use yii\helpers\Html;
         }
     }
     echo $form->field($event, 'description')->textInput(['maxlength' => true]);
+    echo '<br/>';
+    echo '<label id="error" style="color: red"></label>';
     ?>
 </div>
 <div class="modal-footer">

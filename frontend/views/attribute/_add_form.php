@@ -1,14 +1,15 @@
 <?php
-/* @var $alarm Alarm */
+
+/* @var $attribute */
 /* @var $objectUuid */
 
-/* @var Objects[] $objects */
+/* @var $objects */
 
 use common\components\MainFunctions;
-use common\models\Alarm;
-use common\models\Objects;
+use common\models\AttributeType;
 use kartik\select2\Select2;
 use yii\bootstrap\ActiveForm;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
@@ -16,51 +17,42 @@ use yii\helpers\Url;
 
 <?php $form = ActiveForm::begin([
     'enableAjaxValidation' => true,
-    'validationUrl' => Url::toRoute('/alarm/validation'),
-    'action' => '../alarm/save',
+    'validationUrl' => Url::toRoute('/attribute/validation'),
+    'action' => '../attribute/save',
     'options' => [
-        'id' => 'addAlarmForm',
+        'id' => 'addAttributeForm',
         'enctype' => 'multipart/form-data'
     ]]);
 ?>
 <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal">&times;</button>
-    <h4 class="modal-title"><?php echo Yii::t('app', 'Событие') ?></h4>
+    <h4 class="modal-title"><?php echo Yii::t('app', 'Добавить атрибут') ?></h4>
 </div>
 <div class="modal-body">
     <?php
-    if (!$alarm->isNewRecord) {
-        echo $form->field($alarm, 'uuid')->textInput(['maxlength' => true, 'readonly' => true]);
-    } else {
-        echo $form->field($alarm, 'uuid')->hiddenInput(['value' => (new MainFunctions)->GUID()])->label(false);
-    }
-
-    echo $form->field($alarm, 'title')->textInput(['maxlength' => true]);
-    echo $form->field($alarm, 'level')->widget(Select2::class,
+    echo $form->field($attribute, 'uuid')
+        ->hiddenInput(['value' => MainFunctions::GUID()])
+        ->label(false);
+    $attributeTypes = AttributeType::find()->all();
+    $items = ArrayHelper::map($attributeTypes, 'uuid', 'title');
+    echo $form->field($attribute, 'attributeTypeUuid')->widget(Select2::class,
         [
-            'data' => array(
-                Alarm::LEVEL_INFO => 'Информация',
-                Alarm::LEVEL_WARNING => 'Предупреждение',
-                Alarm::LEVEL_PROBLEM => 'Проблема',
-                Alarm::LEVEL_ERROR => 'Тревога',
-                Alarm::LEVEL_CRITICAL => 'Критично'
-            ),
-            'options' => [
-                'placeholder' => Yii::t('app', 'Выберите уровень..'),
-                'style' => ['height' => '42px', 'padding-top' => '10px']
-            ],
+            'name' => 'kv_types',
+            'language' => Yii::t('app', 'ru'),
+            'data' => $items,
+            'options' => ['placeholder' => Yii::t('app', 'Выберите тип атрибута ...')],
             'pluginOptions' => [
                 'allowClear' => true
             ],
-        ]);
-
-    if ($alarm['entityUuid'] != null) {
-        echo $form->field($alarm, 'entityUuid')->hiddenInput(['value' => $model['uuid']])->label(false);
+        ])->label(false);
+    echo $form->field($attribute, 'title')->textInput(['maxlength' => true]);
+    if ($attribute['entityUuid'] != null) {
+        echo $form->field($attribute, 'entityUuid')->hiddenInput(['value' => $model['uuid']])->label(false);
     } else {
         if ($objectUuid) {
-            echo $form->field($alarm, 'entityUuid')->hiddenInput(['value' => $objectUuid])->label(false);
+            echo $form->field($attribute, 'entityUuid')->hiddenInput(['value' => $objectUuid])->label(false);
         } else {
-            echo $form->field($alarm, 'entityUuid')->widget(Select2::class,
+            echo $form->field($attribute, 'entityUuid')->widget(Select2::class,
                 [
                     'data' => $objects,
                     'language' => Yii::t('app', 'ru'),
@@ -76,6 +68,7 @@ use yii\helpers\Url;
     }
     echo '<br/>';
     echo '<label id="error" style="color: red"></label>';
+
     ?>
 </div>
 <div class="modal-footer">
@@ -83,18 +76,18 @@ use yii\helpers\Url;
     <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo Yii::t('app', 'Закрыть') ?></button>
 </div>
 <script>
-    $(document).on("beforeSubmit", "#addAlarmForm", function (e) {
+    $(document).one("beforeSubmit", "#addAttributeForm", function (e) {
         e.preventDefault();
-    }).one('submit', "#addAlarmForm", function (e) {
+    }).one('submit', function (e) {
         e.preventDefault();
         $.ajax({
             type: "post",
-            data: $('#addAlarmForm').serialize(),
-            url: "../alarm/save",
+            data: $('#addAttributeForm').serialize(),
+            url: "../attribute/save",
             success: function (code) {
                 let message = JSON.parse(code);
                 if (message.code === 0) {
-                    $('#modalAddAlarm').modal('hide');
+                    $('#modalAddAttribute').modal('hide');
                     let ajax = document.getElementById('modalParameterContent');
                     ajax.value = true
                 } else {

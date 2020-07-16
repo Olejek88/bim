@@ -92,7 +92,7 @@ class Attribute extends PoliterModel
             'attributeTypeUuid' => Yii::t('app', 'Тип атрибута'),
             'entity' => Yii::t('app', 'Связанная сущность'),
             'entityUuid' => Yii::t('app', 'Связанная сущность'),
-            'title' => Yii::t('app', 'Название'),
+            'title' => Yii::t('app', 'Значение'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
         ];
@@ -141,5 +141,20 @@ class Attribute extends PoliterModel
             }
         }
         return "";
+    }
+
+    /**
+     * @return array
+     */
+    public function getPermissions()
+    {
+        $class = explode('\\', get_class($this));
+        $class = $class[count($class) - 1];
+
+        $perm = parent::getPermissions();
+        $perm['list'] = 'list' . $class;
+        $perm['validation'] = 'validation' . $class;
+
+        return $perm;
     }
 }

@@ -95,10 +95,10 @@ class ActionRegister extends PoliterModel
     public function getEntityName()
     {
         if ($this->entityUuid) {
-            /** @var Equipment $equipment */
-            $equipment = Equipment::find()->where(['uuid' => $this->entityUuid])->one();
-            if ($equipment) {
-                return $equipment->title;
+            /** @var Objects $object */
+            $object = Objects::find()->where(['uuid' => $this->entityUuid])->one();
+            if ($object) {
+                return $object->getFullTitle();
             }
             /** @var User $user */
             $user = User::find()->where(['id' => $this->entityUuid])->one();

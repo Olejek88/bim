@@ -183,6 +183,4 @@ class EventController extends PoliterController
             'objectUuid' => $objectUuid
         ]);
     }
-
-
 }

@@ -38,15 +38,17 @@ class Alarm extends PoliterModel
      * Check Alarm model.
      * @param $entityUuid
      * @param $title
+     * @param $level
      * @return mixed
      * @throws Exception
      */
 
-    public static function addAlarm($entityUuid, $title)
+    public static function addAlarm($entityUuid, $title, $level)
     {
         $model = new Alarm();
         $model->entityUuid = $entityUuid;
         $model->title = $title;
+        $model->level = $level;
         $model->uuid = MainFunctions::GUID();
         $model->save();
         return true;
@@ -61,6 +63,7 @@ class Alarm extends PoliterModel
             [['uuid', 'title', 'entityUuid'], 'required'],
             [['uuid', 'entityUuid'], 'string', 'max' => 50],
             [['title'], 'string'],
+            [['level'], 'integer'],
             [['uuid', 'entityUuid'], 'filter', 'filter' => function ($param) {
                 return htmlspecialchars($param, ENT_QUOTES | ENT_HTML401);
             }
@@ -81,6 +84,7 @@ class Alarm extends PoliterModel
             'uuid' => Yii::t('app', 'Uuid'),
             'entityUuid' => Yii::t('app', 'Связанная сущность'),
             'title' => Yii::t('app', 'Событие'),
+            'level' => Yii::t('app', 'Уровень предупреждения'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
         ];
@@ -91,7 +95,7 @@ class Alarm extends PoliterModel
      */
     public function fields()
     {
-        return ['uuid', 'title', 'entityUuid', 'createdAt', 'changedAt', 'view'];
+        return ['uuid', 'title', 'entityUuid', 'level', 'createdAt', 'changedAt', 'view'];
     }
 
     /**
@@ -102,10 +106,42 @@ class Alarm extends PoliterModel
     public function getEntityTitle()
     {
         if ($this->entityUuid != null) {
-            $equipment = Equipment::findOne(['uuid' => $this->entityUuid]);
-            if ($equipment)
-                return '[' . $equipment->_id . '] ' . $equipment->title;
+            $object = Objects::findOne(['uuid' => $this->entityUuid]);
+            if ($object) {
+                return 'ул.' . $object->parent->title . ', ' . $this->title;
+            }
         }
         return '';
+    }
+
+    /**
+     * @return array
+     */
+    public function getPermissions()
+    {
+        $class = explode('\\', get_class($this));
+        $class = $class[count($class) - 1];
+
+        $perm = parent::getPermissions();
+        $perm['list'] = 'list' . $class;
+        $perm['validation'] = 'validation' . $class;
+
+        return $perm;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAlarmLabel()
+    {
+        if ($this['level'] == Alarm::LEVEL_INFO)
+            return '<span class="label label-info">Информация</span>';
+        if ($this['level'] == Alarm::LEVEL_WARNING)
+            return '<span class="label label-info">Предупреждение</span>';
+        if ($this['level'] == Alarm::LEVEL_PROBLEM)
+            return '<span class="label label-warning">Проблема</span>';
+        if ($this['level'] == Alarm::LEVEL_ERROR)
+            return '<span class="label label-warning">Тревога</span>';
+        return '<span class="label label-danger">Критично</span>';
     }
 }

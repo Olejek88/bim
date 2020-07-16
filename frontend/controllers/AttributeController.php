@@ -2,11 +2,18 @@
 
 namespace frontend\controllers;
 
+use common\components\MainFunctions;
+use common\models\ActionRegister;
 use common\models\Attribute;
 use common\models\AttributeType;
+use common\models\Objects;
+use common\models\ObjectType;
+use Exception;
 use frontend\models\AttributeSearch;
 use Yii;
+use yii\bootstrap\ActiveForm;
 use yii\db\StaleObjectException;
+use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -50,9 +57,12 @@ class AttributeController extends PoliterController
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
+        $model = $this->findModel($id);
+        MainFunctions::register(Yii::t('app', 'Удален атрибут ') . $model->title,
+            ActionRegister::TYPE_DELETE,
+            $model->entityUuid . "");
+        $model->delete();
+        return $this->redirect(parse_url($_SERVER["HTTP_REFERER"], PHP_URL_PATH));
     }
 
     /**
@@ -74,34 +84,87 @@ class AttributeController extends PoliterController
     }
 
     /**
-     * Lists all Attributes models for Attribute .
-     * @param $uuid
+     * Lists all Attributes for Object
      * @return mixed
      */
-    public function actionList($uuid)
+    public function actionList()
     {
-        $attributes = Attribute::find()
-            ->where(['uuid' => $uuid])
-            ->all();
-        return $this->renderAjax('_attributes_list', [
-            'attributes' => $attributes,
+        $searchModel = new AttributeSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider->pagination->pageSize = 50;
+
+        $request = Yii::$app->request;
+        $objectUuid = $request->get('uuid');
+        $dataProvider->query->where(['entityUuid' => $objectUuid]);
+
+        return $this->renderAjax('_list', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'objectUuid' => $objectUuid
         ]);
     }
 
     /**
-     * Creates a new Attribute model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     *
      * @return mixed
      */
-    public function actionAdd()
+    public
+    function actionNew()
+    {
+        $attribute = new Attribute();
+        $objects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->orderBy('title')->all();
+        $objects = ArrayHelper::map($objects, 'uuid', 'title');
+
+        $request = Yii::$app->request;
+        $objectUuid = $request->get('objectUuid');
+        return $this->renderAjax('_add_form', [
+            'attribute' => $attribute,
+            'objects' => $objects,
+            'objectUuid' => $objectUuid
+        ]);
+    }
+
+    /**
+     * @return mixed
+     * @throws Exception
+     */
+    public
+    function actionSave()
     {
         $model = new Attribute();
         if ($model->load(Yii::$app->request->post())) {
             if ($model->save(false)) {
-                return true;
+                MainFunctions::register(Yii::t('app', 'Добавлен атрибут ') . $model->title,
+                    ActionRegister::TYPE_ADD,
+                    $model->entityUuid . "");
+                $return['code'] = 0;
+                $return['message'] = "";
+                return json_encode($return);
+            } else {
+                $message = '';
+                foreach ($model->errors as $key => $error) {
+                    $message .= $error[0] . '</br>';
+                }
+                return json_encode(['message' => $message]);
             }
         }
-        return false;
+        return $this->render('_add_form', [
+            'model' => $model
+        ]);
+    }
+
+    /**
+     * Ajax validation
+     *
+     * @return array
+     *
+     */
+    public function actionValidation()
+    {
+        $model = new Attribute();
+        if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
+            Yii::$app->response->format = 'json';
+            return ActiveForm::validate($model);
+        }
+        return null;
     }
 }

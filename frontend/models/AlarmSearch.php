@@ -37,7 +37,7 @@ class AlarmSearch extends Alarm
     public function rules()
     {
         return [
-            [['uuid', 'title', 'entityUuid', 'createTimeStart', 'createTimeEnd'], 'safe'],
+            [['uuid', 'title', 'level', 'entityUuid', 'createTimeStart', 'createTimeEnd'], 'safe'],
             [['createTimeRange'], 'match', 'pattern' => '/^.+\s\-\s.+$/']
         ];
     }
@@ -86,7 +86,8 @@ class AlarmSearch extends Alarm
         // grid filtering conditions
         $query->andFilterWhere([
             '_id' => $this->_id,
-            'entityUuid' => $this->entityUuid
+            'entityUuid' => $this->entityUuid,
+            'level' => $this->level
         ]);
 
         $query->andFilterWhere(['>=', 'createdAt', $this->createTimeStart])

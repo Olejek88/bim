@@ -383,20 +383,20 @@ class SiteController extends Controller
 
         $event .= '<div class="timeline-item">';
         $event .= '<span class="time"><i class="fa fa-clock-o"></i> ' . date("M j, Y h:i", strtotime($date)) . '</span>';
-        if ($type == 'event')
+        if ($type == 'event') {
             $event .= '<span class="timeline-header" style="vertical-align: middle">' .
                 Yii::t('app', 'Добавлено или изменено событие &nbsp') . " " . $title . '</span>';
-
-        if ($type == 'register')
+        }
+        if ($type == 'register') {
             $event .= '&nbsp;<span class="btn btn-primary btn-xs">' . $user . '</span>&nbsp;
                     <span class="timeline-header" style="vertical-align: middle">' .
                 Yii::t('app', 'Действие в системе &nbsp;') . " " . $title . '</span>';
-
-        if ($type == 'attribute')
+        }
+        if ($type == 'attribute') {
             $event .= '&nbsp;<span class="btn btn-primary btn-xs">' . $user . '</span>&nbsp; 
                     <span class="timeline-header" style="vertical-align: middle">' .
                 Yii::t('app', 'Изменен аттрибут &nbsp;') . " " . $title . '</span>';
-
+        }
         $event .= '<div class="timeline-body">' . $text . '</div>';
         $event .= '</div></li>';
         return $event;
@@ -506,12 +506,12 @@ class SiteController extends Controller
 
         foreach ($alarms as $alarm) {
             if ($alarm["entityUuid"]) {
-                $object = Objects::find()->where(['entityUuid' => $alarm["entityUuid"]])->one();
+                $object = Objects::find()->where(['uuid' => $alarm["entityUuid"]])->one();
                 if ($object["latitude"] > 0) {
                     $position = new LatLng(['lat' => $object["latitude"], 'lng' => $object["longitude"]]);
                     $marker = new Marker(['latLng' => $position, 'popupContent' => '<b>'
                         . $object["title"] . '</b><br/>'
-                        . $alarm["title"]]);
+                        . $alarm->getAlarmLabel() . " " . $alarm["title"]]);
                     $marker->setIcon($alarmIcon);
                     $alarmGroup->addLayer($marker);
                 }

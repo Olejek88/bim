@@ -128,6 +128,7 @@ class m200714_130800_add_new_fields extends Migration
         //self::insertRefs(self::EVENT_TYPE, 'Установка современной качественной теплоизоляции', null);
 
         $this->addColumn('event', 'eventTypeUuid', $this->string(36)->notNull()->defaultValue(EventType::COMMON));
+        $this->addColumn('alarm', 'level', $this->integer()->defaultValue(0));
     }
 
     private function insertRefs($table, $title, $uuid)
