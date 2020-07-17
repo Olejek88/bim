@@ -2,7 +2,7 @@
 /* @var $parameters common\models\Parameter */
 
 /* @var $dataProvider
- * @var $objectUuid
+ * @var $entityUuid
  * @var $parameterTypes ParameterType []
  */
 
@@ -114,7 +114,7 @@ use yii\helpers\Html;
         'toolbar' => [
             ['content' =>
                 Html::a(Yii::t('app', 'Новый'),
-                    ['../parameter/new', 'objectUuid' => $objectUuid],
+                    ['../parameter/new', 'entityUuid' => $entityUuid],
                     [
                         'class' => 'btn btn-success',
                         'title' => Yii::t('app', 'Новый'),
@@ -149,18 +149,18 @@ use yii\helpers\Html;
 
     $this->registerJs('$("#modalAddParameter").on("hidden.bs.modal",
     function () {
-        let ajax = document.getElementById("modalAddParameterContent");
+        let ajax = document.getElementById("modalParameterContent");
         if (ajax.value) {
             ajax.value = false
             $.pjax.reload({
-                container: "#document-table-pjax",
-                url: "/parameter/list?uuid=' . $objectUuid . '",
+                container: "#parameter-table-pjax",
+                url: "/parameter/list?uuid=' . $entityUuid . '",
                 replace: false
             });
         }
         $(this).removeData();
     })');
-    echo Html::hiddenInput("objectUuid", $objectUuid);
+    echo Html::hiddenInput("entityUuid", $entityUuid);
     ?>
 
     <div class="modal remote fade" id="modalAddParameter">

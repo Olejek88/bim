@@ -150,6 +150,8 @@ class SiteController extends Controller
 	             });';
         $leaflet->setJs($js);
 
+        $leaflet->setJs('/js/Leaflet.SelectAreaFeature.js');
+
         // Different layers can be added to our map using the `addLayer` function.
         $leaflet->addLayer($tileLayer);
 

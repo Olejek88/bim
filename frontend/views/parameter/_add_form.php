@@ -7,16 +7,20 @@
 use common\components\MainFunctions;
 use common\models\Parameter;
 use common\models\ParameterType;
+use kartik\date\DatePicker;
 use kartik\select2\Select2;
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
+use yii\helpers\Url;
 
 ?>
 
 <?php $form = ActiveForm::begin([
-    'enableAjaxValidation' => false,
+    'enableAjaxValidation' => true,
+    'validationUrl' => Url::toRoute('/parameter/validation'),
+    'action' => '../parameter/save',
     'options' => [
-        'id' => 'formAddParameter',
+        'id' => 'addParameterForm',
         'enctype' => 'multipart/form-data'
     ]]);
 ?>
@@ -43,9 +47,32 @@ use yii\helpers\Html;
         ])->label(false);
     echo $form->field($parameter, 'entityUuid')->hiddenInput(['value' => $entityUuid])->label(false);
     echo $form->field($parameter, 'value')->textInput(['maxlength' => true]);
+    echo Html::hiddenInput("objectUuid", $entityUuid);
     echo $form->field($parameter, 'date')
         ->hiddenInput(['value' => date("Ymdhis")])
         ->label(false);
+    ?>
+    <div class="pole-mg">
+        <p style="width: 300px; margin-bottom: 0;"><?php echo Yii::t('app', 'Дата актуализации параметра') ?></p>
+        <?php echo DatePicker::widget(
+            [
+                'model' => $parameter,
+                'attribute' => 'date',
+                'value' => date("Ymdhis"),
+                'language' => Yii::t('app', 'ru'),
+                'size' => 'ms',
+                'pluginOptions' => [
+                    'autoclose' => true,
+                    'format' => 'yyyy-mm-dd',
+                ]
+            ]
+        );
+        ?>
+    </div>
+    <?php
+    echo '<br/>';
+    echo '<label id="error" style="color: red"></label>';
+
     ?>
 </div>
 <div class="modal-footer">
@@ -53,20 +80,30 @@ use yii\helpers\Html;
     <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo Yii::t('app', 'Закрыть') ?></button>
 </div>
 <script>
-    $(document).on("beforeSubmit", "#formAddParameter", function (e) {
+    $(document).on("beforeSubmit", "#addParameterForm", function (e) {
         e.preventDefault();
-    }).on('submit', function (e) {
+    }).one('submit', function (e) {
         e.preventDefault();
         $.ajax({
             type: "post",
-            data: $('#formAddParameter').serialize(),
+            data: $('#addParameterForm').serialize(),
             url: "../parameter/save",
-            success: function () {
-                $('#modalAddParameter').modal('hide');
+            success: function (code) {
+                let message = JSON.parse(code);
+                if (message.code === 0) {
+                    $('#modalAddParameter').modal('hide');
+                    let ajax = document.getElementById('modalParameterContent');
+                    ajax.value = true
+                } else {
+                    let div = document.getElementById('error');
+                    div.innerHTML = message.message;
+                }
             },
-            error: function () {
+            error: function (message) {
+                $('#error').val(message.message);
             }
-        })
+        });
     });
+
 </script>
 <?php ActiveForm::end(); ?>

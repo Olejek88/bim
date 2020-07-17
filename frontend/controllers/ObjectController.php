@@ -319,7 +319,7 @@ class ObjectController extends PoliterController
                                     'data-target' => '#modalRegister',
                                 ]
                             );
-                            $links .= Html::a('<span class="fa fa-anchor"></span>&nbsp',
+                            $links .= Html::a('<span class="fa fa-database"></span>&nbsp',
                                 ['/parameter/list', 'uuid' => $object['uuid']],
                                 [
                                     'title' => Yii::t('app', 'Параметры объекта'),
@@ -376,7 +376,14 @@ class ObjectController extends PoliterController
                                     ]
                                 );
                                 $value = $channel->getLastMeasure() . "&nbsp;" . $links;
-                                $links = "";
+                                $links = Html::a('<span class="fa fa-database"></span>&nbsp',
+                                    ['/parameter/list', 'uuid' => $channel['uuid']],
+                                    [
+                                        'title' => Yii::t('app', 'Параметры канала'),
+                                        'data-toggle' => 'modal',
+                                        'data-target' => '#modalParameter',
+                                    ]
+                                );
 
                                 $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children'][$childIdx5]['children'][] = [
                                     'title' => $channel->title,

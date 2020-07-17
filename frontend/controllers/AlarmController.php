@@ -141,7 +141,7 @@ class AlarmController extends PoliterController
             }
         }
         return $this->render('_add_form', [
-            'model' => $model
+            'alarm' => $model
         ]);
     }
 

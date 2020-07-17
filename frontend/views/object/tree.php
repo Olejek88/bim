@@ -353,6 +353,7 @@ function () {
 $this->registerJs('$("#modalAdd").on("hidden.bs.modal",
 function () {
     $(this).removeData();
+    $("#modalParameter").modal("hide");
 })');
 
 $this->registerJs('$("#addButton").on("click",function() {

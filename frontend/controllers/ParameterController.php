@@ -10,6 +10,7 @@ use Exception;
 use frontend\models\ParameterSearch;
 use Throwable;
 use Yii;
+use yii\bootstrap\ActiveForm;
 use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 
@@ -128,7 +129,7 @@ class ParameterController extends PoliterController
         return $this->renderAjax('_parameter_list', [
             'dataProvider' => $dataProvider,
             'parameterTypes' => $parameterTypes,
-            'objectUuid' => $uuid
+            'entityUuid' => $uuid
         ]);
     }
 
@@ -142,13 +143,13 @@ class ParameterController extends PoliterController
     {
         $parameter = new Parameter();
         $request = Yii::$app->request;
-        $objectUuid = $request->get('objectUuid');
+        $entityUuid = $request->get('entityUuid');
         $parameterTypes = ParameterType::find()->orderBy('title')->all();
         $parameterTypes = ArrayHelper::map($parameterTypes, 'uuid', 'title');
 
         return $this->renderAjax('_add_form', [
             'parameter' => $parameter,
-            'entityUuid' => $objectUuid,
+            'entityUuid' => $entityUuid,
             'parameterTypes' => $parameterTypes
         ]);
     }
@@ -169,7 +170,9 @@ class ParameterController extends PoliterController
                     . " для " . $model->getEntityTitle(),
                     ActionRegister::TYPE_ADD,
                     $model->uuid);
-                return $this->redirect('../parameter/index');
+                $return['code'] = 0;
+                $return['message'] = "";
+                return json_encode($return);
             } else {
                 $message = '';
                 foreach ($model->errors as $key => $error) {
@@ -178,8 +181,32 @@ class ParameterController extends PoliterController
                 return json_encode(['message' => $message]);
             }
         }
+
+        $request = Yii::$app->request;
+        $entityUuid = $request->post('entityUuid');
+
+        $parameterTypes = ParameterType::find()->orderBy('title')->all();
+        $parameterTypes = ArrayHelper::map($parameterTypes, 'uuid', 'title');
         return $this->render('_add_form', [
-            'model' => $model
+            'parameter' => $model,
+            'parameterTypes' => $parameterTypes,
+            'entityUuid' => $entityUuid
         ]);
+    }
+
+    /**
+     * Ajax validation
+     *
+     * @return array
+     *
+     */
+    public function actionValidation()
+    {
+        $model = new Parameter();
+        if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
+            Yii::$app->response->format = 'json';
+            return ActiveForm::validate($model);
+        }
+        return null;
     }
 }

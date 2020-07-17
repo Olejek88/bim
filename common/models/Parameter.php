@@ -151,6 +151,7 @@ class Parameter extends PoliterModel
 
         $perm = parent::getPermissions();
         $perm['list'] = 'list' . $class;
+        $perm['validation'] = 'validation' . $class;
         return $perm;
     }
 
@@ -166,6 +167,11 @@ class Parameter extends PoliterModel
             $object = Objects::find()->where(['uuid' => $this->entityUuid])->one();
             if ($object) {
                 return $object->getFullTitle();
+            }
+            /** @var MeasureChannel $channel */
+            $channel = MeasureChannel::find()->where(['uuid' => $this->entityUuid])->one();
+            if ($channel) {
+                return $channel->title;
             }
         }
         return "";
