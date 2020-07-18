@@ -5,11 +5,13 @@ namespace frontend\controllers;
 use common\components\MainFunctions;
 use common\models\ActionRegister;
 use common\models\Alarm;
+use common\models\Defect;
 use common\models\DistrictCoordinates;
 use common\models\Event;
 use common\models\LoginForm;
 use common\models\Measure;
 use common\models\MeasureChannel;
+use common\models\MeasureType;
 use common\models\Objects;
 use common\models\ObjectType;
 use common\models\Register;
@@ -61,7 +63,7 @@ class SiteController extends Controller
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'dashboard', 'error', 'timeline', 'config', 'trash'],
+                        'actions' => ['logout', 'index', 'dashboard', 'error', 'timeline', 'config', 'trash', 'stats'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -223,6 +225,124 @@ class SiteController extends Controller
                 'eventsCount' => $eventsCount,
                 'categories' => [],
                 'values' => []
+            ]
+        );
+    }
+
+    /**
+     *
+     * @return string
+     * @throws Exception
+     */
+    public function actionStats()
+    {
+        $today = getdate();
+
+        $categories_month = "'" . Yii::t('app', 'Январь') . "','" .
+            Yii::t('app', 'Февраль') . "','" .
+            Yii::t('app', 'Март') . "','" .
+            Yii::t('app', 'Апрель') . "','" .
+            Yii::t('app', 'Май') . "','" .
+            Yii::t('app', 'Июнь') . "','" .
+            Yii::t('app', 'Июль') . "','" .
+            Yii::t('app', 'Август') . "','" .
+            Yii::t('app', 'Сентябрь') . "','" .
+            Yii::t('app', 'Октябрь') . "','" .
+            Yii::t('app', 'Ноябрь') . "','" .
+            Yii::t('app', 'Декабрь') . "'";
+        $bar = '';
+        $bar .= "{ name: '',";
+        $bar .= "data: [";
+        $zero = 0;
+        for ($m = 1; $m <= 12; $m++) {
+            $start = sprintf("%d%02d01000000", $today['year'], $m);
+            $end = sprintf("%d%02d01000000", $today['year'], $m + 1);
+            $values = Measure::find()
+                ->where('startDate>=' . $start)
+                ->andWhere('startDate<' . $end)
+                ->count();
+            if ($zero > 0) {
+                $bar .= ",";
+            }
+            $bar .= $values;
+            $zero++;
+        }
+        $bar .= "]}";
+
+        $values_days = '';
+        $values_days .= "{ name: '',";
+        $values_days .= "data: [";
+        $zero = 0;
+        $max_date = date('t');
+        $categories_days = "";
+        for ($day = 1; $day < $max_date; $day++) {
+            $categories_days .= $day . ',';
+            $start = sprintf("%d%02d%02d000000", $today['year'], $today['month'], $day);
+            $end = sprintf("%d%02d%02d235959", $today['year'], $today['month'], $day);
+            $values = Measure::find()
+                ->where('startDate>=' . $start)
+                ->andWhere('startDate<=' . $end)
+                ->count();
+            if ($zero > 0) {
+                $values_days .= ",";
+            }
+            $values_days .= $values;
+            $zero++;
+        }
+        $categories_days = substr($categories_days, 0, -1);
+
+        $channels = [];
+        /** @var Objects[] $objects */
+        $objects = Objects::find()->orderBy('title')->all();
+        foreach ($objects as $object) {
+            $channels['object'] = $object->getFullTitle();
+            $channels['energy'] = MeasureChannel::find()
+                ->where(['objectUuid' => $object->uuid])
+                ->andWhere(['measureTypeUuid' => MeasureType::ENERGY])
+                ->count();
+            $channels['heat'] = MeasureChannel::find()
+                ->where(['objectUuid' => $object->uuid])
+                ->andWhere(['measureTypeUuid' => MeasureType::HEAT_CONSUMED])
+                ->count();
+            $channels['water'] = MeasureChannel::find()
+                ->where(['objectUuid' => $object->uuid])
+                ->andWhere(['measureTypeUuid' => MeasureType::COLD_WATER])
+                ->count();
+            $channels['all'] = MeasureChannel::find()
+                ->where(['objectUuid' => $object->uuid])
+                ->count();
+
+        }
+
+        $stats['channels'] = MeasureChannel::find()->count();
+        $stats['channel_types'] = MeasureType::find()->count();
+        $stats['data'] = Measure::find()->count();
+        $stats['data_types'] = MeasureType::find()->count();
+
+        $measureChannels = MeasureChannel::find()
+            ->where(['measureTypeUuid' => MeasureType::ENERGY])
+            ->all();
+        $chan = [];
+        foreach ($measureChannels as $measureChannel) {
+            $chan[] = $measureChannel['uuid'];
+        }
+        $data_by_source[0] = Measure::find()
+            ->where(['in', 'measureChannelUuid', $chan])
+            ->count();
+
+        $data_by_type[0] = Measure::find()->where(['measureChannel.type' => MeasureType::MEASURE_TYPE_CURRENT])->count();
+
+        return $this->render(
+            'stats',
+            [
+                'categories_month' => $categories_month,
+                'values_month' => $bar,
+                'categories_days' => $categories_days,
+                'values_days' => $values_days,
+                'channels' => $channels,
+                'data_by_source' => $data_by_source,
+                'data_by_type' => $data_by_type,
+                'stats' => $stats
             ]
         );
     }
