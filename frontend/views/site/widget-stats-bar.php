@@ -3,6 +3,7 @@
 /* @var $title
  * @var $categories
  * @var $values
+ * @var $id
  */
 
 $this->registerJsFile('/js/vendor/lib/HighCharts/highcharts.js');
@@ -24,14 +25,11 @@ $this->registerJsFile('/js/vendor/lib/HighCharts/modules/exporting.js');
     <div class="box-body">
         <div class="row">
             <div class="col-md-12">
-                <p class="text-center">
-                    <strong><?php echo $title ?></strong>
-                </p>
                 <div class="chart">
-                    <div id="container" style="height: 250px;"></div>
+                    <div id="container<?= $id ?>" style="height: 250px;"></div>
                     <script type="text/javascript">
                         document.addEventListener("DOMContentLoaded", function () {
-                            Highcharts.chart('container', {
+                            Highcharts.chart('container<?= $id?>', {
                                 data: {
                                     table: 'datatable'
                                 },

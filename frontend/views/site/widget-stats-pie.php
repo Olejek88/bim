@@ -26,7 +26,7 @@ $this->registerJsFile('/js/vendor/lib/HighCharts/modules/exporting.js');
         <div class="row">
             <div class="col-md-12">
                 <div class="chart-responsive">
-                    <div id="container-stats" style="min-width:400px; width:100%; height:90%">
+                    <div id="pie<?= $id ?>" style="min-width:400px; width:100%; height:90%">
                     </div>
                 </div>
             </div>
@@ -37,7 +37,7 @@ $this->registerJsFile('/js/vendor/lib/HighCharts/modules/exporting.js');
 
 <script type="text/javascript">
     document.addEventListener("DOMContentLoaded", function () {
-        Highcharts.chart('container-defects', {
+        Highcharts.chart('pie<?= $id?>', {
             chart: {
                 plotBackgroundColor: null,
                 plotBorderWidth: null,

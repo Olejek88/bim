@@ -5,7 +5,6 @@ namespace frontend\controllers;
 use common\components\MainFunctions;
 use common\models\ActionRegister;
 use common\models\Alarm;
-use common\models\Defect;
 use common\models\DistrictCoordinates;
 use common\models\Event;
 use common\models\LoginForm;
@@ -251,15 +250,15 @@ class SiteController extends Controller
             Yii::t('app', 'Ноябрь') . "','" .
             Yii::t('app', 'Декабрь') . "'";
         $bar = '';
-        $bar .= "{ name: '',";
+        $bar .= "{ name: 'Месяцы',";
         $bar .= "data: [";
         $zero = 0;
         for ($m = 1; $m <= 12; $m++) {
             $start = sprintf("%d%02d01000000", $today['year'], $m);
             $end = sprintf("%d%02d01000000", $today['year'], $m + 1);
             $values = Measure::find()
-                ->where('startDate>=' . $start)
-                ->andWhere('startDate<' . $end)
+                ->where('date>=' . $start)
+                ->andWhere('date<' . $end)
                 ->count();
             if ($zero > 0) {
                 $bar .= ",";
@@ -270,18 +269,18 @@ class SiteController extends Controller
         $bar .= "]}";
 
         $values_days = '';
-        $values_days .= "{ name: '',";
+        $values_days .= "{ name: 'Дни',";
         $values_days .= "data: [";
         $zero = 0;
         $max_date = date('t');
         $categories_days = "";
-        for ($day = 1; $day < $max_date; $day++) {
+        for ($day = 1; $day <= $max_date; $day++) {
             $categories_days .= $day . ',';
-            $start = sprintf("%d%02d%02d000000", $today['year'], $today['month'], $day);
-            $end = sprintf("%d%02d%02d235959", $today['year'], $today['month'], $day);
+            $start = sprintf("%d%02d%02d000000", $today['year'], $today['mon'], $day);
+            $end = sprintf("%d%02d%02d235959", $today['year'], $today['mon'], $day);
             $values = Measure::find()
-                ->where('startDate>=' . $start)
-                ->andWhere('startDate<=' . $end)
+                ->where('date>=' . $start)
+                ->andWhere('date<=' . $end)
                 ->count();
             if ($zero > 0) {
                 $values_days .= ",";
@@ -290,28 +289,30 @@ class SiteController extends Controller
             $zero++;
         }
         $categories_days = substr($categories_days, 0, -1);
+        $values_days .= "]}";
 
         $channels = [];
+        $count = 0;
         /** @var Objects[] $objects */
-        $objects = Objects::find()->orderBy('title')->all();
+        $objects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->orderBy('title')->all();
         foreach ($objects as $object) {
-            $channels['object'] = $object->getFullTitle();
-            $channels['energy'] = MeasureChannel::find()
+            $channels[$count]['object'] = $object->getFullTitle();
+            $channels[$count]['energy'] = MeasureChannel::find()
                 ->where(['objectUuid' => $object->uuid])
                 ->andWhere(['measureTypeUuid' => MeasureType::ENERGY])
                 ->count();
-            $channels['heat'] = MeasureChannel::find()
+            $channels[$count]['heat'] = MeasureChannel::find()
                 ->where(['objectUuid' => $object->uuid])
                 ->andWhere(['measureTypeUuid' => MeasureType::HEAT_CONSUMED])
                 ->count();
-            $channels['water'] = MeasureChannel::find()
+            $channels[$count]['water'] = MeasureChannel::find()
                 ->where(['objectUuid' => $object->uuid])
                 ->andWhere(['measureTypeUuid' => MeasureType::COLD_WATER])
                 ->count();
-            $channels['all'] = MeasureChannel::find()
+            $channels[$count]['all'] = MeasureChannel::find()
                 ->where(['objectUuid' => $object->uuid])
                 ->count();
-
+            $count++;
         }
 
         $stats['channels'] = MeasureChannel::find()->count();
@@ -319,18 +320,43 @@ class SiteController extends Controller
         $stats['data'] = Measure::find()->count();
         $stats['data_types'] = MeasureType::find()->count();
 
-        $measureChannels = MeasureChannel::find()
-            ->where(['measureTypeUuid' => MeasureType::ENERGY])
-            ->all();
-        $chan = [];
+        $measureChannels = MeasureChannel::find()->all();
+        $chan1 = [];
+        $chan2 = [];
+        $chan3 = [];
         foreach ($measureChannels as $measureChannel) {
-            $chan[] = $measureChannel['uuid'];
+            if ($measureChannel->measureTypeUuid == MeasureType::ENERGY || $measureChannel->measureTypeUuid == MeasureType::VOLTAGE) {
+                $chan1[] = $measureChannel['uuid'];
+            }
+            if ($measureChannel->measureTypeUuid == MeasureType::HEAT_CONSUMED || $measureChannel->measureTypeUuid == MeasureType::HEAT_IN) {
+                $chan2[] = $measureChannel['uuid'];
+            }
+            if ($measureChannel->measureTypeUuid == MeasureType::COLD_WATER || $measureChannel->measureTypeUuid == MeasureType::HOT_WATER) {
+                $chan3[] = $measureChannel['uuid'];
+            }
         }
-        $data_by_source[0] = Measure::find()
-            ->where(['in', 'measureChannelUuid', $chan])
+        $data_by_source[0]['cnt'] = Measure::find()
+            ->where(['in', 'measureChannelUuid', $chan1])
             ->count();
+        $data_by_source[1]['cnt'] = Measure::find()
+            ->where(['in', 'measureChannelUuid', $chan2])
+            ->count();
+        $data_by_source[2]['cnt'] = Measure::find()
+            ->where(['in', 'measureChannelUuid', $chan3])
+            ->count();
+        $data_by_source[0]['title'] = 'Электроэнергия';
+        $data_by_source[1]['title'] = 'Тепло';
+        $data_by_source[2]['title'] = 'Вода';
 
-        $data_by_type[0] = Measure::find()->where(['measureChannel.type' => MeasureType::MEASURE_TYPE_CURRENT])->count();
+        $data_by_type[0]['cnt'] = Measure::find()->joinWith('measureChannel')
+            ->where(['measure_channel.type' => MeasureType::MEASURE_TYPE_CURRENT])->count();
+        $data_by_type[1]['cnt'] = Measure::find()->joinWith('measureChannel')
+            ->where(['measure_channel.type' => MeasureType::MEASURE_TYPE_HOURS])->count();
+        $data_by_type[2]['cnt'] = Measure::find()->joinWith('measureChannel')
+            ->where(['measure_channel.type' => MeasureType::MEASURE_TYPE_DAYS])->count();
+        $data_by_type[0]['title'] = 'Текущие';
+        $data_by_type[1]['title'] = 'Часовые';
+        $data_by_type[2]['title'] = 'Дневные';
 
         return $this->render(
             'stats',

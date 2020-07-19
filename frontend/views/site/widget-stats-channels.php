@@ -34,10 +34,10 @@
                 foreach ($channels as $channel) {
                     print '<tr><td>';
                     echo $channel['object'];
-                    print '</td><td><span class="label label-info">' . $channel['heat'] . '</span></td>';
-                    print '</td><td><span class="label label-info">' . $channel['energy'] . '</span></td>';
-                    print '</td><td><span class="label label-info">' . $channel['water'] . '</span></td>';
-                    print '</td><td><span class="label label-info">' . $channel['all'] . '</span></td>';
+                    print '</td><td style="text-align: center"><span class="label label-info">' . $channel['heat'] . '</span></td>';
+                    print '<td style="text-align: center"><span class="label label-info">' . $channel['energy'] . '</span></td>';
+                    print '<td style="text-align: center"><span class="label label-info">' . $channel['water'] . '</span></td>';
+                    print '<td style="text-align: center"><span class="label label-info">' . $channel['all'] . '</span></td>';
                     print '</tr>';
                     $count++;
                 }

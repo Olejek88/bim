@@ -20,12 +20,12 @@ $this->registerJsFile('/js/HighCharts/modules/exporting.js');
     <div class="col-md-7">
         <div class="row">
             <div class="col-md-12">
-                <?= $this->render('widget-stats-bar', ['categories' => $categories_month, 'values' => $values_month, 'title' => 'Количество данных по месяцам']); ?>
+                <?= $this->render('widget-stats-bar', ['id' => '1', 'categories' => $categories_month, 'values' => $values_month, 'title' => 'Количество данных по месяцам']); ?>
             </div>
         </div>
         <div class="row">
             <div class="col-md-12">
-                <?= $this->render('widget-stats-bar', ['categories' => $categories_days, 'values' => $values_days, 'title' => 'Количество данных по дням']); ?>
+                <?= $this->render('widget-stats-bar', ['id' => '2', 'categories' => $categories_days, 'values' => $values_days, 'title' => 'Количество данных по дням']); ?>
             </div>
         </div>
     </div>
@@ -37,10 +37,10 @@ $this->registerJsFile('/js/HighCharts/modules/exporting.js');
 
 <div class="row">
     <div class="col-md-5">
-        <?= $this->render('widget-stats-pie', ['data' => $data_by_source, 'title' => 'По ресурсам']); ?>
+        <?= $this->render('widget-stats-pie', ['id' => '1', 'data' => $data_by_source, 'title' => 'По ресурсам']); ?>
     </div>
     <div class="col-md-5">
-        <?= $this->render('widget-stats-pie', ['data' => $data_by_type, 'title' => 'По типам']); ?>
+        <?= $this->render('widget-stats-pie', ['id' => '2', 'data' => $data_by_type, 'title' => 'По типам']); ?>
     </div>
     <div class="col-md-2">
         <?= $this->render('widget-stats-main', ['stats' => $stats]); ?>
