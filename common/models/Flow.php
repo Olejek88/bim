@@ -18,6 +18,8 @@ use yii\db\TableSchema;
  */
 class Flow extends ActiveRecord
 {
+    use PoliterTrait;
+
     /**
      * @return object|Connection|null
      * @throws InvalidConfigException
@@ -80,10 +82,19 @@ class Flow extends ActiveRecord
 
     public function afterFind()
     {
-        $pDate = date_parse_from_format('d.m.y H:i:s,v', $this->TIME);
-        $date = date('Y-m-d H:i:s', mktime($pDate['hour'], $pDate['minute'], $pDate['second'], $pDate['month'], $pDate['day'], $pDate['year']));
+        $date = self::getDatetime($this->TIME);
         $this->TIME = $date;
         $this->setOldAttribute('TIME', $date);
     }
 
+    /**
+     * @return array
+     */
+    public function getPermissions()
+    {
+        $class = explode('\\', get_class($this));
+        $class = $class[count($class) - 1];
+
+        return [];
+    }
 }

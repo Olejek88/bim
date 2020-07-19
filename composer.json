@@ -42,7 +42,8 @@
     "ext-oci8": "*",
     "neconix/yii2-oci8": "1.*",
     "ext-PDO": "*",
-    "ext-json": "*"
+    "ext-json": "*",
+    "inpassor/yii2-daemon": "^0.3.2"
   },
   "require-dev": {
     "yiisoft/yii2-debug": "~2.1.0",

@@ -20,6 +20,8 @@ use yii\db\TableSchema;
  */
 class FlowArchive extends ActiveRecord
 {
+    use PoliterTrait;
+
     /**
      * @return object|Connection|null
      * @throws InvalidConfigException
@@ -31,8 +33,10 @@ class FlowArchive extends ActiveRecord
 
     public static function tableName()
     {
+        // условие фильтрации по датам реально выглядит так - fromTime >= from and toTime < to
+        // !!! ВАЖНО !!!! при фильтрации по датам, дата будет приведена  в формат 'Y-m-d H:i:s'
         return 'table(PTER_LINK_API.GetFlowArchive(:id,
-         TO_TIMESTAMP(:fromTime, \'DD.MM.YYYY\'), TO_TIMESTAMP(:toTime, \'DD.MM.YYYY\')))';
+         TO_TIMESTAMP(:fromTime, \'YYYY.MM.DD HH24:MI:SS\'), TO_TIMESTAMP(:toTime, \'YYYY.MM.DD HH24:MI:SS\')))';
     }
 
     public static function getTableSchema()
@@ -79,19 +83,32 @@ class FlowArchive extends ActiveRecord
     public static function findOne($id)
     {
         $query = Yii::createObject(FlowArchiveQuery::class, [self::class]);
-        $query->where(['ID' => $id])->orderBy('TIME desc')->limit(1);
+        $query->where(['ID' => $id])->orderBy(['TIME' => SORT_DESC])->limit(1);
         return $query->one();
     }
-
 
     public function afterFind()
     {
         $timeFields = ['TIME', 'ADDTIME'];
         foreach ($timeFields as $field) {
-            $pDate = date_parse_from_format('d.m.y H:i:s,v', $this->$field);
-            $date = date('Y-m-d H:i:s', mktime($pDate['hour'], $pDate['minute'], $pDate['second'], $pDate['month'], $pDate['day'], $pDate['year']));
+            $date = self::getDatetime($this->TIME);
             $this->$field = $date;
             $this->setOldAttribute($field, $date);
         }
+
+        $value = self::getFloatValue($this->VALUE);
+        $this->VALUE = $value;
+        $this->setOldAttribute('VALUE', $value);
+    }
+
+    /**
+     * @return array
+     */
+    public function getPermissions()
+    {
+        $class = explode('\\', get_class($this));
+        $class = $class[count($class) - 1];
+
+        return [];
     }
 }

@@ -21,16 +21,25 @@ use yii\db\TableSchema;
  * @property string VALUE
  * @property string TIME
  * @property string WRITABLE
+ *
+ * @property-read array $permissions
  */
 class Flows2 extends ActiveRecord
 {
+    use PoliterTrait;
+
     /**
      * @return object|Connection|null
      * @throws InvalidConfigException
      */
     public static function getDb()
     {
-        return Yii::$app->get('table(PTER_LINK_API.GetFlows2())');
+        return Yii::$app->get('oracle');
+    }
+
+    public static function tableName()
+    {
+        return 'table(PTER_LINK_API.GetFlows2())';
     }
 
     public static function getTableSchema()
@@ -51,11 +60,33 @@ class Flows2 extends ActiveRecord
         return $sch;
     }
 
+//    /**
+//     * @return object|ActiveQuery
+//     * @throws InvalidConfigException
+//     */
+//    public static function find()
+//    {
+//        return Yii::createObject(Flows2Query::class, [self::class]);
+//    }
+
     public function afterFind()
     {
-        $pDate = date_parse_from_format('d.m.y H:i:s,v', $this->TIME);
-        $date = date('Y-m-d H:i:s', mktime($pDate['hour'], $pDate['minute'], $pDate['second'], $pDate['month'], $pDate['day'], $pDate['year']));
+        $date = self::getDatetime($this->TIME);
         $this->TIME = $date;
         $this->setOldAttribute('TIME', $date);
+        $value = self::getFloatValue($this->VALUE);
+        $this->VALUE = $value;
+        $this->setOldAttribute('VALUE', $value);
+    }
+
+    /**
+     * @return array
+     */
+    public function getPermissions()
+    {
+        $class = explode('\\', get_class($this));
+        $class = $class[count($class) - 1];
+
+        return [];
     }
 }

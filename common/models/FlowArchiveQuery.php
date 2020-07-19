@@ -24,20 +24,22 @@ class FlowArchiveQuery extends ActiveQuery
     public function where($condition, $params = [])
     {
         $params = [];
-        if (/*isset($condition['ID']) && */ !empty($condition['ID'])) {
+        if (!empty($condition['ID'])) {
             $params[':id'] = $condition['ID'];
         } else {
             throw new InvalidConfigException();
         }
 
-        if (/*isset($condition['ID']) && */ !empty($condition['fromTime'])) {
-            $params[':fromTime'] = $condition['fromTime'];
+        if (!empty($condition['fromTime'])) {
+            $params[':fromTime'] = date('Y-m-d H:i:s', strtotime($condition['fromTime']));
+            unset($condition['fromTime']);
         } else {
             $params[':fromTime'] = null;
         }
 
-        if (/*isset($condition['ID']) && */ !empty($condition['toTime'])) {
-            $params[':toTime'] = $condition['toTime'];
+        if (!empty($condition['toTime'])) {
+            $params[':toTime'] = date('Y-m-d H:i:s', strtotime($condition['toTime']));;
+            unset($condition['toTime']);
         } else {
             $params[':toTime'] = null;
         }

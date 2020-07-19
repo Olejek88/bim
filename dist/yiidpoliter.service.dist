@@ -1,0 +1,15 @@
+[Unit]
+Description=yiidpoliter
+After=network-online.target mysql.service
+Requires=mysql.service
+
+[Service]
+User=www-data
+PIDFile=/media/www/politer.local.net/html/console/runtime/daemon/daemon.pid
+Type=forking
+KillMode=process
+ExecStart=/media/www/politer.local.net/html/vendor/inpassor/yii2-daemon/yiid start
+ExecStop=/media/www/politer.local.net/html/vendor/inpassor/yii2-daemon/yiid stop
+
+[Install]
+WantedBy=multi-user.target

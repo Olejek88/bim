@@ -7,35 +7,39 @@ use yii\web\View;
 /** @var $this View */
 /** @var array $tree */
 
-$this->registerJsFile('/js/custom/modules/list/jquery.fancytree.contextMenu.js',
+$this->registerJsFile('/js/jquery.fancytree.contextMenu.js',
     ['depends' => ['wbraganca\fancytree\FancytreeAsset']]);
-$this->registerJsFile('/js/custom/modules/list/jquery.contextMenu.min.js',
+$this->registerJsFile('/js/jquery.contextMenu.min.js',
     ['depends' => ['yii\jui\JuiAsset']]);
-$this->registerCssFile('/css/custom/modules/list/ui.fancytree.css');
-$this->registerCssFile('/css/custom/modules/list/jquery.contextMenu.min.css');
-
+$this->registerCssFile('/css/ui.fancytree.css');
+$this->registerCssFile('/css/jquery.contextMenu.min.css');
 
 $bindObjectCallback = <<<JS
 function (key, opt) {
-    var node = $.ui.fancytree.getNode(opt.\$trigger);
+    let node = $.ui.fancytree.getNode(opt.\$trigger);
+    let extTree = $("#extMeasureChannelsTree").data('selectedObj', {
+        path: node.data.path,
+        id: node.data.nodeId,
+        folder: node.folder
+    });
     $.ajax({
-        url: "/flows/bind-object",
-        type: "post",
-        data: {
-            path: node.data.path,
-            id: node.data.nodeId,
-            folder: node.folder,
-        },
+        url: "/flows/link-obj-form",
+        type: "get",
         success: function (data) {
-            console.log('success', data);
+            $("#modalLinkObjContent").html(data);
+            $("#modalLinkObj").modal("show");
         }
    });
 }
 JS;
+?>
 
+<div id="extMeasureChannelsTree"></div>
 
+<?php
 echo FancytreeWidget::widget([
     'options' => [
+        'id' => 'extMeasureChannelsTree',
         'source' => $tree,
         'keyboard' => false,
         'autoScroll' => true,
@@ -56,4 +60,19 @@ echo FancytreeWidget::widget([
 //        ),
     ],
 ]);
+?>
+
+<div class="modal remote fade" id="modalLinkObj">
+    <div class="modal-dialog">
+        <div class="modal-content loader-lg" id="modalLinkObjContent">
+        </div>
+    </div>
+</div>
+
+<?php
+$this->registerJs('$("#modalLinkObj").on("hidden.bs.modal",
+function () {
+    $(this).removeData();
+})');
+?>
 
