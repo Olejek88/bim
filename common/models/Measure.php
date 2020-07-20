@@ -14,7 +14,6 @@ use yii\db\Expression;
  * @property string $uuid
  * @property string $measureChannelUuid
  * @property double $value
- * @property integer $type
  * @property string $date
  * @property string $createdAt
  * @property string $changedAt

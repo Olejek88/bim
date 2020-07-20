@@ -35,7 +35,6 @@ class PoliterGetAllMeasureController extends Controller
                 $m->measureChannelUuid = $mc['uuid'];
                 $m->date = FlowArchive::getDatetime($archive['TIME']);
                 $m->value = floatval(FlowArchive::getFloatValue($archive['VALUE']));
-                $m->type = $mc['type'];
                 if (!$m->save()) {
                     // TODO: запротоколировать ошибки записи
                 }
