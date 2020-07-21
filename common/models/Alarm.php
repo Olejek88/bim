@@ -20,6 +20,8 @@ use Yii;
  */
 class Alarm extends PoliterModel
 {
+    const LEVEL_FIXED = 0;
+
     const LEVEL_INFO = 1;
     const LEVEL_WARNING = 2;
     const LEVEL_PROBLEM = 3;

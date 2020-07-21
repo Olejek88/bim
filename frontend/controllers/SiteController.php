@@ -151,8 +151,6 @@ class SiteController extends Controller
 	             });';
         $leaflet->setJs($js);
 
-        $leaflet->setJs('/js/Leaflet.SelectAreaFeature.js');
-
         // Different layers can be added to our map using the `addLayer` function.
         $leaflet->addLayer($tileLayer);
 
@@ -648,13 +646,15 @@ class SiteController extends Controller
          * Вывод точек фиксации показаний и неисправности (measuredValue/defect -> equipment -> object)
          */
         $alarms = Alarm::find()
+            ->where(['>', 'level', Alarm::LEVEL_FIXED])
             ->orderBy('createdAt desc')
             ->limit(30)
             ->all();
 
         foreach ($alarms as $alarm) {
             if ($alarm["entityUuid"]) {
-                $object = Objects::find()->where(['uuid' => $alarm["entityUuid"]])->one();
+                $object = Objects::find()->where(['uuid' => $alarm["entityUuid"]])
+                    ->one();
                 if ($object["latitude"] > 0) {
                     $position = new LatLng(['lat' => $object["latitude"], 'lng' => $object["longitude"]]);
                     $marker = new Marker(['latLng' => $position, 'popupContent' => '<b>'
@@ -667,17 +667,54 @@ class SiteController extends Controller
         }
 
         $objectSelect = Objects::find()
-            ->select('_id, title, latitude, longitude, objectTypeUuid, parentUuid')
             ->where(['deleted' => 0])
             ->andWhere(['objectTypeUuid' => ObjectType::OBJECT])
             ->all();
 
         $default_coordinates = new LatLng(['lat' => 55.54, 'lng' => 61.36]);
         $coordinates = $default_coordinates;
+        /** @var Objects $object */
         foreach ($objectSelect as $object) {
             $position = new LatLng(['lat' => $object["latitude"], 'lng' => $object["longitude"]]);
+            $data = '';
+            /** @var Measure $measureEnergy */
+            $measureEnergy = Measure::find()->joinWith('measureChannel')
+                ->where(['measure_channel.measureTypeUuid' => MeasureType::ENERGY])
+                ->andWhere(['measure_channel.type' => MeasureType::MEASURE_TYPE_CURRENT])
+                ->andWhere(['objectUuid' => $object->uuid])
+                ->one();
+            if ($measureEnergy) {
+                $data .= $measureEnergy->measureChannel->title . ' = ' . $measureEnergy->value . '<br/>';
+            }
+            /** @var Measure $measureHeat */
+            $measureHeat = Measure::find()->joinWith('measureChannel')
+                ->where(['measure_channel.measureTypeUuid' => MeasureType::HEAT_CONSUMED])
+                ->andWhere(['measure_channel.type' => MeasureType::MEASURE_TYPE_CURRENT])
+                ->andWhere(['objectUuid' => $object->uuid])
+                ->one();
+            if ($measureHeat) {
+                $data .= $measureHeat->measureChannel->title . ' = ' . $measureHeat->value . '<br/>';
+            }
+            /** @var Measure $measureWater */
+            $measureWater = Measure::find()->joinWith('measureChannel')
+                ->where(['measure_channel.measureTypeUuid' => MeasureType::COLD_WATER])
+                ->andWhere(['measure_channel.type' => MeasureType::MEASURE_TYPE_CURRENT])
+                ->andWhere(['objectUuid' => $object->uuid])
+                ->one();
+            if ($measureWater) {
+                $data .= $measureWater->measureChannel->title . ' = ' . $measureWater->value . '<br/>';
+            }
+            $alarm = Alarm::find()->where(['entityUuid' => $object->uuid])
+                ->andWhere(['>', 'level', Alarm::LEVEL_FIXED])
+                ->one();
+            if ($alarm) {
+                $data .= $alarm->getAlarmLabel() . " " . $alarm["title"] . '<br/>';
+            }
             $marker = new Marker(['latLng' => $position, 'popupContent' => '<b>'
-                . htmlspecialchars($object->getFullTitle()) . '</b>']);
+                . htmlspecialchars($object->getFullTitle()) . '</b><br/>'
+                . htmlspecialchars($object->objectSubType->title) . '<br/>'
+                . $data
+            ]);
             $marker->setIcon($objectIcon);
             $objectsGroup->addLayer($marker);
             $coordinates = new LatLng(['lat' => $object["latitude"], 'lng' => $object["longitude"]]);
