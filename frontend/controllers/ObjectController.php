@@ -445,7 +445,7 @@ class ObjectController extends PoliterController
 
         $object_uuid = null;
         $object_type = null;
-        if ($_POST['selected_node']) {
+        if (!empty($_POST['selected_node'])) {
             /** @var Objects $currentObject */
             $currentObject = Objects::find()->where(['_id' => $_POST['selected_node']])->one();
             if ($currentObject) {

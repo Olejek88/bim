@@ -3,14 +3,16 @@
 /* @var $leafLet */
 
 use dosamigos\leaflet\widgets\Map;
+use frontend\assets\SelectAreaFeatureAsset;
 
 $this->title = Yii::t('app', 'ПолиТЭР::Карта');
 $this->registerJs('$(window).on("resize", function () { $("#w0").height($(window).height()-50); $("#w0").width($(window).width()-50); }).trigger("resize");');
-//$this->registerJsFile('/js/Leaflet.SelectAreaFeature.js',['depends' => ['dosamigos\leaflet\widgets\Map']]);
 $this->registerJs('$("#modalAdd").on("hidden.bs.modal",
 function () {
     $(this).removeData();
 })');
+
+SelectAreaFeatureAsset::register($this);
 ?>
 
 <div class="box-relative" style="width: 100%">

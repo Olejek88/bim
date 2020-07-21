@@ -3,7 +3,6 @@
 namespace console\controllers;
 
 use common\models\PoliterModel;
-use common\models\ToirusModel;
 use common\models\User;
 use Exception;
 use Yii;
@@ -79,6 +78,34 @@ class PoliterAccessController extends Controller
                     $permsByModel[$modelName] = $perms;
                 }
             }
+        }
+
+        // разрешения предоставляемые моделями которые не наследуют common\models\PoliterModel
+        $excludeModels = [
+            'common\models\Flow',
+            'common\models\FlowArchive',
+            'common\models\Flows',
+            'common\models\Flows2',
+        ];
+
+        foreach ($excludeModels as $class) {
+            $class = str_replace('/', '\\', $class);
+            $class = str_replace('.php', '', $class);
+            try {
+                if (!in_array($class, get_declared_classes())) {
+                    Yii::autoload($class);
+                }
+            } catch (Exception $exception) {
+                $msg = $this->ansiFormat($exception, Console::BG_RED);
+                echo $msg . PHP_EOL;
+                return ExitCode::UNSPECIFIED_ERROR;
+            }
+
+            $model = new $class;
+            $perms = $model->getPermissions();
+            $modelName = explode('\\', $class);
+            $modelName = $modelName[count($modelName) - 1];
+            $permsByModel[$modelName] = $perms;
         }
 
         // добавляем отсутствующие разрешения

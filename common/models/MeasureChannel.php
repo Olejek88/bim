@@ -25,6 +25,8 @@ use yii\db\Expression;
  *
  * @property MeasureType $measureType
  * @property Objects $object
+ * @property-read string $typeName
+ * @property-read string $lastMeasure
  */
 class MeasureChannel extends PoliterModel
 {
