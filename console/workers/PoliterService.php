@@ -273,7 +273,7 @@ class PoliterService extends Worker
     private function getLostMeasuresByHours(&$measures, $date, &$mcs, $deep = -7)
     {
         foreach ($measures as $channelUuid => $channel) {
-            $absDeep = abs(intval($deep));
+            $absDeep = abs(intval($deep)) * 24;
             $dateList = [];
             for ($i = 1; $i <= $absDeep; $i++) {
                 $dateList[date('Y-m-d H:00:00', strtotime($date . '-' . $i . ' hour'))] = null;
