@@ -34,7 +34,7 @@ class FlowArchive extends ActiveRecord
     public static function tableName()
     {
         // условие фильтрации по датам реально выглядит так - fromTime >= from and toTime < to
-        // !!! ВАЖНО !!!! при фильтрации по датам, дата будет приведена  в формат 'Y-m-d H:i:s'
+        // !!! ВАЖНО !!!! при фильтрации по датам, дата будет приведена в формат 'Y-m-d H:i:s'
         return 'table(PTER_LINK_API.GetFlowArchive(:id,
          TO_TIMESTAMP(:fromTime, \'YYYY.MM.DD HH24:MI:SS\'), TO_TIMESTAMP(:toTime, \'YYYY.MM.DD HH24:MI:SS\')))';
     }

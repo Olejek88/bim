@@ -17,10 +17,21 @@ class PoliterService extends Worker
 {
     const LOG_ID = "politer";
 
+    private $checkLostDate;
+
     public function init()
     {
         $this->logFile = '@console/runtime/daemon/logs/worker-politer.log';
         $this->errorLogFile = '@console/runtime/daemon/logs/worker-politer-error.log';
+        $hour = date('G');
+        $checkDate = date('Y-m-d 03:00:00');
+        if ($hour >= 0 && $hour < 4) {
+            // проверяем сегодня
+            $this->checkLostDate = strtotime($checkDate);
+        } else {
+            // проверяем завтра
+            $this->checkLostDate = strtotime($checkDate . ' +1 day');
+        }
         parent::init();
     }
 
@@ -34,12 +45,13 @@ class PoliterService extends Worker
 
         // тянем текущие значения
         $currentDate = date('Y-m-d H:i:s');
-//        $currentDate = '2020-06-10 11:00:00';
         self::getExtMeasuredValues($currentDate);
 
         // пытаемся получить измерения не полученные ранее
-        // TODO: дёргать их так же часто как текущие не нужно, нужно реализовать ограничение
-        self::getExtLostMeasure();
+        if (time() > $this->checkLostDate) {
+            self::getExtLostMeasure($currentDate);
+            $this->checkLostDate = strtotime(date('Y-m-d 03:00:00') . ' +1 day');
+        }
 
         $this->log('[' . self::LOG_ID . '] stop worker');
     }
@@ -90,34 +102,6 @@ class PoliterService extends Worker
             return $item;
         });
 
-        // тестовые данные
-//        $flows2 = [
-//            '5088' => [
-//                'VALUE' => '5088.1',
-//                'TIME' => '10.06.20 12:26:48,610000',
-//            ],
-//            '5086' => [
-//                'VALUE' => '5086.1',
-//                'TIME' => '12.06.20 11:34:51,052000',
-//            ],
-//            '5083' => [
-//                'VALUE' => '5083.1',
-//                'TIME' => '11.06.20 11:26:48,329000',
-//            ],
-//            '5087' => [
-//                'VALUE' => '5087.1',
-//                'TIME' => '11.06.20 11:26:48,735000',
-//            ],
-//            '5085' => [
-//                'VALUE' => '5085.1',
-//                'TIME' => '12.06.20 11:34:50,630000',
-//            ],
-//            '5084' => [
-//                'VALUE' => '5084.1',
-//                'TIME' => '10.06.20 12:26:48,063000',
-//            ],
-//        ];
-
         foreach ($mcs as $mc) {
             /** @var Measure $m */
             $m = null;
@@ -154,11 +138,11 @@ class PoliterService extends Worker
                     $extMeasureDate = date('Ymd', strtotime(Flows2::getDatetime($extMeasureDateSrc)));
                     self::createMeasure($m, $f2, $mc['uuid'], $measureDate == $extMeasureDate);
                     break;
-                case MeasureType::MEASURE_TYPE_MONTH:
-//                    echo "MEASURE_TYPE_MONTH" . PHP_EOL;
-                    // проверяем на разность дат по месяцу
-                    $measureDate = date('Ym', strtotime($measureDateSrc));
-                    $extMeasureDate = date('Ym', strtotime(Flows2::getDatetime($extMeasureDateSrc)));
+                case MeasureType::MEASURE_TYPE_TOTAL:
+//                    echo "MEASURE_TYPE_TOTAL" . PHP_EOL;
+                    // проверяем на разность дат по дню
+                    $measureDate = date('Ymd', strtotime($measureDateSrc));
+                    $extMeasureDate = date('Ymd', strtotime(Flows2::getDatetime($extMeasureDateSrc)));
                     self::createMeasure($m, $f2, $mc['uuid'], $measureDate == $extMeasureDate);
                     break;
                 default:
@@ -207,56 +191,139 @@ class PoliterService extends Worker
     }
 
     /**
+     * @param $date
      * @throws InvalidConfigException
-     * @throws Exception
      */
-    private function getExtLostMeasure()
+    private function getExtLostMeasure($date)
     {
-        // TODO: проверку потерянных значений исправить с использованием типа измерения
-        // TODO: то есть искать потерянные значения для дат, часов, дней, месяцев.
-
         // как глубоко будем проверять пропущенные значения
         $deep = -7;
-        $mcs = MeasureChannel::find()->where(['deleted' => false])->select(['uuid', 'param_id', 'type'])->asArray()->all();
-        $mcs = ArrayHelper::map($mcs, 'uuid', function ($item) {
-            return $item;
-        });
 
+        // проверяем каналы с частотой текущее значение
+        self::getLostByHours(MeasureType::MEASURE_TYPE_CURRENT, $date, 'Y-m-d H:00:00', $deep);
+
+        // проверяем каналы с частотой в час
+        self::getLostByHours(MeasureType::MEASURE_TYPE_HOURS, $date, 'Y-m-d H:00:00', $deep);
+
+        // проверяем каналы с частотой в день
+        self::getLostByDays(MeasureType::MEASURE_TYPE_DAYS, $date, 'Y-m-d 00:00:00', $deep);
+
+        // проверяем каналы с частотой сумма
+        self::getLostByDays(MeasureType::MEASURE_TYPE_TOTAL, $date, 'Y-m-d 00:00:00', $deep);
+    }
+
+    /**
+     * @param $type
+     * @param $date
+     * @param $dateFormat
+     * @param int $deep
+     * @throws InvalidConfigException
+     */
+    private function getLostByHours($type, $date, $dateFormat, $deep = -7)
+    {
+        $mcs = self::getMeasureChannels($type);
+
+        // пустые списки измерений по каналам
         $measuresByChannels = ArrayHelper::map($mcs, 'uuid', function ($item) {
             return [];
         });
 
-        $uuids = [];
-        foreach ($mcs as $mc) {
-            $uuids[] = $mc['uuid'];
-        }
-
-        $date = '2020-06-11 00:00:00';
-        $measures = Measure::find()
-            ->where(['measureChannelUuid' => $uuids])
-            ->andWhere([
-                'AND',
-                ['>=', 'date', date('Y-m-d', strtotime($date . '' . $deep . ' day'))],
-                ['<', 'date', $date],
-            ])
-            ->asArray()
-            ->orderBy(['date' => SORT_ASC])
-            ->all();
+        $measures = self::getMeasures($type, $date, $dateFormat, $deep);
         foreach ($measures as $measure) {
             $measuresByChannels[$measure['measureChannelUuid']][$measure['uuid']] = $measure;
         }
 
-        unset($measures);
+        $measures = &$measuresByChannels;
+        self::getLostMeasuresByHours($measures, $date, $mcs, $deep);
+    }
 
-        foreach ($measuresByChannels as $channelUuid => $channel) {
+    /**
+     * @param $type
+     * @param $date
+     * @param $dateFormat
+     * @param int $deep
+     * @throws InvalidConfigException
+     */
+    private function getLostByDays($type, $date, $dateFormat, $deep = -7)
+    {
+        $mcs = self::getMeasureChannels($type);
+
+        // пустые списки измерений по каналам
+        $measuresByChannels = ArrayHelper::map($mcs, 'uuid', function ($item) {
+            return [];
+        });
+
+        $measures = self::getMeasures($type, $date, $dateFormat, $deep);
+        foreach ($measures as $measure) {
+            $measuresByChannels[$measure['measureChannelUuid']][$measure['uuid']] = $measure;
+        }
+
+        $measures = &$measuresByChannels;
+        self::getLostMeasuresByDays($measures, $date, $mcs, $deep);
+    }
+
+    /**
+     * @param $measures
+     * @param $date
+     * @param $mcs
+     * @param int $deep
+     * @throws InvalidConfigException
+     * @throws Exception
+     */
+    private function getLostMeasuresByHours(&$measures, $date, &$mcs, $deep = -7)
+    {
+        foreach ($measures as $channelUuid => $channel) {
             $absDeep = abs(intval($deep));
             $dateList = [];
             for ($i = 1; $i <= $absDeep; $i++) {
-                $dateList[date('Ymd', strtotime($date . '-' . $i . ' day'))] = null;
+                $dateList[date('Y-m-d H:00:00', strtotime($date . '-' . $i . ' hour'))] = null;
             }
 
             foreach ($channel as $measure) {
-                $measureDate = date('Ymd', strtotime($measure['date']));
+                $measureDate = date('Y-m-d H:00:00', strtotime($measure['date']));
+                unset($dateList[$measureDate]);
+            }
+
+            foreach ($dateList as $lostDate => $value) {
+                $archive = FlowArchive::find()
+                    ->where(['ID' => $mcs[$channelUuid]['param_id'],
+                        'fromTime' => date('Y-m-d H:00:00', strtotime($lostDate)),
+                        'toTime' => date('Y-m-d H:00:00', strtotime($lostDate . '+1 hour')),
+                    ])->one();
+                if ($archive) {
+                    $m = new Measure();
+                    $m->uuid = MainFunctions::GUID();
+                    $m->measureChannelUuid = $channelUuid;
+                    $m->date = $archive->TIME;
+                    $m->value = $archive->VALUE;
+                    if (!$m->save()) {
+                        // TODO: запротоколировать ошибки записи
+                    }
+
+                }
+            }
+        }
+    }
+
+    /**
+     * @param $measures
+     * @param $date
+     * @param $mcs
+     * @param int $deep
+     * @throws InvalidConfigException
+     * @throws Exception
+     */
+    private function getLostMeasuresByDays(&$measures, $date, &$mcs, $deep = -7)
+    {
+        foreach ($measures as $channelUuid => $channel) {
+            $absDeep = abs(intval($deep));
+            $dateList = [];
+            for ($i = 1; $i <= $absDeep; $i++) {
+                $dateList[date('Y-m-d 00:00:00', strtotime($date . '-' . $i . ' day'))] = null;
+            }
+
+            foreach ($channel as $measure) {
+                $measureDate = date('Y-m-d 00:00:00', strtotime($measure['date']));
                 unset($dateList[$measureDate]);
             }
 
@@ -270,8 +337,8 @@ class PoliterService extends Worker
                     $m = new Measure();
                     $m->uuid = MainFunctions::GUID();
                     $m->measureChannelUuid = $channelUuid;
-                    $m->date = FlowArchive::getDatetime($archive['TIME']);
-                    $m->value = floatval(FlowArchive::getFloatValue($archive['VALUE']));
+                    $m->date = $archive->TIME;
+                    $m->value = $archive->VALUE;
                     if (!$m->save()) {
                         // TODO: запротоколировать ошибки записи
                     }
@@ -279,5 +346,40 @@ class PoliterService extends Worker
                 }
             }
         }
+    }
+
+    /**
+     * @param $type
+     * @param $date
+     * @param $dateFormat
+     * @param int $deep
+     * @return Measure[]
+     */
+    private function getMeasures($type, $date, $dateFormat, $deep = -7)
+    {
+        $sq = MeasureChannel::find()->where(['deleted' => false, 'type' => $type])->select(['uuid']);
+        return Measure::find()->where(['measureChannelUuid' => $sq])
+            ->andWhere([
+                'AND',
+                ['>=', 'date', date($dateFormat, strtotime($date . '' . $deep . ' day'))],
+                ['<', 'date', date($dateFormat, strtotime($date))],
+            ])
+            ->asArray()
+            ->orderBy(['date' => SORT_ASC])
+            ->all();
+    }
+
+    /**
+     * @param $type
+     * @return array of MeasureChannel arrays
+     */
+    private function getMeasureChannels($type)
+    {
+        $mcs = MeasureChannel::find()->where(['deleted' => false, 'type' => $type])
+            ->select(['uuid', 'param_id', 'type'])->asArray()->all();
+        $mcs = ArrayHelper::map($mcs, 'uuid', function ($item) {
+            return $item;
+        });
+        return $mcs;
     }
 }

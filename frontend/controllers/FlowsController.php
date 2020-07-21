@@ -157,9 +157,10 @@ class FlowsController extends Controller
                 // выбираем все каналы измерений которые соответствуют пути и связываем их с объектом
                 $flows = Flows::find()->where(['like', 'PATH', $path . '%', false])->all();
             } else {
-                $flows = Flows::findOne(['ID' => $id]);
-                if ($flows) {
-                    $flows[] = $flows;
+                $flows = [];
+                $flows1 = Flows::findOne(['ID' => $id]);
+                if ($flows1) {
+                    $flows[] = $flows1;
                 }
             }
 
