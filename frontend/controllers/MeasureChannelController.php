@@ -125,6 +125,7 @@ class MeasureChannelController extends Controller
                 $values = Measure::find()
                     ->where(['measureChannelUuid' => $measureChannelUuid])
                     ->orderBy('date')
+                    ->limit(100)
                     ->all();
                 return $this->renderAjax('trend', [
                     'model' => $measureChannel,
@@ -230,5 +231,50 @@ class MeasureChannelController extends Controller
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
+    }
+
+    /**
+     * @return mixed
+     */
+    public
+    function actionDashboard()
+    {
+        $request = Yii::$app->request;
+        $measureChannelUuid = $request->get('uuid');
+        if ($measureChannelUuid) {
+            /** @var MeasureChannel $measureChannel */
+            $measureChannel = MeasureChannel::find()->where(['uuid' => $measureChannelUuid])->limit(1)->one();
+            if ($measureChannel) {
+                $name = $measureChannel->title;
+                $measures = Measure::find()
+                    ->where(['measureChannelUuid' => $measureChannelUuid])
+                    ->orderBy('date')
+                    ->limit(30)
+                    ->all();
+
+                $values = '';
+                $values .= "{ name: 'Тренд',";
+                $values .= "data: [";
+                $zero = 0;
+                $categories = "";
+                foreach ($measures as $measure) {
+                    $categories .= '\'' . date("d H:i", strtotime($measure->date)) . '\',';
+                    if ($zero > 0) {
+                        $values .= ",";
+                    }
+                    $values .= $measure->value;
+                    $zero++;
+                }
+                $categories = substr($categories, 0, -1);
+                $values .= "]}";
+                return $this->render('dashboard', [
+                    'channel' => $measureChannel,
+                    'name' => $name,
+                    'categories' => $categories,
+                    'values' => $values,
+                    'measures' => $measures
+                ]);
+            }
+        }
     }
 }

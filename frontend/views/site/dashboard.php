@@ -4,8 +4,6 @@
  * @var $orders
  * @var $registers
  * @var $newMessagesCount
- * @var $equipments Equipment[]
- * @var $equipmentsCount
  * @var $messagesChat
  * @var $usersCount
  * @var $currentUser
@@ -21,8 +19,6 @@
 $this->title = Yii::t('app', 'ПолиТЭР::Сводная');
 $this->registerJsFile('/js/HighCharts/highcharts.js');
 $this->registerJsFile('/js/HighCharts/modules/exporting.js');
-
-use common\models\Equipment;
 
 ?>
 

@@ -384,6 +384,9 @@ class ObjectController extends PoliterController
                                         'data-target' => '#modalParameter',
                                     ]
                                 );
+                                $links .= Html::a('<span class="fa fa-pie-chart"></span>&nbsp',
+                                    ['/measure-channel/dashboard', 'uuid' => $channel['uuid']]
+                                );
 
                                 $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children'][$childIdx5]['children'][] = [
                                     'title' => $channel->title,

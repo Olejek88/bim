@@ -152,6 +152,7 @@ class MeasureChannel extends PoliterModel
         $class = $class[count($class) - 1];
 
         $perm = parent::getPermissions();
+        $perm['dashboard'] = 'dashboard' . $class;
         $perm['trend'] = 'trend' . $class;
         return $perm;
     }
