@@ -9,7 +9,16 @@ use common\models\MeasureType;
 use common\models\Objects;
 use common\models\ObjectSubType;
 use common\models\ObjectType;
+use dosamigos\leaflet\layers\Marker;
+use dosamigos\leaflet\types\Icon;
+use dosamigos\leaflet\types\LatLng;
+use dosamigos\leaflet\types\Point;
+use frontend\models\ActionRegisterSearch;
+use frontend\models\AlarmSearch;
+use frontend\models\EventSearch;
+use frontend\models\MeasureChannelSearch;
 use frontend\models\ObjectsSearch;
+use frontend\models\ParameterSearch;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\filters\AccessControl;
@@ -343,6 +352,9 @@ class ObjectController extends PoliterController
                                     'data-target' => '#modalParameter',
                                 ]
                             );
+                            $links .= Html::a('<span class="fa fa-th"></span>&nbsp',
+                                ['/object/dashboard', 'uuid' => $object['uuid']]
+                            );
 
                             $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children'][] = [
                                 'title' => $object->getFullTitle(),
@@ -384,7 +396,7 @@ class ObjectController extends PoliterController
                                         'data-target' => '#modalParameter',
                                     ]
                                 );
-                                $links .= Html::a('<span class="fa fa-pie-chart"></span>&nbsp',
+                                $links .= Html::a('<span class="fa fa-th"></span>&nbsp',
                                     ['/measure-channel/dashboard', 'uuid' => $channel['uuid']]
                                 );
 
@@ -613,5 +625,71 @@ class ObjectController extends PoliterController
             }
         }
         return $this->redirect(['../site/trash']);
+    }
+
+    /**
+     * @return mixed
+     */
+    public
+    function actionDashboard()
+    {
+        $request = Yii::$app->request;
+        $objectUuid = $request->get('uuid');
+        if ($objectUuid) {
+            /** @var Objects $object */
+            $object = Objects::find()->where(['uuid' => $objectUuid])->limit(1)->one();
+            if ($object) {
+                $searchModel = new ParameterSearch();
+                $parameters = $searchModel->search(Yii::$app->request->queryParams);
+                $parameters->pagination->pageSize = 20;
+                $parameters->query->andWhere(['entityUuid' => $object->uuid]);
+
+                $searchModel = new EventSearch();
+                $events = $searchModel->search(Yii::$app->request->queryParams);
+                $events->pagination->pageSize = 0;
+                $events->query->andWhere(['objectUuid' => $object->uuid]);
+
+                $searchModel = new MeasureChannelSearch();
+                $channels = $searchModel->search(Yii::$app->request->queryParams);
+                $channels->pagination->pageSize = 0;
+                $channels->query->andWhere(['objectUuid' => $object->uuid]);
+
+                $searchModel = new AlarmSearch();
+                $alarms = $searchModel->search(Yii::$app->request->queryParams);
+                $alarms->pagination->pageSize = 0;
+                $alarms->query->andWhere(['entityUuid' => $object->uuid]);
+
+                $searchModel = new ActionRegisterSearch();
+                $registers = $searchModel->search(Yii::$app->request->queryParams);
+                $registers->pagination->pageSize = 0;
+                $registers->query->andWhere(['entityUuid' => $object->uuid]);
+
+                $position = new LatLng(['lat' => $object["latitude"], 'lng' => $object["longitude"]]);
+                $marker = new Marker(['latLng' => $position, 'popupContent' => '<b>'
+                    . htmlspecialchars($object->getFullTitle()) . '</b><br/>'
+                    . htmlspecialchars($object->objectSubType->title) . '<br/>'
+                ]);
+                $objectIcon = new Icon([
+                    'iconUrl' => '/images/marker-icon.png',
+                    'iconSize' => new Point(['x' => 28, 'y' => 43]),
+                    'iconAnchor' => new Point (['x' => 14, 'y' => 43]),
+                    'popupAnchor' => new Point (['x' => -3, 'y' => -76])
+                ]);
+                $marker->setIcon($objectIcon);
+                $coordinates = new LatLng(['lat' => $object["latitude"], 'lng' => $object["longitude"]]);
+
+                return $this->render('dashboard', [
+                    'object' => $object,
+                    'coordinates' => $coordinates,
+                    'marker' => $marker,
+                    'parameters' => $parameters,
+                    'events' => $events,
+                    'channels' => $channels,
+                    'alarms' => $alarms,
+                    'registers' => $registers
+                ]);
+            }
+        }
+        return null;
     }
 }

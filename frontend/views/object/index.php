@@ -193,8 +193,12 @@ $gridColumns = [
                         'data-target' => '#modalAddEquipment',
                     ]);
             },
+            'dashboard' => function ($url, $model) {
+                return Html::a('<span class="fa fa-pie-chart"></span>&nbsp',
+                    ['/object/dashboard', 'uuid' => $model['uuid']]);
+            }
         ],
-        'template' => '{edit} {register} {channels} {events} {delete}'
+        'template' => '{edit} {register} {channels} {events} {dashboard} {delete}'
     ]
 ];
 

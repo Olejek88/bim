@@ -276,5 +276,6 @@ class MeasureChannelController extends Controller
                 ]);
             }
         }
+        return null;
     }
 }

@@ -187,6 +187,25 @@ class Objects extends PoliterModel
     }
 
     /**
+     * Объект связанного поля.
+     *
+     * @return string
+     */
+    public function getParentsTitle()
+    {
+        $title = '';
+        $parentUuid = $this->parentUuid;
+        while ($parentUuid) {
+            $title .= ' / ';
+            /** @var Objects $object */
+            $object = Objects::find()->where(['uuid' => $parentUuid])->one();
+            $title .= $object->title;
+            $parentUuid = $object->parentUuid;
+        }
+        return $title;
+    }
+
+    /**
      * @return array
      */
     public function getPermissions()
@@ -202,6 +221,7 @@ class Objects extends PoliterModel
         $perm['restore'] = 'restore' . $class;
         $perm['save-district'] = 'save-district' . $class;
         $perm['new-district'] = 'new-district' . $class;
+        $perm['dashboard'] = 'dashboard' . $class;
         return $perm;
     }
 
