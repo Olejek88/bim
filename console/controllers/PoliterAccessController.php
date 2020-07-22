@@ -56,26 +56,28 @@ class PoliterAccessController extends Controller
         $classes = FileHelper::findFiles('common/models/');
         $permsByModel = [];
         foreach ($classes as $class) {
-            $class = str_replace('/', '\\', $class);
-            $class = str_replace('.php', '', $class);
-            if ($class != 'common\models\PoliterModel') {
-                try {
-                    if (!in_array($class, get_declared_classes())) {
-                        Yii::autoload($class);
+            if ($class !== 'common/models/PoliterTrait.php') {
+                $class = str_replace('/', '\\', $class);
+                $class = str_replace('.php', '', $class);
+                if ($class != 'common\models\PoliterModel') {
+                    try {
+                        if (!in_array($class, get_declared_classes())) {
+                            Yii::autoload($class);
+                        }
+                    } catch (Exception $exception) {
+                        $msg = $this->ansiFormat($exception, Console::BG_RED);
+                        echo $msg . PHP_EOL;
+                        return ExitCode::UNSPECIFIED_ERROR;
                     }
-                } catch (Exception $exception) {
-                    $msg = $this->ansiFormat($exception, Console::BG_RED);
-                    echo $msg . PHP_EOL;
-                    return ExitCode::UNSPECIFIED_ERROR;
-                }
 
-                /** @var PoliterModel $model */
-                if (in_array('common\models\PoliterModel', class_parents($class))) {
-                    $model = new $class;
-                    $perms = $model->getPermissions();
-                    $modelName = explode('\\', $class);
-                    $modelName = $modelName[count($modelName) - 1];
-                    $permsByModel[$modelName] = $perms;
+                    /** @var PoliterModel $model */
+                    if (in_array('common\models\PoliterModel', class_parents($class))) {
+                        $model = new $class;
+                        $perms = $model->getPermissions();
+                        $modelName = explode('\\', $class);
+                        $modelName = $modelName[count($modelName) - 1];
+                        $permsByModel[$modelName] = $perms;
+                    }
                 }
             }
         }
