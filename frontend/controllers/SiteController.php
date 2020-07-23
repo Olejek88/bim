@@ -7,12 +7,15 @@ use common\models\ActionRegister;
 use common\models\Alarm;
 use common\models\DistrictCoordinates;
 use common\models\Event;
+use common\models\EventType;
 use common\models\LoginForm;
 use common\models\Measure;
 use common\models\MeasureChannel;
 use common\models\MeasureType;
 use common\models\Objects;
+use common\models\ObjectSubType;
 use common\models\ObjectType;
+use common\models\ParameterType;
 use common\models\Register;
 use common\models\ServiceRegister;
 use common\models\User;
@@ -25,6 +28,8 @@ use dosamigos\leaflet\types\Icon;
 use dosamigos\leaflet\types\LatLng;
 use dosamigos\leaflet\types\Point;
 use Exception;
+use frontend\models\EventSearch;
+use frontend\models\MeasureChannelSearch;
 use frontend\models\SignupForm;
 use koputo\leaflet\plugins\subgroup\Subgroup;
 use koputo\leaflet\plugins\subgroup\SubgroupCluster;
@@ -205,9 +210,23 @@ class SiteController extends Controller
     {
         $objectsCount = Objects::find()->where(['deleted' => 0])->count();
         $objectsTypeCount = ObjectType::find()->count();
+        $objectsSubTypeCount = ObjectSubType::find()->count();
         $channelsCount = MeasureChannel::find()->where(['deleted' => 0])->count();
         $measuresCount = Measure::find()->count();
         $eventsCount = Event::find()->count();
+        $eventTypesCount = EventType::find()->count();
+        $measureTypesCount = MeasureType::find()->count();
+        $parameterTypesCount = ParameterType::find()->count();
+        $parametersCount = ParameterType::find()->count();
+
+        $searchModel = new MeasureChannelSearch();
+        $channels = $searchModel->search(Yii::$app->request->queryParams);
+        $channels->query->limit(10);
+
+        $searchModel = new EventSearch();
+        $events = $searchModel->search(Yii::$app->request->queryParams);
+        $events->query->limit(10);
+
         $layer = self::getLayers();
         // По числу в шаблоне
         $registers = ServiceRegister::find()->orderBy('_id desc')->limit(8)->all();
@@ -216,11 +235,18 @@ class SiteController extends Controller
             [
                 'layer' => $layer,
                 'registers' => $registers,
+                'events' => $events,
                 'objectsTypeCount' => $objectsTypeCount,
+                'objectsSubTypeCount' => $objectsSubTypeCount,
                 'objectsCount' => $objectsCount,
                 'channelsCount' => $channelsCount,
                 'measuresCount' => $measuresCount,
                 'eventsCount' => $eventsCount,
+                'eventTypesCount' => $eventTypesCount,
+                'measureTypesCount' => $measureTypesCount,
+                'parametersCount' => $parametersCount,
+                'parameterTypesCount' => $parameterTypesCount,
+                'channels' => $channels,
                 'categories' => [],
                 'values' => []
             ]

@@ -36,6 +36,7 @@ $this->registerJs('$(window).on("resize", function () { $("#w1").height(400);}).
                     ]);
                     $leaflet = new LeafLet([
                         'center' => $center, // set the center
+                        'zoom' => 15
                     ]);
 
                     $layers = new Layers();

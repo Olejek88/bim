@@ -10,7 +10,7 @@ use dosamigos\leaflet\widgets\Map;
 
 $this->registerJs('$(window).on("resize", function () { $("#w1").height(400);}).trigger("resize");');
 ?>
-<div class="box box-success">
+<div class="box box-success" style="height: 400px;">
     <div class="box-header with-border">
         <h3 class="box-title"><?php echo Yii::t('app', 'Расположение') ?></h3>
         <div class="box-tools pull-right">
@@ -36,6 +36,7 @@ $this->registerJs('$(window).on("resize", function () { $("#w1").height(400);}).
                     ]);
                     $leaflet = new LeafLet([
                         'center' => $center, // set the center
+                        'zoom' => 17
                     ]);
 
                     $layers = new Layers();

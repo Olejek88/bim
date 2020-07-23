@@ -8,6 +8,7 @@ use common\models\Flows2;
 use common\models\Measure;
 use common\models\MeasureChannel;
 use common\models\MeasureType;
+use common\models\ServiceRegister;
 use Exception;
 use inpassor\daemon\Worker;
 use yii\base\InvalidConfigException;
@@ -31,7 +32,6 @@ class PoliterService extends Worker
     public function run()
     {
         $this->log('[' . self::LOG_ID . '] start worker');
-
         // тянем текущие значения
         $currentDate = date('Y-m-d H:i:s');
 //        $currentDate = '2020-06-10 11:00:00';
@@ -42,6 +42,8 @@ class PoliterService extends Worker
         self::getExtLostMeasure();
 
         $this->log('[' . self::LOG_ID . '] stop worker');
+        ServiceRegister::addServiceRegister(ServiceRegister::SERVICE_IMPORT, ServiceRegister::TYPE_INFO,
+            null, 'сервис закончил свою работу');
     }
 
     /**
@@ -89,6 +91,10 @@ class PoliterService extends Worker
         $flows2 = ArrayHelper::map($flows2, 'ID', function ($item) {
             return $item;
         });
+        if (count($flows2) == 0) {
+            ServiceRegister::addServiceRegister(ServiceRegister::SERVICE_IMPORT, ServiceRegister::TYPE_INFO,
+                null, 'нет данных для импорта');
+        }
 
         // тестовые данные
 //        $flows2 = [
@@ -203,6 +209,8 @@ class PoliterService extends Worker
 
         if (!$m->save()) {
             // TODO: запротоколировать ошибки записи
+            ServiceRegister::addServiceRegister(ServiceRegister::SERVICE_IMPORT, ServiceRegister::TYPE_ERROR,
+                null, 'ошибка: ' . json_encode($m->errors));
         }
     }
 
@@ -274,8 +282,9 @@ class PoliterService extends Worker
                     $m->value = floatval(FlowArchive::getFloatValue($archive['VALUE']));
                     if (!$m->save()) {
                         // TODO: запротоколировать ошибки записи
+                        ServiceRegister::addServiceRegister(ServiceRegister::SERVICE_IMPORT, ServiceRegister::TYPE_ERROR,
+                            null, 'ошибка: ' . json_encode($m->errors));
                     }
-
                 }
             }
         }
