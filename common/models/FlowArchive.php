@@ -31,6 +31,14 @@ class FlowArchive extends ActiveRecord
         return Yii::$app->get('oracle');
     }
 
+    public static function tableName()
+    {
+        // условие фильтрации по датам реально выглядит так - fromTime >= from and toTime < to
+        // !!! ВАЖНО !!!! при фильтрации по датам, дата будет приведена в формат 'Y-m-d H:i:s'
+        return 'table(PTER_LINK_API.GetFlowArchive(:id,
+         TO_TIMESTAMP(:fromTime, \'YYYY.MM.DD HH24:MI:SS\'), TO_TIMESTAMP(:toTime, \'YYYY.MM.DD HH24:MI:SS\')))';
+    }
+
     public static function getTableSchema()
     {
         $sch = new TableSchema();
@@ -43,14 +51,6 @@ class FlowArchive extends ActiveRecord
             'ADDTIME' => new ColumnSchema(['type' => 'string', 'phpType' => 'string']),
         ];
         return $sch;
-    }
-
-    public static function tableName()
-    {
-        // условие фильтрации по датам реально выглядит так - fromTime >= from and toTime < to
-        // !!! ВАЖНО !!!! при фильтрации по датам, дата будет приведена  в формат 'Y-m-d H:i:s'
-        return 'table(PTER_LINK_API.GetFlowArchive(:id,
-         TO_TIMESTAMP(:fromTime, \'YYYY.MM.DD HH24:MI:SS\'), TO_TIMESTAMP(:toTime, \'YYYY.MM.DD HH24:MI:SS\')))';
     }
 
     /**
