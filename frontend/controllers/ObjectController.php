@@ -93,6 +93,18 @@ class ObjectController extends PoliterController
      */
     public function actionIndex()
     {
+        if (isset($_POST['editableAttribute'])) {
+            $model = Objects::find()
+                ->where(['_id' => $_POST['editableKey']])
+                ->one();
+            if ($_POST['editableAttribute'] == 'title') {
+                $model['title'] = $_POST['Objects'][$_POST['editableIndex']]['title'];
+            }
+            if ($model->save())
+                return json_encode('success');
+            return json_encode('failed');
+        }
+
         $searchModel = new ObjectsSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 200;
@@ -107,6 +119,35 @@ class ObjectController extends PoliterController
             'dataProvider' => $dataProvider,
             'objectTypes' => $objectTypes,
             'objectSubTypes' => $objectSubTypes
+        ]);
+    }
+
+    /**
+     * Lists all districts.
+     * @return mixed
+     * @throws InvalidConfigException
+     */
+    public function actionDistricts()
+    {
+        if (isset($_POST['editableAttribute'])) {
+            $model = Objects::find()
+                ->where(['_id' => $_POST['editableKey']])
+                ->one();
+            if ($_POST['editableAttribute'] == 'title') {
+                $model['title'] = $_POST['Objects'][$_POST['editableIndex']]['title'];
+            }
+            if ($model->save())
+                return json_encode('success');
+            return json_encode('failed');
+        }
+
+        $searchModel = new ObjectsSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider->pagination->pageSize = 50;
+        $dataProvider->query->andWhere(['objectTypeUuid' => ObjectType::SUB_DISTRICT]);
+
+        return $this->render('districts', [
+            'dataProvider' => $dataProvider
         ]);
     }
 
@@ -500,7 +541,7 @@ class ObjectController extends PoliterController
         if ($_POST['selected_node'] && $type) {
             /** @var Objects $currentObject */
             $object = Objects::find()->where(['_id' => $_POST['selected_node']])->one();
-            if ($type == 'object' && $object) {
+            if (true) {
                 return $this->renderAjax('_add_form', [
                     'object' => $object,
                     'objects' => $objects,

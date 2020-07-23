@@ -251,6 +251,7 @@ class MeasureChannelController extends Controller
                     ->orderBy('date')
                     ->limit(30)
                     ->all();
+                $measures = array_reverse($measures);
 
                 $values = '';
                 $values .= "{ name: 'Тренд',";

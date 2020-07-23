@@ -4,6 +4,7 @@ namespace common\components;
 
 use common\models\ActionRegister;
 use common\models\User;
+use dosamigos\leaflet\types\LatLng;
 use Yii;
 
 /**
@@ -113,5 +114,39 @@ class MainFunctions
         fclose($handle);
     }
 
-}
+    /**
+     * @param $p LatLng
+     * @param $polygon LatLng[]
+     * @return bool
+     */
+    static function isPointInPolygon($p, $polygon)
+    {
+        if (count($polygon)) {
+            $minX = $polygon[0]->lat;
+            $maxX = $polygon[0]->lat;
+            $minY = $polygon[0]->lng;
+            $maxY = $polygon[0]->lng;
+            for ($i = 1; $i < count($polygon); $i++) {
+                $q = $polygon[$i];
+                $minX = min($q->lat, $minX);
+                $maxX = max($q->lat, $maxX);
+                $minY = min($q->lng, $minY);
+                $maxY = max($q->lng, $maxY);
+            }
 
+            if ($p->lat < $minX || $p->lat > $maxX || $p->lng < $minY || $p->lng > $maxY) {
+                return false;
+            }
+
+            $inside = false;
+            for ($i = 0, $j = count($polygon) - 1; $i < count($polygon); $j = $i++) {
+                if (($polygon[$i]->lng > $p->lng) != ($polygon[$j]->lng > $p->lng) &&
+                    $p->lat < ($polygon[$j]->lat - $polygon[$i]->lat) * ($p->lng - $polygon[$i]->lng) / ($polygon[$j]->lng - $polygon[$i]->lng) + $polygon[$i]->lat) {
+                    $inside = !$inside;
+                }
+            }
+            return $inside;
+        }
+        return false;
+    }
+}

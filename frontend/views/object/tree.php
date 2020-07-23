@@ -14,10 +14,10 @@ $this->title = Yii::t('app', 'Дерево объектов системы');
             <col width="*">
             <col width="*">
             <col width="220px">
-            <col width="80px">
+            <col width="90px">
             <col width="*">
             <col width="60px">
-            <col width="70px">
+            <col width="90px">
         </colgroup>
         <thead style="color: white" class="thead_tree">
         <tr>

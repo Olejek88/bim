@@ -27,10 +27,12 @@
                 </thead>
                 <tbody>
                 <?php
+                $cnt = 0;
                 foreach ($measures as $data) {
                     print '<tr><td>' . $data['date'] . '</td>';
                     print '<td style="text-align: center">' . $data['value'] . '</td>';
                     print '</tr>';
+                    if ($cnt++ > 12) break;
                 }
                 ?>
                 </tbody>

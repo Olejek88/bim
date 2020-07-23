@@ -2,9 +2,12 @@
 
 namespace common\models;
 
+use common\components\MainFunctions;
+use dosamigos\leaflet\types\LatLng;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 use yii\db\Expression;
 
 /**
@@ -222,6 +225,7 @@ class Objects extends PoliterModel
         $perm['save-district'] = 'save-district' . $class;
         $perm['new-district'] = 'new-district' . $class;
         $perm['dashboard'] = 'dashboard' . $class;
+        $perm['districts'] = 'districts' . $class;
         return $perm;
     }
 
@@ -260,4 +264,45 @@ class Objects extends PoliterModel
         //return 'ул.' . $house->street->title . ', д.' . $house->number . ' - ' . $this->title;
     }
 
+    /**
+     * @param $max_count
+     * @return array
+     */
+    public function getObjectsByDistrict($max_count)
+    {
+        $objectsIn = [];
+        $cnt = 0;
+        if ($this->objectTypeUuid == ObjectType::SUB_DISTRICT) {
+            $coordinates = DistrictCoordinates::find()->where(['districtUuid' => $this->uuid])->one();
+            if ($coordinates) {
+                $objects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->all();
+                foreach ($objects as $object) {
+                    $p = new LatLng(['lat' => $object->latitude, 'lng' => $object->longitude]);
+                    if (MainFunctions::isPointInPolygon($p, json_decode($coordinates['coordinates']))) {
+                        $objectsIn[] = $object;
+                        if ($cnt++ >= $max_count - 1) break;
+                    }
+                }
+            }
+        }
+        return $objectsIn;
+    }
+
+    /**
+     * @return array|ActiveRecord
+     */
+    public function getSubDistrict()
+    {
+        if ($this->objectTypeUuid == ObjectType::OBJECT) {
+            $districtCoordinates = DistrictCoordinates::find()->all();
+            $p = new LatLng(['lat' => $this->latitude, 'lng' => $this->longitude]);
+            foreach ($districtCoordinates as $districtCoordinate) {
+                if (MainFunctions::isPointInPolygon($p, json_decode($districtCoordinate['coordinates']))) {
+                    $district = Objects::find()->where(['uuid' => $districtCoordinate['objectUuid']])->one();
+                    return $district;
+                }
+            }
+        }
+        return null;
+    }
 }

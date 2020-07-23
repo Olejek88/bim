@@ -18,6 +18,7 @@ use dosamigos\leaflet\plugins\geocoder\GeoCoder;
 use dosamigos\leaflet\plugins\geocoder\ServiceNominatim;
 use dosamigos\leaflet\types\Icon;
 use dosamigos\leaflet\types\LatLng;
+use dosamigos\leaflet\types\Point;
 use dosamigos\leaflet\widgets\Map;
 use kartik\select2\Select2;
 use yii\bootstrap\ActiveForm;
@@ -38,8 +39,8 @@ use yii\helpers\Html;
 </div>
 <div class="modal-body">
     <?php
-    $latDefault = 55.160374;
-    $lngDefault = 61.402738;
+    $latDefault = 55.16;
+    $lngDefault = 61.371;
     if ($object['uuid']) {
         echo Html::hiddenInput("objectUuid", $object['uuid']);
         echo $form->field($object, 'uuid')
@@ -146,7 +147,9 @@ use yii\helpers\Html;
         $center = new LatLng(['lat' => $latDefault, 'lng' => $lngDefault]);
 
     // now lets create a marker that we are going to place on our map
-    $icon = new Icon(['iconUrl' => '/images/marker-icon.png', 'shadowUrl' => '/images/marker-shadow.png']);
+    $icon = new Icon(['iconUrl' => '/images/marker-icon.png', 'shadowUrl' => '/images/marker-shadow.png'
+        , 'iconSize' => new Point(['x' => 25, 'y' => 41]), 'iconAnchor' => new Point (['x' => 13, 'y' => 41])]);
+
     $marker = new Marker([
         'latLng' => $center,
         'icon' => $icon,

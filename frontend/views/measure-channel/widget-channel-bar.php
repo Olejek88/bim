@@ -26,7 +26,7 @@ $this->registerJsFile('/js/vendor/lib/HighCharts/modules/exporting.js');
         <div class="row">
             <div class="col-md-12">
                 <div class="chart">
-                    <div id="container<?= $id ?>" style="height: 250px;"></div>
+                    <div id="container<?= $id ?>" style="height: 500px;"></div>
                     <script type="text/javascript">
                         document.addEventListener("DOMContentLoaded", function () {
                             Highcharts.chart('container<?= $id?>', {

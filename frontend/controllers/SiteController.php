@@ -109,6 +109,7 @@ class SiteController extends Controller
         ]);
         $leaflet = new LeafLet([
             'center' => $center, // set the center
+            'zoom' => 15
         ]);
 
         $layers = new Layers();
@@ -297,20 +298,31 @@ class SiteController extends Controller
             $channels[$count]['object'] = $object->getFullTitle();
             $channels[$count]['energy'] = MeasureChannel::find()
                 ->where(['objectUuid' => $object->uuid])
-                ->andWhere(['measureTypeUuid' => MeasureType::ENERGY])
+                ->andWhere(['or', ['measureTypeUuid' => MeasureType::ENERGY],
+                    ['measureTypeUuid' => MeasureType::VOLTAGE],
+                    ['measureTypeUuid' => MeasureType::CURRENT],
+                    ['measureTypeUuid' => MeasureType::POWER],
+                    ['measureTypeUuid' => MeasureType::FREQUENCY]])
                 ->count();
             $channels[$count]['heat'] = MeasureChannel::find()
                 ->where(['objectUuid' => $object->uuid])
-                ->andWhere(['measureTypeUuid' => MeasureType::HEAT_CONSUMED])
+                ->andWhere(['or', ['measureTypeUuid' => MeasureType::HEAT_CONSUMED],
+                    ['measureTypeUuid' => MeasureType::HEAT_FLOW],
+                    ['measureTypeUuid' => MeasureType::TEMPERATURE],
+                    ['measureTypeUuid' => MeasureType::PRESSURE],
+                    ['measureTypeUuid' => MeasureType::HEAT_IN]])
                 ->count();
             $channels[$count]['water'] = MeasureChannel::find()
                 ->where(['objectUuid' => $object->uuid])
-                ->andWhere(['measureTypeUuid' => MeasureType::COLD_WATER])
+                ->andWhere(['or', ['measureTypeUuid' => MeasureType::COLD_WATER],
+                    ['measureTypeUuid' => MeasureType::HOT_WATER]])
                 ->count();
             $channels[$count]['all'] = MeasureChannel::find()
                 ->where(['objectUuid' => $object->uuid])
                 ->count();
-            $count++;
+            if ($channels[$count]['all'] > 0) {
+                $count++;
+            }
         }
 
         $stats['channels'] = MeasureChannel::find()->count();
@@ -637,8 +649,8 @@ class SiteController extends Controller
         ]);
         $objectIcon = new Icon([
             'iconUrl' => '/images/marker-icon.png',
-            'iconSize' => new Point(['x' => 28, 'y' => 43]),
-            'iconAnchor' => new Point (['x' => 14, 'y' => 43]),
+            'iconSize' => new Point(['x' => 25, 'y' => 41]),
+            'iconAnchor' => new Point (['x' => 13, 'y' => 41]),
             'popupAnchor' => new Point (['x' => -3, 'y' => -76])
         ]);
 
@@ -726,14 +738,16 @@ class SiteController extends Controller
         $districts = DistrictCoordinates::find()->all();
         /** @var DistrictCoordinates $district */
         foreach ($districts as $district) {
-            $district_coordinates = json_decode($district->coordinates);
-            $coordinates_latlng = [];
-            foreach ($district_coordinates as $coordinate) {
-                $coordinates_latlng[] = new LatLng(['lat' => $coordinate->lat, 'lng' => $coordinate->lng]);
+            if ($district->district->deleted == 0) {
+                $district_coordinates = json_decode($district->coordinates);
+                $coordinates_latlng = [];
+                foreach ($district_coordinates as $coordinate) {
+                    $coordinates_latlng[] = new LatLng(['lat' => $coordinate->lat, 'lng' => $coordinate->lng]);
+                }
+                $polygon = new Polygon(['latLngs' => $coordinates_latlng, 'popupContent' => '<b>'
+                    . htmlspecialchars($district->district->getFullTitle()) . '</b>']);
+                $regionGroup->addLayer($polygon);
             }
-            $polygon = new Polygon(['latLngs' => $coordinates_latlng, 'popupContent' => '<b>'
-                . htmlspecialchars($district->district->getFullTitle()) . '</b>']);
-            $regionGroup->addLayer($polygon);
         }
 
         $layer['objectGroup'] = $objectsGroup;

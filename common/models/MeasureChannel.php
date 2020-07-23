@@ -118,7 +118,7 @@ class MeasureChannel extends PoliterModel
             ->limit(1)
             ->one();
         if ($measure) {
-            return $measure->value . ' [' . date("Y-m-d h:i:s", strtotime($measure->date)) . ']';
+            return number_format($measure->value, 3) . ' [' . date("m/d h:i:s", strtotime($measure->date)) . ']';
         }
         return '-';
     }
