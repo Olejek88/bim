@@ -1,9 +1,11 @@
 <?php
 /* @var $searchModel ObjectsSearch */
 /* @var $objectTypes */
+
 /* @var $objectSubTypes */
 
 use common\models\MeasureChannel;
+use common\models\ObjectType;
 use frontend\models\ObjectsSearch;
 use kartik\editable\Editable;
 use kartik\grid\GridView;
@@ -151,59 +153,95 @@ $gridColumns = [
     [
         'class' => 'kartik\grid\ActionColumn',
         'headerOptions' => ['class' => 'kartik-sheet-style'],
-        'width' => '150px',
+        'width' => '100px',
         'header' => Yii::t('app', 'Действия'),
         'buttons' => [
-            'register' => function ($url, $model) {
-                return Html::a('<span class="fa fa-list"></span>',
-                    ['/register/list', 'uuid' => $model['uuid']],
-                    [
-                        'title' => Yii::t('app', 'Журнал событий'),
-                        'data-toggle' => 'modal',
-                        'data-target' => '#modalRegister',
-                    ]
-                );
+            'dashboard' => function ($url, $model) {
+                if ($model->objectTypeUuid == ObjectType::OBJECT) {
+                    return Html::a('<span class="fa fa-th"></span>&nbsp',
+                        ['/object/dashboard', 'uuid' => $model['uuid']]
+                    );
+                } else {
+                    return '';
+                }
             },
-            'channels' => function ($url, $model) {
-                return Html::a('<span class="fa fa-bar-chart"></span>',
-                    ['/object/channels', 'uuid' => $model['uuid']],
-                    [
-                        'title' => Yii::t('app', 'Каналы измерения'),
-                        'data-toggle' => 'modal',
-                        'data-target' => '#modalChannels',
-                    ]
-                );
+            'attributes' => function ($url, $model) {
+                if ($model->objectTypeUuid == ObjectType::OBJECT) {
+                    return Html::a('<span class="fa fa-list-ul"></span>&nbsp',
+                        ['/attribute/list', 'uuid' => $model['uuid']],
+                        [
+                            'title' => Yii::t('app', 'Атрибуты объекта'),
+                            'data-toggle' => 'modal',
+                            'data-target' => '#modalParameter',
+                        ]
+                    );
+                } else {
+                    return '';
+                }
+            },
+            'alarms' => function ($url, $model) {
+                if ($model->objectTypeUuid == ObjectType::OBJECT) {
+                    return Html::a('<span class="fa fa-warning"></span>&nbsp',
+                        ['/alarm/list', 'uuid' => $model['uuid']],
+                        [
+                            'title' => Yii::t('app', 'Предупреждения по объекту'),
+                            'data-toggle' => 'modal',
+                            'data-target' => '#modalParameter',
+                        ]
+                    );
+                } else {
+                    return '';
+                }
+            },
+            'parameters' => function ($url, $model) {
+                if ($model->objectTypeUuid == ObjectType::OBJECT) {
+                    return Html::a('<span class="fa fa-database"></span>&nbsp',
+                        ['/parameter/list', 'uuid' => $model['uuid']],
+                        [
+                            'title' => Yii::t('app', 'Параметры объекта'),
+                            'data-toggle' => 'modal',
+                            'data-target' => '#modalParameter',
+                        ]
+                    );
+                } else {
+                    return '';
+                }
             },
             'events' => function ($url, $model) {
-                return Html::a('<span class="fa fa-calendar"></span>',
-                    ['/object/events', 'uuid' => $model['uuid']],
-                    [
-                        'title' => Yii::t('app', 'События'),
-                        'data-toggle' => 'modal',
-                        'data-target' => '#modalEvents',
-                    ]
-                );
+                if ($model->objectTypeUuid == ObjectType::OBJECT) {
+                    return Html::a('<span class="fa fa-list"></span>&nbsp',
+                        ['/event/list', 'objectUuid' => $model['uuid']],
+                        [
+                            'title' => Yii::t('app', 'События объекта'),
+                            'data-toggle' => 'modal',
+                            'data-target' => '#modalRegister',
+                        ]
+                    );
+                } else {
+                    return '';
+                }
             },
-            'edit' => function ($url, $model) {
-                return Html::a('<span class="fa fa-edit"></span>',
-                    ['/object/edit', 'uuid' => $model['uuid']],
-                    [
-                        'title' => Yii::t('app', 'Редактировать'),
-                        'data-toggle' => 'modal',
-                        'data-target' => '#modalAddEquipment',
-                    ]);
-            },
-            'dashboard' => function ($url, $model) {
-                return Html::a('<span class="fa fa-pie-chart"></span>&nbsp',
-                    ['/object/dashboard', 'uuid' => $model['uuid']]);
-            }
+            /*            'register' => function ($url, $model) {
+                            if ($model->objectTypeUuid == ObjectType::OBJECT) {
+                                return Html::a('<span class="fa fa-bolt"></span>',
+                                    ['/register/list', 'uuid' => $model['uuid']],
+                                    [
+                                        'title' => Yii::t('app', 'Журнал событий'),
+                                        'data-toggle' => 'modal',
+                                        'data-target' => '#modalRegister',
+                                    ]
+                                );
+                            } else {
+                                return '';
+                            }
+                        }*/
         ],
-        'template' => '{edit} {register} {channels} {events} {dashboard} {delete}'
+        'template' => '{attributes}{alarms}{parameters}{events}{dashboard}{delete}'
     ]
 ];
 
 echo GridView::widget([
-    'id' => 'equipment-table-index',
+    'id' => 'object-table-index',
     'dataProvider' => $dataProvider,
     'filterModel' => $searchModel,
     'columns' => $gridColumns,
@@ -255,17 +293,44 @@ echo GridView::widget([
     }
 ]);
 
+$this->registerJs('$("#modalAddMeasure").on("hidden.bs.modal",
+function () {
+    $(this).removeData();
+})');
+$this->registerJs('$("#modalChart").on("hidden.bs.modal",
+function () {
+    $(this).removeData();
+})');
 $this->registerJs('$("#modalRegister").on("hidden.bs.modal",
 function () {
     $(this).removeData();
 })');
-$this->registerJs('$("#modalChannels").on("hidden.bs.modal",
+$this->registerJs('$("#modalParameter").on("hidden.bs.modal",
 function () {
     $(this).removeData();
+    $("#modalAddAlarm").modal("hide");
+    $("#modalAddEvent").modal("hide");
+    $("#modalAddAttribute").modal("hide");
 })');
-$this->registerJs('$("#modalEvents").on("hidden.bs.modal",
+$this->registerJs('$("#modalAddAlarm").on("hidden.bs.modal",
 function () {
     $(this).removeData();
+    $("#modalParameter").modal("hide");
+})');
+$this->registerJs('$("#modalAddEvent").on("hidden.bs.modal",
+function () {
+    $(this).removeData();
+    $("#modalParameter").modal("hide");
+})');
+$this->registerJs('$("#modalAddAttribute").on("hidden.bs.modal",
+function () {
+    $(this).removeData();
+    $("#modalParameter").modal("hide");
+})');
+$this->registerJs('$("#modalAdd").on("hidden.bs.modal",
+function () {
+    $(this).removeData();
+    $("#modalParameter").modal("hide");
 })');
 $this->registerJs('$("#modalAdd").on("show.bs.modal",
 function () {
@@ -281,26 +346,32 @@ function () {
 ?>
 
 <div class="modal remote fade" id="modalRegister">
-    <div class="modal-dialog" style="width: 800px">
-        <div class="modal-content loader-lg" id="modalDocumentationContent">
+    <div class="modal-dialog" style="width: 1000px">
+        <div class="modal-content loader-lg">
+        </div>
+    </div>
+</div>
+<div class="modal remote fade" id="modalParameter">
+    <div class="modal-dialog" style="width: 1000px; height: 500px">
+        <div class="modal-content loader-lg" id="modalParameterContent">
         </div>
     </div>
 </div>
 <div class="modal remote fade" id="modalAdd">
     <div class="modal-dialog" style="width: 800px; height: 400px">
-        <div class="modal-content loader-lg" style="margin: 10px; padding: 10px">
+        <div class="modal-content loader-lg" style="margin: 10px; padding: 10px" id="modalContent">
         </div>
     </div>
 </div>
-<div class="modal remote fade" id="modalChannels">
-    <div class="modal-dialog" style="width: 1200px">
-        <div class="modal-content loader-lg">
+<div class="modal remote fade" id="modalAlarm">
+    <div class="modal-dialog" style="width: 800px; height: 400px">
+        <div class="modal-content loader-lg" style="margin: 10px; padding: 10px" id="modalContent">
         </div>
     </div>
 </div>
-<div class="modal remote fade" id="modalRegister">
-    <div class="modal-dialog" style="width: 800px">
-        <div class="modal-content loader-lg" id="modalRegisterContent">
+<div class="modal remote fade" id="modalAddMeasure">
+    <div class="modal-dialog" style="width: 800px; height: 400px">
+        <div class="modal-content loader-lg" style="margin: 10px; padding: 10px" id="modalContent">
         </div>
     </div>
 </div>

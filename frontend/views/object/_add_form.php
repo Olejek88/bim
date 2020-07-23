@@ -116,6 +116,53 @@ use yii\helpers\Html;
     echo $form->field($object, 'fiasParentGuid')->textInput(['maxlength' => true]);
     echo $form->field($object, 'okato')->textInput(['maxlength' => true]);
 
+    if ($object->objectTypeUuid == ObjectType::OBJECT) {
+        echo $form->field($object, 'source')->widget(Select2::class,
+            [
+                'data' => array(
+                    0 => 'Потребитель',
+                    1 => 'Поставщик'
+                ),
+                'options' => [
+                    'placeholder' => Yii::t('app', 'Выберите тип..'),
+                    'style' => ['height' => '42px', 'padding-top' => '10px']
+                ],
+                'pluginOptions' => [
+                    'allowClear' => true
+                ],
+            ]);
+
+        echo $form->field($object, 'water')->widget(Select2::class,
+            [
+                'data' => array(
+                    0 => 'Нет',
+                    1 => 'Да'
+                ),
+                'options' => [
+                    'placeholder' => Yii::t('app', 'Есть учет воды..'),
+                    'style' => ['height' => '42px', 'padding-top' => '10px']
+                ],
+                'pluginOptions' => [
+                    'allowClear' => true
+                ],
+            ]);
+
+        echo $form->field($object, 'electricity')->widget(Select2::class,
+            [
+                'data' => array(
+                    0 => 'Нет',
+                    1 => 'Да'
+                ),
+                'options' => [
+                    'placeholder' => Yii::t('app', 'Есть учет электроэнергии..'),
+                    'style' => ['height' => '42px', 'padding-top' => '10px']
+                ],
+                'pluginOptions' => [
+                    'allowClear' => true
+                ],
+            ]);
+    }
+
     $latitude = $object->latitude;
     $longitude = $object->longitude;
 
@@ -216,7 +263,7 @@ use yii\helpers\Html;
     <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo Yii::t('app', 'Закрыть') ?></button>
 </div>
 <script>
-    var send = false;
+    let send = false;
     $(document).on("beforeSubmit", "#form-object", function (e) {
         e.preventDefault();
     }).on('submit', '#form-object', function (e) {

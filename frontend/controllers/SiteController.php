@@ -164,6 +164,10 @@ class SiteController extends Controller
         $subGroupPlugin->addSubGroup($layer['objectGroup']);
         $subGroupPlugin->addSubGroup($layer['regionGroup']);
         $subGroupPlugin->addSubGroup($layer['alarmGroup']);
+
+        //$subGroupPlugin->addSubGroup($layer['heatGroup']);
+        //$subGroupPlugin->addSubGroup($layer['waterGroup']);
+        //$subGroupPlugin->addSubGroup($layer['powerGroup']);
         $layers->setOverlays([]);
 
         $layers->setName('ctrlLayer');
@@ -219,21 +223,69 @@ class SiteController extends Controller
         $parameterTypesCount = ParameterType::find()->count();
         $parametersCount = ParameterType::find()->count();
 
-        $searchModel = new MeasureChannelSearch();
-        $channels = $searchModel->search(Yii::$app->request->queryParams);
-        $channels->query->limit(10);
-
         $searchModel = new EventSearch();
         $events = $searchModel->search(Yii::$app->request->queryParams);
         $events->query->limit(10);
 
         $layer = self::getLayers();
+
+        $fullTree = array();
+        $objects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])
+            ->andWhere(['deleted' => 0])->all();
+        foreach ($objects as $object) {
+            $fullTree['children'][] = [
+                'title' => $object->getFullTitle(),
+                'type_title' => $object->objectSubType->title,
+                'key' => $object['_id'],
+                'expanded' => true,
+                'folder' => true
+            ];
+            /** @var MeasureChannel[] $channels */
+            $channels = MeasureChannel::find()
+                ->where(['objectUuid' => $object['uuid']])
+                ->andWhere(['deleted' => 0])
+                ->andWhere(['or', ['measureTypeUuid' => MeasureType::ENERGY],
+                    ['measureTypeUuid' => MeasureType::POWER],
+                    ['measureTypeUuid' => MeasureType::HEAT_FLOW],
+                    ['measureTypeUuid' => MeasureType::TEMPERATURE],
+                    ['measureTypeUuid' => MeasureType::PRESSURE],
+                    ['measureTypeUuid' => MeasureType::HEAT_IN],
+                    ['measureTypeUuid' => MeasureType::COLD_WATER]])
+                ->all();
+            foreach ($channels as $channel) {
+                $childIdx = count($fullTree['children']) - 1;
+                $links = Html::a('<span class="fa fa-line-chart"></span>&nbsp',
+                    ['/measure-channel/trend', 'measureChannelUuid' => $channel['uuid']],
+                    [
+                        'title' => Yii::t('app', 'Измерения'),
+                        'data-toggle' => 'modal',
+                        'data-target' => '#modalChart',
+                    ]
+                );
+                $links .= Html::a('<span class="fa fa-th"></span>&nbsp',
+                    ['/measure-channel/dashboard', 'uuid' => $channel['uuid']]
+                );
+                $value = $channel->getLastMeasure();
+                if ($value != '-') {
+                    $value = $value . "&nbsp;" . $links;
+                    $fullTree['children'][$childIdx]['children'][] = [
+                        'title' => $channel->title,
+                        'value' => $value,
+                        'folder' => false
+                    ];
+                }
+            }
+        }
+
+        $searchModel = new MeasureChannelSearch();
+        $channels = $searchModel->search(Yii::$app->request->queryParams);
+        $channels->query->limit(10);
+
         // По числу в шаблоне
         $registers = ServiceRegister::find()->orderBy('_id desc')->limit(8)->all();
         return $this->render(
             'dashboard',
-            [
-                'layer' => $layer,
+            ['layer' => $layer,
                 'registers' => $registers,
                 'events' => $events,
                 'objectsTypeCount' => $objectsTypeCount,
@@ -247,9 +299,9 @@ class SiteController extends Controller
                 'parametersCount' => $parametersCount,
                 'parameterTypesCount' => $parameterTypesCount,
                 'channels' => $channels,
+                'objects' => $fullTree,
                 'categories' => [],
-                'values' => []
-            ]
+                'values' => []]
         );
     }
 
@@ -258,7 +310,8 @@ class SiteController extends Controller
      * @return string
      * @throws Exception
      */
-    public function actionStats()
+    public
+    function actionStats()
     {
         $today = getdate();
 
@@ -414,7 +467,8 @@ class SiteController extends Controller
      *
      * @return string
      */
-    public function actionLogin()
+    public
+    function actionLogin()
     {
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
@@ -451,7 +505,8 @@ class SiteController extends Controller
      *
      * @return string
      */
-    public function actionError()
+    public
+    function actionError()
     {
         $exception = Yii::$app->errorHandler->exception;
         if ($exception !== null) {
@@ -465,7 +520,8 @@ class SiteController extends Controller
      *
      * @return string
      */
-    public function actionLogout()
+    public
+    function actionLogout()
     {
         Yii::$app->user->logout();
 
@@ -477,7 +533,8 @@ class SiteController extends Controller
      *
      * @return mixed
      */
-    public function actionTimeline()
+    public
+    function actionTimeline()
     {
         $events = [];
         if (!empty($_GET['type']) && is_numeric($_GET['type'])) {
@@ -555,7 +612,8 @@ class SiteController extends Controller
      *
      * @return string
      */
-    public static function formEvent($date, $type, $id, $title, $text, $user)
+    public
+    static function formEvent($date, $type, $id, $title, $text, $user)
     {
         $event = '<li>';
         if ($type == 'register')
@@ -588,7 +646,8 @@ class SiteController extends Controller
 
     /**
      */
-    public function actionConfig()
+    public
+    function actionConfig()
     {
         $this->enableCsrfValidation = false;
 
@@ -603,7 +662,8 @@ class SiteController extends Controller
      *
      * @return mixed
      */
-    public function actionTrash()
+    public
+    function actionTrash()
     {
         $events = [];
         $type = null;
@@ -641,7 +701,8 @@ class SiteController extends Controller
      *
      * @return string
      */
-    public static function formTrashEvent($date, $type, $text)
+    public
+    static function formTrashEvent($date, $type, $text)
     {
         $event = '<li>';
         if ($type == 'object')
@@ -658,7 +719,8 @@ class SiteController extends Controller
      * @return mixed
      * @throws Exception
      */
-    public function getLayers()
+    public
+    function getLayers()
     {
         $objectsGroup = new SubGroup();
         $objectsGroup->setTitle(Yii::t('app', 'Объекты'));
@@ -666,6 +728,13 @@ class SiteController extends Controller
         $alarmGroup->setTitle(Yii::t('app', 'Предупреждения'));
         $regionGroup = new SubGroup();
         $regionGroup->setTitle(Yii::t('app', 'Районы'));
+
+        $heatGroup = new SubGroup();
+        $heatGroup->setTitle(Yii::t('app', 'Тепло'));
+        $powerGroup = new SubGroup();
+        $powerGroup->setTitle(Yii::t('app', 'Электроэнергия'));
+        $waterGroup = new SubGroup();
+        $waterGroup->setTitle(Yii::t('app', 'Вода'));
 
         $alarmIcon = new Icon([
             'iconUrl' => '/images/marker_defect_m.png',
@@ -680,9 +749,6 @@ class SiteController extends Controller
             'popupAnchor' => new Point (['x' => -3, 'y' => -76])
         ]);
 
-        /**
-         * Вывод точек фиксации показаний и неисправности (measuredValue/defect -> equipment -> object)
-         */
         $alarms = Alarm::find()
             ->where(['>', 'level', Alarm::LEVEL_FIXED])
             ->orderBy('createdAt desc')
@@ -717,18 +783,21 @@ class SiteController extends Controller
             $data = '';
             /** @var Measure $measureEnergy */
             $measureEnergy = Measure::find()->joinWith('measureChannel')
-                ->where(['measure_channel.measureTypeUuid' => MeasureType::ENERGY])
-                ->andWhere(['measure_channel.type' => MeasureType::MEASURE_TYPE_CURRENT])
+                ->where(['or', ['measure_channel.measureTypeUuid' => MeasureType::ENERGY], ['measure_channel.measureTypeUuid' => MeasureType::POWER]])
                 ->andWhere(['objectUuid' => $object->uuid])
+                ->orderBy('date desc')
+                ->limit(1)
                 ->one();
             if ($measureEnergy) {
                 $data .= $measureEnergy->measureChannel->title . ' = ' . $measureEnergy->value . '<br/>';
             }
             /** @var Measure $measureHeat */
             $measureHeat = Measure::find()->joinWith('measureChannel')
-                ->where(['measure_channel.measureTypeUuid' => MeasureType::HEAT_CONSUMED])
-                ->andWhere(['measure_channel.type' => MeasureType::MEASURE_TYPE_CURRENT])
+                ->where(['or', ['measure_channel.measureTypeUuid' => MeasureType::HEAT_CONSUMED],
+                    ['measure_channel.measureTypeUuid' => MeasureType::HEAT_FLOW]])
                 ->andWhere(['objectUuid' => $object->uuid])
+                ->orderBy('date desc')
+                ->limit(1)
                 ->one();
             if ($measureHeat) {
                 $data .= $measureHeat->measureChannel->title . ' = ' . $measureHeat->value . '<br/>';
@@ -736,8 +805,9 @@ class SiteController extends Controller
             /** @var Measure $measureWater */
             $measureWater = Measure::find()->joinWith('measureChannel')
                 ->where(['measure_channel.measureTypeUuid' => MeasureType::COLD_WATER])
-                ->andWhere(['measure_channel.type' => MeasureType::MEASURE_TYPE_CURRENT])
                 ->andWhere(['objectUuid' => $object->uuid])
+                ->orderBy('date desc')
+                ->limit(1)
                 ->one();
             if ($measureWater) {
                 $data .= $measureWater->measureChannel->title . ' = ' . $measureWater->value . '<br/>';
@@ -759,6 +829,13 @@ class SiteController extends Controller
             if ($coordinates->lng == $default_coordinates->lng && $coordinates->lat == $default_coordinates->lat && $object["latitude"] > 0) {
                 $coordinates = new LatLng(['lat' => $object["latitude"], 'lng' => $object["longitude"]]);
             }
+            $heatGroup->addLayer($marker);
+            if ($object->water) {
+                $waterGroup->addLayer($marker);
+            }
+            if ($object->electricity) {
+                $powerGroup->addLayer($marker);
+            }
         }
 
         $districts = DistrictCoordinates::find()->all();
@@ -772,6 +849,7 @@ class SiteController extends Controller
                 }
                 $polygon = new Polygon(['latLngs' => $coordinates_latlng, 'popupContent' => '<b>'
                     . htmlspecialchars($district->district->getFullTitle()) . '</b>']);
+                //$polygon->clientOptions = ['color' => 'red'];
                 $regionGroup->addLayer($polygon);
             }
         }
@@ -780,6 +858,10 @@ class SiteController extends Controller
         $layer['alarmGroup'] = $alarmGroup;
         $layer['regionGroup'] = $regionGroup;
         $layer['coordinates'] = $coordinates;
+        $layer['heatGroup'] = $heatGroup;
+        $layer['waterGroup'] = $waterGroup;
+        $layer['powerGroup'] = $powerGroup;
+
         return $layer;
     }
 

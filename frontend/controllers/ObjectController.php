@@ -351,6 +351,7 @@ class ObjectController extends PoliterController
                         $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][] = [
                             'title' => $street['title'],
                             'type' => 'street',
+                            'expanded' => true,
                             'key' => $street['_id'],
                             'folder' => true
                         ];
@@ -396,11 +397,18 @@ class ObjectController extends PoliterController
                             $links .= Html::a('<span class="fa fa-th"></span>&nbsp',
                                 ['/object/dashboard', 'uuid' => $object['uuid']]
                             );
+                            $type = '';
+                            if ($object->source) $type .= '<span class="fa fa-plug" title="Поставщик"></span>&nbsp;&nbsp;';
+                            $type .= '<span class="fa fa-thermometer" title="Учет тепла"></span>&nbsp';
+                            if ($object->water) $type .= '<span class="fa fa-tint" title="Учет ХВС"></span>&nbsp';
+                            if ($object->electricity) $type .= '<span class="fa fa-bolt" title="Учет электроэнергии"></span>';
 
                             $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children'][] = [
                                 'title' => $object->getFullTitle(),
                                 'type' => 'object',
                                 'links' => $links,
+                                'expanded' => true,
+                                'measure_type' => $type,
                                 'type_title' => $object->objectSubType->title,
                                 'key' => $object['_id'],
                                 'folder' => true
@@ -719,6 +727,33 @@ class ObjectController extends PoliterController
                 $marker->setIcon($objectIcon);
                 $coordinates = new LatLng(['lat' => $object["latitude"], 'lng' => $object["longitude"]]);
 
+                $data['month'] = [];
+                $channelPower = MeasureChannel::find()->where(['objectUuid' => $object['uuid']])->andWhere(['deleted' => 0])
+                    ->andWhere(['measureTypeUuid' => MeasureType::ENERGY])
+                    ->andWhere(['type' => MeasureType::MEASURE_TYPE_MONTH])
+                    ->one();
+                $channelHeat = MeasureChannel::find()->where(['objectUuid' => $object['uuid']])->andWhere(['deleted' => 0])
+                    ->andWhere(['type' => MeasureType::MEASURE_TYPE_MONTH])
+                    ->andWhere(['measureTypeUuid' => MeasureType::HEAT_CONSUMED])->one();
+                $channelWater = MeasureChannel::find()->where(['objectUuid' => $object['uuid']])->andWhere(['deleted' => 0])
+                    ->andWhere(['type' => MeasureType::MEASURE_TYPE_MONTH])
+                    ->andWhere(['measureTypeUuid' => MeasureType::COLD_WATER])->one();
+                /*                $last_measures = Measure::find()->where(['measureChannelUuid' => $channelPower['uuid']])
+                                    ->orderBy('date desc')->all();
+                                $cnt = -1;
+                                $last_date = '';
+                                foreach ($last_measures as $measure) {
+                                    if ($measure['date'] != $last_date)
+                                        $last_date = $measure['date'];
+                                    $data['month'][$cnt]['date'] = $measure['date'];
+                                    if ($measure['measureChannelUuid'] == $channelHeat['uuid'])
+                                        $data['month'][$cnt]['heat'] = $measure['value'];
+                                    if ($measure['measureChannelUuid'] == $channelWater['uuid'])
+                                        $data['month'][$cnt]['water'] = $measure['value'];
+                                    if ($measure['measureChannelUuid'] == $channelPower['uuid'])
+                                        $data['month'][$cnt]['power'] = $measure['value'];
+                                }*/
+
                 return $this->render('dashboard', [
                     'object' => $object,
                     'coordinates' => $coordinates,
@@ -727,7 +762,8 @@ class ObjectController extends PoliterController
                     'events' => $events,
                     'channels' => $channels,
                     'alarms' => $alarms,
-                    'registers' => $registers
+                    'registers' => $registers,
+                    'measures' => $data
                 ]);
             }
         }

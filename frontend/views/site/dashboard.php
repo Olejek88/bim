@@ -4,6 +4,7 @@
  * @var $channels
  * @var $registers
  * @var $events
+ * @var $objects
  * @var $objectsCount
  * @var $objectsTypeCount
  * @var $channelsCount
@@ -52,7 +53,7 @@ $this->registerJsFile('/js/HighCharts/modules/exporting.js');
 <!-- Main row -->
 <div class="row">
     <!-- Left col -->
-    <div class="col-md-8">
+    <div class="col-md-7">
         <?= $this->render('widget-map', ['layer' => $layer]); ?>
         <div class="row">
             <div class="col-md-12">
@@ -68,8 +69,8 @@ $this->registerJsFile('/js/HighCharts/modules/exporting.js');
         </div>
     </div>
 
-    <div class="col-md-4">
-        <?php echo $this->render('widget-last-channels', ['channels' => $channels]); ?>
+    <div class="col-md-5">
+        <?php echo $this->render('widget-objects-tree', ['objects' => $objects]); ?>
     </div>
 </div>
 

@@ -6,6 +6,7 @@
  * @var $events
  * @var $channels
  * @var $alarms
+ * @var $measures
  * @var $registers
  */
 $this->title = Yii::t('app', 'ПолиТЭР::Информация об объекте');
@@ -33,10 +34,10 @@ $this->title = Yii::t('app', 'ПолиТЭР::Информация об объе
     </div>
 </div>
 <div class="row">
-    <div class="col-md-5">
+    <div class="col-md-6">
         <?= $this->render('widget-object-alarms', ['alarms' => $alarms]); ?>
     </div>
-    <div class="col-md-7">
-        <?= $this->render('widget-object-registers', ['registers' => $registers]); ?>
+    <div class="col-md-6">
+        <?= $this->render('widget-object-consumption', ['measures' => $measures]); ?>
     </div>
 </div>

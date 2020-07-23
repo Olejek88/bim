@@ -27,6 +27,9 @@ use yii\db\Expression;
  * @property boolean $deleted
  * @property string $createdAt
  * @property string $changedAt
+ * @property integer $source
+ * @property integer $water
+ * @property integer $electricity
  *
  * @property ObjectType $objectType
  * @property Objects $parent
@@ -81,7 +84,7 @@ class Objects extends PoliterModel
                 ],
                 'required'
             ],
-            [['latitude', 'longitude'], 'number'],
+            [['latitude', 'longitude', 'source', 'water', 'electricity'], 'number'],
             [['uuid', 'objectTypeUuid', 'parentUuid', 'objectSubTypeUuid', 'fiasGuid', 'fiasParentGuid'], 'string', 'max' => 50],
             [['createdAt', 'changedAt'], 'safe'],
             [['title', 'okato'], 'string', 'max' => 250],
@@ -121,6 +124,9 @@ class Objects extends PoliterModel
             'fiasGuid' => Yii::t('app', 'ID ФИАС'),
             'fiasParentGuid' => Yii::t('app', 'ID Род.ФИАС'),
             'okato' => Yii::t('app', 'ОКАТО'),
+            'source' => Yii::t('app', 'Поставщик'),
+            'water' => Yii::t('app', 'ХВС'),
+            'electricity' => Yii::t('app', 'Электроэнергия'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
         ];
@@ -151,6 +157,9 @@ class Objects extends PoliterModel
             'fiasGuid',
             'fiasParentGuid',
             'okato',
+            'source',
+            'water',
+            'electricity',
             'createdAt',
             'changedAt',
         ];
