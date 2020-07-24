@@ -27,6 +27,8 @@ class ServiceRegister extends PoliterModel
     const TYPE_ERROR = 2;
 
     const SERVICE_IMPORT = '[politer]';
+    const SERVICE_ARCHIVE = '[archive]';
+    const SERVICE_ALARM = '[alarm]';
 
     /**
      * @inheritdoc

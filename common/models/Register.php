@@ -102,9 +102,14 @@ class Register extends PoliterModel
     public function getEntityTitle()
     {
         if ($this->entityUuid != null) {
-            $equipment = Equipment::findOne(['uuid' => $this->entityUuid]);
-            if ($equipment)
-                return '[' . $equipment->_id . '] ' . $equipment->title;
+            $channel = MeasureChannel::findOne(['uuid' => $this->entityUuid]);
+            if ($channel) {
+                return $channel->object->getFullTitle() . '/' . $channel->title;
+            }
+            $object = Objects::findOne(['uuid' => $this->entityUuid]);
+            if ($object) {
+                return $object->getFullTitle();
+            }
         }
         return '';
     }

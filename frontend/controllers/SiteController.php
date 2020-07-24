@@ -550,11 +550,10 @@ class SiteController extends Controller
                 ->all();
             foreach ($registers as $register) {
                 $text = '<i class="fa fa-cogs"></i>&nbsp;
-                <a class="btn btn-default btn-xs">' . $register->getFullTitle() . '</a><br/>
-                <i class="fa fa-clipboard"></i>&nbsp;' . Yii::t('app', 'Изменил параметр') . ': <a class="btn btn-default btn-xs">'
-                    . $register['title'] . '</a>';
-                $events[] = ['date' => $register['date'], 'event' => self::formEvent($register['date'],
-                    'register', 0, '', $text, $register['user']->name)];
+                <a class="btn btn-default btn-xs">' . $register->title . '</a><br/>
+                <i class="fa fa-clipboard"></i> ' . $register->getEntityTitle() . '';
+                $events[] = ['date' => $register['createdAt'], 'event' => self::formEvent($register['createdAt'],
+                    'register', 0, '', $text, '')];
             }
         }
 
@@ -750,7 +749,7 @@ class SiteController extends Controller
         ]);
 
         $alarms = Alarm::find()
-            ->where(['>', 'level', Alarm::LEVEL_FIXED])
+            ->where(['status' => Alarm::STATUS_FIXED])
             ->orderBy('createdAt desc')
             ->limit(30)
             ->all();
@@ -813,7 +812,7 @@ class SiteController extends Controller
                 $data .= $measureWater->measureChannel->title . ' = ' . $measureWater->value . '<br/>';
             }
             $alarm = Alarm::find()->where(['entityUuid' => $object->uuid])
-                ->andWhere(['>', 'level', Alarm::LEVEL_FIXED])
+                ->andWhere(['status' => Alarm::STATUS_ACTIVE])
                 ->one();
             if ($alarm) {
                 $data .= $alarm->getAlarmLabel() . " " . $alarm["title"] . '<br/>';

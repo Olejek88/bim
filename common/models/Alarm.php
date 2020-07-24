@@ -14,13 +14,19 @@ use Yii;
  * @property string $title
  * @property int $level
  * @property string $entityUuid
+ * @property int $status
+ * @property int $type
  * @property string $createdAt [datetime]
  * @property string $changedAt [datetime]
  *
  */
 class Alarm extends PoliterModel
 {
-    const LEVEL_FIXED = 0;
+    const STATUS_FIXED = 0;
+    const STATUS_ACTIVE = 1;
+
+    const TYPE_NO_DATA = 1;
+    const TYPE_ALARM = 2;
 
     const LEVEL_INFO = 1;
     const LEVEL_WARNING = 2;
@@ -65,7 +71,7 @@ class Alarm extends PoliterModel
             [['uuid', 'title', 'entityUuid'], 'required'],
             [['uuid', 'entityUuid'], 'string', 'max' => 50],
             [['title'], 'string'],
-            [['level'], 'integer'],
+            [['level', 'status'], 'integer'],
             [['uuid', 'entityUuid'], 'filter', 'filter' => function ($param) {
                 return htmlspecialchars($param, ENT_QUOTES | ENT_HTML401);
             }
@@ -87,6 +93,7 @@ class Alarm extends PoliterModel
             'entityUuid' => Yii::t('app', 'Связанная сущность'),
             'title' => Yii::t('app', 'Событие'),
             'level' => Yii::t('app', 'Уровень предупреждения'),
+            'status' => Yii::t('app', 'Статус'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
         ];

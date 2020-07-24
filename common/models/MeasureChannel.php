@@ -22,6 +22,7 @@ use yii\db\Expression;
  * @property string $original_name
  * @property string $param_id
  * @property integer $type
+ * @property integer $status
  *
  * @property MeasureType $measureType
  * @property Objects $object
@@ -30,6 +31,9 @@ use yii\db\Expression;
  */
 class MeasureChannel extends PoliterModel
 {
+    const STATUS_OFF = 0; // канал отключен / не используется
+    const STATUS_ACTIVE = 1; // канал включен / данные актуальны / связь есть
+    const STATUS_NO_CONNECT = -1; // канал включен / данные не актуальны / связи нет
 
     /**
      * @inheritdoc
@@ -65,7 +69,7 @@ class MeasureChannel extends PoliterModel
             [['uuid', 'title', 'objectUuid', 'measureTypeUuid'], 'required'],
             [['createdAt', 'changedAt'], 'safe'],
             [['uuid', 'objectUuid', 'measureTypeUuid', 'param_id'], 'string', 'max' => 50],
-            [['type'], 'integer'],
+            [['type', 'status'], 'integer'],
             [['title', 'original_name'], 'string', 'max' => 250],
             [['path'], 'string', 'max' => 512],
         ];
@@ -85,6 +89,7 @@ class MeasureChannel extends PoliterModel
             'measureType' => Yii::t('app', 'Тип измерения'),
             'measureTypeUuid' => Yii::t('app', 'Тип измерения'),
             'type' => Yii::t('app', 'Тип значений'),
+            'status' => Yii::t('app', 'Статус канала'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
         ];

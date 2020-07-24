@@ -39,7 +39,6 @@ use yii\helpers\Url;
     echo $form->field($alarm, 'level')->widget(Select2::class,
         [
             'data' => array(
-                Alarm::LEVEL_FIXED => 'Решена',
                 Alarm::LEVEL_INFO => 'Информация',
                 Alarm::LEVEL_WARNING => 'Предупреждение',
                 Alarm::LEVEL_PROBLEM => 'Проблема',
