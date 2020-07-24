@@ -4,11 +4,14 @@ namespace frontend\controllers;
 
 use common\components\MainFunctions;
 use common\models\DistrictCoordinates;
+use common\models\Measure;
 use common\models\MeasureChannel;
 use common\models\MeasureType;
 use common\models\Objects;
 use common\models\ObjectSubType;
 use common\models\ObjectType;
+use common\models\Parameter;
+use common\models\ParameterType;
 use dosamigos\leaflet\layers\Marker;
 use dosamigos\leaflet\types\Icon;
 use dosamigos\leaflet\types\LatLng;
@@ -702,6 +705,7 @@ class ObjectController extends PoliterController
                 $channels = $searchModel->search(Yii::$app->request->queryParams);
                 $channels->pagination->pageSize = 0;
                 $channels->query->andWhere(['objectUuid' => $object->uuid]);
+                $channels->query->andWhere(['<>', 'status', MeasureChannel::STATUS_OFF]);
 
                 $searchModel = new AlarmSearch();
                 $alarms = $searchModel->search(Yii::$app->request->queryParams);
@@ -728,31 +732,31 @@ class ObjectController extends PoliterController
                 $coordinates = new LatLng(['lat' => $object["latitude"], 'lng' => $object["longitude"]]);
 
                 $data['month'] = [];
-                $channelPower = MeasureChannel::find()->where(['objectUuid' => $object['uuid']])->andWhere(['deleted' => 0])
-                    ->andWhere(['measureTypeUuid' => MeasureType::ENERGY])
+                $channel_uuid = [];
+                $measureChannels = MeasureChannel::find()->where(['objectUuid' => $object['uuid']])
+                    ->andWhere(['deleted' => 0])
                     ->andWhere(['type' => MeasureType::MEASURE_TYPE_MONTH])
-                    ->one();
-                $channelHeat = MeasureChannel::find()->where(['objectUuid' => $object['uuid']])->andWhere(['deleted' => 0])
-                    ->andWhere(['type' => MeasureType::MEASURE_TYPE_MONTH])
-                    ->andWhere(['measureTypeUuid' => MeasureType::HEAT_CONSUMED])->one();
-                $channelWater = MeasureChannel::find()->where(['objectUuid' => $object['uuid']])->andWhere(['deleted' => 0])
-                    ->andWhere(['type' => MeasureType::MEASURE_TYPE_MONTH])
-                    ->andWhere(['measureTypeUuid' => MeasureType::COLD_WATER])->one();
-                /*                $last_measures = Measure::find()->where(['measureChannelUuid' => $channelPower['uuid']])
-                                    ->orderBy('date desc')->all();
-                                $cnt = -1;
-                                $last_date = '';
-                                foreach ($last_measures as $measure) {
-                                    if ($measure['date'] != $last_date)
-                                        $last_date = $measure['date'];
-                                    $data['month'][$cnt]['date'] = $measure['date'];
-                                    if ($measure['measureChannelUuid'] == $channelHeat['uuid'])
-                                        $data['month'][$cnt]['heat'] = $measure['value'];
-                                    if ($measure['measureChannelUuid'] == $channelWater['uuid'])
-                                        $data['month'][$cnt]['water'] = $measure['value'];
-                                    if ($measure['measureChannelUuid'] == $channelPower['uuid'])
-                                        $data['month'][$cnt]['power'] = $measure['value'];
-                                }*/
+                    ->all();
+                foreach ($measureChannels as $measureChannel) {
+                    $channel_uuid[] = $measureChannel['uuid'];
+                }
+                /** @var Measure[] $last_measures */
+                $last_measures = Measure::find()
+                    ->where(['in', 'measureChannelUuid', $channel_uuid])
+                    ->orderBy('date desc')->all();
+                $cnt = -1;
+                $last_date = '';
+                foreach ($last_measures as $measure) {
+                    if ($measure['date'] != $last_date)
+                        $last_date = $measure['date'];
+                    $data['month'][$cnt]['date'] = $measure['date'];
+                    if ($measure->measureChannel->measureTypeUuid == MeasureType::HEAT_CONSUMED)
+                        $data['month'][$cnt]['heat'] = $measure['value'];
+                    if ($measure->measureChannel->measureTypeUuid == MeasureType::COLD_WATER)
+                        $data['month'][$cnt]['water'] = $measure['value'];
+                    if ($measure->measureChannel->measureTypeUuid == MeasureType::ENERGY)
+                        $data['month'][$cnt]['power'] = $measure['value'];
+                }
 
                 return $this->render('dashboard', [
                     'object' => $object,
@@ -768,5 +772,128 @@ class ObjectController extends PoliterController
             }
         }
         return null;
+    }
+
+    /**
+     * @return mixed
+     * @throws \Exception
+     */
+    public
+    function actionPlanEdit()
+    {
+        if (isset($_GET["month"]))
+            $month = $_GET["month"];
+        else $month = '';
+        if (isset($_GET["entityUuid"]) && isset($_GET["month"])) {
+            $parameter = new Parameter();
+            if (isset($_GET["parameter_uuid"])) {
+                $parameter = Parameter::find()->where(['uuid' => $_GET["parameter_uuid"]])->one();
+                if (!$parameter) {
+                    $parameter = new Parameter();
+                }
+            }
+            return $this->renderAjax('_add_plan', [
+                'date' => $month,
+                'entityUuid' => $_GET["entityUuid"],
+                'objectUuid' => $_GET["entityUuid"],
+                'parameter' => $parameter
+            ]);
+        }
+        return null;
+    }
+
+    /**
+     * @return string
+     */
+    public
+    function actionPlan()
+    {
+        setlocale(LC_TIME, 'ru_RU.UTF-8', 'Russian_Russia', 'Russian');
+        $objects = [];
+        $dates_title = [];
+        $mon_date_str = [];
+        $mon_date_str2[] = [];
+        $mon_date_str3[] = [];
+
+        $month_count = 1;
+        $dates = date("Y0101 00:00:00", time());
+        while ($month_count <= 12) {
+            $mon_date[$month_count] = strtotime($dates);
+            $mon_date_str[$month_count] = strftime("%Y%m01000000", $mon_date[$month_count]);
+            $mon_date_str2[$month_count] = strftime("%Y%m01000000", $mon_date[$month_count]);
+            $dates_title[$month_count] = strftime("%h", $mon_date[$month_count]);
+
+            $localtime = localtime($mon_date[$month_count], true);
+            $mon = $localtime['tm_mon'];
+            $year = $localtime['tm_year'];
+            $mon++;
+            if ($mon > 11) {
+                $mon = 0;
+                $year++;
+            }
+            $dates = sprintf("%d-%02d-01 00:00:00", $year + 1900, $mon + 1);
+            $mon_date_str3[$month_count] = strftime("%Y%m01000000", strtotime($dates));
+            $month_count++;
+        }
+        $count = 0;
+        $allObjects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->all();
+        foreach ($allObjects as $object) {
+            $measureChannelHeat = MeasureChannel::find()
+                ->where(['objectUuid' => $object['uuid']])
+                ->andWhere(['measureTypeUuid' => MeasureType::HEAT_CONSUMED])
+                ->andWhere(['type' => MeasureType::MEASURE_TYPE_MONTH])
+                ->one();
+            for ($i = 1; $i < $month_count; $i++) {
+                $sum[$i] = 0;
+            }
+            $objects[$count]['title'] = $object->getFullTitle();
+            /*            if ($measureChannelHeat) {
+                            $objects[$count]['title'] = $measureChannelHeat['uuid'];
+                        }*/
+            for ($month = 1; $month < $month_count; $month++) {
+                $objects[$count]['plans'][$month]['plan'] = '';
+                $parameter_uuid = null;
+                $parameterValue = '<span class="span-plan0">n/a</span>';
+                if ($measureChannelHeat) {
+                    $parameter = Parameter::find()
+                        ->where(['entityUuid' => $measureChannelHeat['uuid']])
+                        ->andWhere(['date' => $mon_date_str2[$month]])
+                        ->andWhere(['parameterTypeUuid' => ParameterType::TARGET_CONSUMPTION])
+                        ->one();
+                    if ($parameter) {
+                        $parameterValue = "<span class='span-plan1'>" . $parameter['value'] . "</span>";
+                        $parameter_uuid = $parameter['uuid'];
+                    }
+                    $objects[$count]['plans'][$month]['plan']
+                        = Html::a($parameterValue, ['/object/plan-edit', 'month' => $mon_date_str[$month],
+                        'parameter_uuid' => $parameter_uuid,
+                        'entityUuid' => $measureChannelHeat['uuid']],
+                        [
+                            'title' => 'Редактировать',
+                            'data-toggle' => 'modal',
+                            'data-target' => '#modalPlan',
+                        ]);
+                } else {
+                    $objects[$count]['plans'][$month]['plan'] = '<span class="span-plan0">-</span>';
+                }
+                $measureValue = '<span class="span-plan0">-</span>';
+                if ($measureChannelHeat) {
+                    $measure = Measure::find()
+                        ->where(['measureChannelUuid' => $measureChannelHeat['uuid']])
+                        ->andWhere(['date' => $mon_date_str2[$month]])
+                        ->one();
+                    if ($measure) {
+                        $measureValue = "<span class='span-plan1'>" . $measure['value'] . "</span>";
+                    }
+                }
+                $objects[$count]['plans'][$month]['fact'] = $measureValue;
+            }
+            $count++;
+        }
+        return $this->render('plan', [
+            'objects' => $objects,
+            'month_count' => $month_count,
+            'dates' => $dates_title
+        ]);
     }
 }

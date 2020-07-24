@@ -703,3 +703,11 @@ a.desc:after {
     padding: 10px 20px;
     margin: 0 0 15px 0;
 }
+
+.span-plan0 {
+    color: #0b3e6f;
+}
+
+.span-plan1 {
+    color: #0f7b9f;
+}

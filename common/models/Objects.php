@@ -230,11 +230,13 @@ class Objects extends PoliterModel
         $perm['deleted'] = 'deleted' . $class;
         $perm['save'] = 'save' . $class;
         $perm['edit'] = 'edit' . $class;
+        $perm['plan'] = 'plan' . $class;
         $perm['restore'] = 'restore' . $class;
         $perm['save-district'] = 'save-district' . $class;
         $perm['new-district'] = 'new-district' . $class;
         $perm['dashboard'] = 'dashboard' . $class;
         $perm['districts'] = 'districts' . $class;
+        $perm['plan-edit'] = 'plan-edit' . $class;
         return $perm;
     }
 

@@ -8,7 +8,7 @@ use dosamigos\leaflet\layers\TileLayer;
 use dosamigos\leaflet\LeafLet;
 use dosamigos\leaflet\widgets\Map;
 
-$this->registerJs('$(window).on("resize", function () { $("#w1").height(400);}).trigger("resize");');
+$this->registerJs('$(window).on("resize", function () { $("#w0").height(400);}).trigger("resize");');
 ?>
 <div class="box box-success" style="height: 400px;">
     <div class="box-header with-border">
