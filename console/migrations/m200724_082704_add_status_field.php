@@ -18,6 +18,7 @@ class m200724_082704_add_status_field extends Migration
         $this->addColumn(self::MEASURE_CHANNEL, 'status', $this->integer()->defaultValue(1));
         $this->addColumn(self::ALARM, 'status', $this->integer()->defaultValue(1));
         $this->addColumn(self::ALARM, 'type', $this->integer()->defaultValue(0));
+        return true;
     }
 
     /**
@@ -25,9 +26,10 @@ class m200724_082704_add_status_field extends Migration
      */
     public function safeDown()
     {
-        echo "m200724_082704_add_status_field cannot be reverted.\n";
-
-        return false;
+        $this->dropColumn(self::MEASURE_CHANNEL, 'status');
+        $this->dropColumn(self::ALARM, 'status');
+        $this->dropColumn(self::ALARM, 'type');
+        return true;
     }
 
     /*

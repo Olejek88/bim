@@ -16,6 +16,9 @@ function () {
     <table class="kv-grid-table table table-hover table-bordered table-condensed kv-table-wrap">
         <thead>
         <tr class="kartik-sheet-style" style="height: 20px">
+            <th class="kv-align-middle" data-col-seq="0" colspan="25">Календарь целей потребления тепла объектов</th>
+        </tr>
+        <tr class="kartik-sheet-style" style="height: 20px">
             <th class="kv-align-middle" data-col-seq="0"
                 style="width: 200px;" rowspan="2">Объект
             </th>
@@ -28,7 +31,7 @@ function () {
         <tr>
             <?php
             foreach ($dates as $date) {
-                echo '<th class="text-center kv-align-middle">План</th >';
+                echo '<th class="text-center kv-align-middle" style="background-color: #e0e0e0">План</th >';
                 echo '<th class="text-center kv-align-middle">Факт</th >';
             }
             ?>
@@ -40,7 +43,7 @@ function () {
             echo '<tr data-key="1">';
             echo '<td class="kv-align-middle">' . $object['title'] . '</td>';
             foreach ($object['plans'] as $plan) {
-                echo '<td class="text-center kv-align-center kv-align-middle">' . $plan['plan'] . '</td>';
+                echo '<td class="text-center kv-align-center kv-align-middle" style="background-color: #e0e0e0">' . $plan['plan'] . '</td>';
                 echo '<td class="text-center kv-align-center kv-align-middle">' . $plan['fact'] . '</td>';
             }
             echo '</tr>';

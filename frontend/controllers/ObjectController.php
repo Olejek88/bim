@@ -744,12 +744,22 @@ class ObjectController extends PoliterController
                 $last_measures = Measure::find()
                     ->where(['in', 'measureChannelUuid', $channel_uuid])
                     ->orderBy('date desc')->all();
-                $cnt = -1;
+
                 $last_date = '';
+                for ($cnt = 0; $cnt < 7; $cnt++) {
+                    $data['month'][$cnt]['date'] = "-";
+                    $data['month'][$cnt]['heat'] = "-";
+                    $data['month'][$cnt]['water'] = "-";
+                    $data['month'][$cnt]['power'] = "-";
+                }
+                $cnt = -1;
                 foreach ($last_measures as $measure) {
-                    if ($measure['date'] != $last_date)
+                    if ($measure['date'] != $last_date) {
                         $last_date = $measure['date'];
-                    $data['month'][$cnt]['date'] = $measure['date'];
+                        $cnt++;
+                        if ($cnt > 6) break;
+                        $data['month'][$cnt]['date'] = $measure['date'];
+                    }
                     if ($measure->measureChannel->measureTypeUuid == MeasureType::HEAT_CONSUMED)
                         $data['month'][$cnt]['heat'] = $measure['value'];
                     if ($measure->measureChannel->measureTypeUuid == MeasureType::COLD_WATER)

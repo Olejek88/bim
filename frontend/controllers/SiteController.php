@@ -443,9 +443,12 @@ class SiteController extends Controller
             ->where(['measure_channel.type' => MeasureType::MEASURE_TYPE_HOURS])->count();
         $data_by_type[2]['cnt'] = Measure::find()->joinWith('measureChannel')
             ->where(['measure_channel.type' => MeasureType::MEASURE_TYPE_DAYS])->count();
+        $data_by_type[3]['cnt'] = Measure::find()->joinWith('measureChannel')
+            ->where(['measure_channel.type' => MeasureType::MEASURE_TYPE_MONTH])->count();
         $data_by_type[0]['title'] = 'Текущие';
         $data_by_type[1]['title'] = 'Часовые';
         $data_by_type[2]['title'] = 'Дневные';
+        $data_by_type[3]['title'] = 'По месяцам';
 
         return $this->render(
             'stats',

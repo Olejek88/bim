@@ -62,20 +62,18 @@ $this->title = Yii::t('app', 'Профиль пользователя') . " " . 
                         ?>
                         <br/>
                         <br/>
-                        <p>
-                            <strong><i class="fa fa-users margin-r-5"></i><?php echo Yii::t('app', 'Роль') ?>
-                            </strong>
-                            <?php
-                            $assignments = Yii::$app->getAuthManager()->getAssignments($model['id']);
-                            foreach ($assignments as $value) {
-                                if ($value->roleName == User::ROLE_ADMIN)
-                                    echo '<span class="label label-danger">' . Yii::t('app', 'Администратор') . '</span>';
-                                if ($value->roleName == User::ROLE_OPERATOR)
-                                    echo '<span class="label label-success">' . Yii::t('app', 'Оператор') . '</span>';
-                                break;
-                            }
-                            ?>
-                        </p>
+                        <strong><i class="fa fa-users margin-r-5"></i><?php echo Yii::t('app', 'Роль') ?>
+                        </strong>
+                        <?php
+                        $assignments = Yii::$app->getAuthManager()->getAssignments($model['id']);
+                        foreach ($assignments as $value) {
+                            if ($value->roleName == User::ROLE_ADMIN)
+                                echo '<span class="label label-danger">' . Yii::t('app', 'Администратор') . '</span>';
+                            if ($value->roleName == User::ROLE_OPERATOR)
+                                echo '<span class="label label-success">' . Yii::t('app', 'Оператор') . '</span>';
+                            break;
+                        }
+                        ?>
                     </div>
                 </div>
             </div><!---->
