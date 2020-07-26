@@ -237,6 +237,7 @@ class Objects extends PoliterModel
         $perm['dashboard'] = 'dashboard' . $class;
         $perm['districts'] = 'districts' . $class;
         $perm['plan-edit'] = 'plan-edit' . $class;
+        $perm['table'] = 'table' . $class;
         return $perm;
     }
 
@@ -309,11 +310,58 @@ class Objects extends PoliterModel
             $p = new LatLng(['lat' => $this->latitude, 'lng' => $this->longitude]);
             foreach ($districtCoordinates as $districtCoordinate) {
                 if (MainFunctions::isPointInPolygon($p, json_decode($districtCoordinate['coordinates']))) {
-                    $district = Objects::find()->where(['uuid' => $districtCoordinate['objectUuid']])->one();
+                    $district = Objects::find()->where(['uuid' => $districtCoordinate['districtUuid']])->one();
                     return $district;
                 }
             }
         }
         return null;
+    }
+
+    /**
+     * @param $uuid
+     * @return string
+     */
+    public function getParameter($uuid)
+    {
+        /** @var Parameter $parameter */
+        $parameter = Parameter::find()
+            ->where(['entityUuid' => $this->uuid])
+            ->andWhere(['parameterTypeUuid' => $uuid])
+            ->one();
+        if ($parameter) {
+            return $parameter->value;
+        }
+        return "n/a";
+    }
+
+    /**
+     * @param string $uuid
+     * @param boolean $includeDate
+     * @return string
+     */
+    public function getCurrent($uuid, $includeDate)
+    {
+        $measureChannel = MeasureChannel::find()
+            ->where(['objectUuid' => $this->uuid])
+            ->andWhere(['measureTypeUuid' => $uuid])
+            ->andWhere(['type' => MeasureType::CURRENT])
+            ->limit(1)
+            ->one();
+        if ($measureChannel) {
+            /** @var Measure $measure */
+            $measure = Measure::find()
+                ->where(['measureChannelUuid' => $measureChannel['uuid']])
+                ->orderBy('date desc')
+                ->limit(1)
+                ->one();
+            if ($measure) {
+                if ($includeDate)
+                    return number_format($measure->value, 3) . ' [' . $measure->date . ']';
+                else
+                    return number_format($measure->value, 3);
+            }
+        }
+        return "-";
     }
 }

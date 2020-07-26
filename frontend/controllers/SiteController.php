@@ -821,7 +821,7 @@ class SiteController extends Controller
                 $data .= $alarm->getAlarmLabel() . " " . $alarm["title"] . '<br/>';
             }
             $marker = new Marker(['latLng' => $position, 'popupContent' => '<b>'
-                . htmlspecialchars($object->getFullTitle()) . '</b><br/>'
+                . '<a href="/object/dashboard?uuid=' . $object['uuid'] . '">' . htmlspecialchars($object->getFullTitle()) . '</a></b><br/>'
                 . htmlspecialchars($object->objectSubType->title) . '<br/>'
                 . $data
             ]);

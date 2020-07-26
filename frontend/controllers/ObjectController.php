@@ -906,4 +906,115 @@ class ObjectController extends PoliterController
             'dates' => $dates_title
         ]);
     }
+
+    /**
+     * @return string
+     */
+    public
+    function actionTable()
+    {
+        setlocale(LC_TIME, 'ru_RU.UTF-8', 'Russian_Russia', 'Russian');
+        $objects = [];
+        $mon_date_str = [];
+        $mon_date_str2[] = [];
+        $mon_date_str3[] = [];
+        $month_count = 1;
+        $dates_title = [];
+        $dates = date("Ym01 00:00:00", time() - 3600 * 24 * 31);
+        while ($month_count < 3) {
+            $mon_date[$month_count] = strtotime($dates);
+            $mon_date_str[$month_count] = strftime("%Y%m01000000", $mon_date[$month_count]);
+            $mon_date_str2[$month_count] = strftime("%Y%m01000000", $mon_date[$month_count]);
+            $dates_title[$month_count] = strftime("%h", $mon_date[$month_count]);
+            $localtime = localtime($mon_date[$month_count], true);
+            $mon = $localtime['tm_mon'];
+            $year = $localtime['tm_year'];
+            $mon--;
+            if ($mon == 1) {
+                $mon = 12;
+                $year--;
+            }
+            $dates = sprintf("%d-%02d-01 00:00:00", $year + 1900, $mon + 1);
+            $mon_date_str3[$month_count] = strftime("%Y%m01000000", strtotime($dates));
+            $month_count++;
+        }
+        $count = 0;
+        /** @var Objects[] $allObjects */
+        $allObjects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->all();
+        foreach ($allObjects as $object) {
+            $measureChannelHeat = MeasureChannel::getChannel($object['uuid'], MeasureType::HEAT_CONSUMED, MeasureType::MEASURE_TYPE_MONTH);
+            $measureChannelWater = MeasureChannel::getChannel($object['uuid'], MeasureType::COLD_WATER, MeasureType::MEASURE_TYPE_MONTH);
+            $measureChannelEnergy = MeasureChannel::getChannel($object['uuid'], MeasureType::ENERGY, MeasureType::MEASURE_TYPE_MONTH);
+
+            for ($i = 1; $i < $month_count; $i++) {
+                $sumHeat[$i] = 0;
+                $sumWater[$i] = 0;
+                $sumPower[$i] = 0;
+            }
+            $objects[$count]['title'] = Html::a($object->getFullTitle(), ['object/dashboard', 'uuid' => $object['uuid']]);
+            $objects[$count]['region'] = $object->getSubDistrict();
+            $objects[$count]['type'] = $object->objectSubType->title;
+            $objects[$count]['efficiency'] = $object->getParameter(ParameterType::ENERGY_EFFICIENCY);
+            $objects[$count]['equipment'] = $object->getParameter(ParameterType::POWER_EQUIPMENT);
+            $objects[$count]['water'] = $object->water;
+            $objects[$count]['electricity'] = $object->electricity;
+
+            $objects[$count]['heat'] = $object->getCurrent(MeasureType::HEAT_CONSUMED, true);
+            $objects[$count]['water'] = $object->getCurrent(MeasureType::COLD_WATER, true);
+            $objects[$count]['electricity'] = $object->getCurrent(MeasureType::ENERGY, true);
+
+            for ($month = 1; $month < $month_count; $month++) {
+                $objects[$count]['plans'][$month]['plan_heat'] = '<span class="span-plan0">-</span>';
+                $objects[$count]['plans'][$month]['plan_water'] = '<span class="span-plan0">-</span>';
+                $objects[$count]['plans'][$month]['plan_electricity'] = '<span class="span-plan0">-</span>';
+                if ($measureChannelHeat) {
+                    $objects[$count]['plans'][$month]['plan_heat'] = $measureChannelHeat->getParameter(ParameterType::TARGET_CONSUMPTION, $mon_date_str2[$month]);
+                }
+                $objects[$count]['plans'][$month]['plan_water'] = '<span class="span-plan0">-</span>';
+                if ($measureChannelWater) {
+                    $objects[$count]['plans'][$month]['plan_water'] = $measureChannelWater->getParameter(ParameterType::TARGET_CONSUMPTION, $mon_date_str2[$month]);
+                }
+                $objects[$count]['plans'][$month]['plan_electricity'] = '<span class="span-plan0">-</span>';
+                if ($measureChannelEnergy) {
+                    $objects[$count]['plans'][$month]['plan_electricity'] = $measureChannelEnergy->getParameter(ParameterType::TARGET_CONSUMPTION, $mon_date_str2[$month]);
+                }
+                $objects[$count]['plans'][$month]['fact_heat'] = '<span class="span-plan0">-</span>';
+                $objects[$count]['plans'][$month]['fact_water'] = '<span class="span-plan0">-</span>';
+                $objects[$count]['plans'][$month]['fact_electricity'] = '<span class="span-plan0">-</span>';
+                if ($measureChannelHeat) {
+                    $measure = Measure::find()
+                        ->where(['measureChannelUuid' => $measureChannelHeat['uuid']])
+                        ->andWhere(['date' => $mon_date_str2[$month]])
+                        ->one();
+                    if ($measure) {
+                        $objects[$count]['plans'][$month]['fact_heat'] = "<span class='span-plan1'>" . $measure['value'] . "</span>";
+                    }
+                }
+                if ($measureChannelWater) {
+                    $measure = Measure::find()
+                        ->where(['measureChannelUuid' => $measureChannelWater['uuid']])
+                        ->andWhere(['date' => $mon_date_str2[$month]])
+                        ->one();
+                    if ($measure) {
+                        $objects[$count]['plans'][$month]['fact_water'] = "<span class='span-plan1'>" . $measure['value'] . "</span>";
+                    }
+                }
+                if ($measureChannelEnergy) {
+                    $measure = Measure::find()
+                        ->where(['measureChannelUuid' => $measureChannelEnergy['uuid']])
+                        ->andWhere(['date' => $mon_date_str2[$month]])
+                        ->one();
+                    if ($measure) {
+                        $objects[$count]['plans'][$month]['fact_electricity'] = "<span class='span-plan1'>" . $measure['value'] . "</span>";
+                    }
+                }
+            }
+            $count++;
+        }
+        return $this->render('table', [
+            'objects' => $objects,
+            'month_count' => $month_count,
+            'dates' => $dates_title
+        ]);
+    }
 }

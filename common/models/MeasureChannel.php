@@ -5,6 +5,7 @@ namespace common\models;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 use yii\db\Expression;
 
 /**
@@ -162,5 +163,41 @@ class MeasureChannel extends PoliterModel
         $perm['dashboard'] = 'dashboard' . $class;
         $perm['trend'] = 'trend' . $class;
         return $perm;
+    }
+
+    /**
+     * @param $objectUuid
+     * @param $measureTypeUuid
+     * @param $type
+     * @return ActiveRecord
+     */
+    public static function getChannel($objectUuid, $measureTypeUuid, $type)
+    {
+        return MeasureChannel::find()
+            ->where(['objectUuid' => $objectUuid])
+            ->andWhere(['measureTypeUuid' => $measureTypeUuid])
+            ->andWhere(['type' => $type])
+            ->limit(1)
+            ->one();
+    }
+
+    /**
+     * @param $uuid
+     * @param $date
+     * @return string
+     */
+    public function getParameter($uuid, $date)
+    {
+        /** @var Parameter $parameter */
+        $parameter = Parameter::find()
+            ->where(['entityUuid' => $this->uuid])
+            ->andWhere(['date' => $date])
+            ->andWhere(['parameterTypeUuid' => $uuid])
+            ->limit(1)
+            ->one();
+        if ($parameter) {
+            return $parameter->value;
+        }
+        return "n/a";
     }
 }
