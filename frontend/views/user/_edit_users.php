@@ -31,7 +31,6 @@ use yii\widgets\ActiveForm;
     if (!$model->isNewRecord) {
         echo $form->field($model, 'id')->hiddenInput(['maxlength' => true, 'readonly' => true])->label(false);
     }
-    echo $form->field($model, 'pass')->passwordInput(['maxlength' => true, 'value' => '']);
     ?>
 
     <?php echo $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
@@ -44,6 +43,7 @@ use yii\widgets\ActiveForm;
         '9' => Yii::t('app', 'Отключен'),
         '0' => Yii::t('app', 'Удален')];
     echo $form->field($model, 'status')->dropDownList($items);
+    echo $form->field($model, 'pass')->passwordInput(['maxlength' => true, 'value' => '']);
     ?>
 
     <?php

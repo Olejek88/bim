@@ -385,20 +385,11 @@ class UserController extends PoliterController
             $usersParams = Yii::$app->request->getBodyParam('User', null);
             $pass = $usersParams['pass'];
             if (!empty($pass)) {
-                $model->pass = Yii::$app->security->generatePasswordHash($pass);
+                $model->password_hash = Yii::$app->security->generatePasswordHash($pass);
             }
 
             if ($model->save()) {
                 MainFunctions::register(Yii::t('app', 'Обновлен профиль пользователя ') . $model->name, ActionRegister::TYPE_EDIT, $id . "");
-                if (!empty($pass)) {
-                    // обновляем пароль для связанной записи из таблицы user
-                    $user = User::findOne($model->userId);
-                    if ($user != null) {
-                        $user->setPassword($pass);
-                        $user->save();
-                    }
-                }
-
                 // обновляем разрешения пользователя
                 $newRoleModel = new Role();
                 if ($newRoleModel->load(Yii::$app->request->post())) {

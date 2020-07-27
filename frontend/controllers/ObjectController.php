@@ -910,8 +910,7 @@ class ObjectController extends PoliterController
     /**
      * @return string
      */
-    public
-    function actionTable()
+    public function actionTable()
     {
         setlocale(LC_TIME, 'ru_RU.UTF-8', 'Russian_Russia', 'Russian');
         $objects = [];
@@ -1012,6 +1011,225 @@ class ObjectController extends PoliterController
             $count++;
         }
         return $this->render('table', [
+            'objects' => $objects,
+            'month_count' => $month_count,
+            'dates' => $dates_title
+        ]);
+    }
+
+    /**
+     * Проверяем наличие параметров коэффициентов для объекта, и если их нет - создаем их
+     *
+     * @param $objectUuid
+     * @throws \Exception
+     */
+    public static
+    function createConsumptionCoefficients($objectUuid)
+    {
+        $channelHeat = MeasureChannel::getChannel($objectUuid, MeasureType::HEAT_CONSUMED, MeasureType::MEASURE_TYPE_MONTH);
+        $channelWater = MeasureChannel::getChannel($objectUuid, MeasureType::COLD_WATER, MeasureType::MEASURE_TYPE_MONTH);
+        $channelEnergy = MeasureChannel::getChannel($objectUuid, MeasureType::ENERGY, MeasureType::MEASURE_TYPE_MONTH);
+        if ($channelHeat) {
+            $parameter = Parameter::find()
+                ->where(['entityUuid' => $channelHeat['uuid']])
+                ->andWhere(['parameterTypeUuid' => ParameterType::CONSUMPTION_COEFFICIENT])
+                ->limit(1)
+                ->one();
+            if (!$parameter) {
+                for ($month = 1; $month <= 12; $month++) {
+                    $parameter = new Parameter();
+                    $parameter->uuid = MainFunctions::GUID();
+                    $parameter->entityUuid = $channelHeat['uuid'];
+                    $parameter->parameterTypeUuid = ParameterType::CONSUMPTION_COEFFICIENT;
+                    $parameter->date = sprintf("1970%02d01000000", $month);
+                    switch ($month) {
+                        case 1:
+                            $parameter->value = 1;
+                            break;
+                        case 2:
+                            $parameter->value = 1;
+                            break;
+                        case 3:
+                            $parameter->value = 0.9;
+                            break;
+                        case 4:
+                            $parameter->value = 0.7;
+                            break;
+                        case 5:
+                            $parameter->value = 0.4;
+                            break;
+                        case 10:
+                            $parameter->value = 0.4;
+                            break;
+                        case 11:
+                            $parameter->value = 0.9;
+                            break;
+                        case 12:
+                            $parameter->value = 1;
+                            break;
+                        default:
+                            $parameter->value = 0;
+                    }
+                    $parameter->save();
+                }
+            }
+        }
+        if ($channelWater) {
+            $parameter = Parameter::find()
+                ->where(['entityUuid' => $channelWater['uuid']])
+                ->andWhere(['parameterTypeUuid' => ParameterType::CONSUMPTION_COEFFICIENT])
+                ->limit(1)
+                ->one();
+            if (!$parameter) {
+                for ($month = 1; $month <= 12; $month++) {
+                    $parameter = new Parameter();
+                    $parameter->uuid = MainFunctions::GUID();
+                    $parameter->entityUuid = $channelWater['uuid'];
+                    $parameter->parameterTypeUuid = ParameterType::CONSUMPTION_COEFFICIENT;
+                    $parameter->date = sprintf("1970%02d01000000", $month);
+                    switch ($month) {
+                        case 5:
+                            $parameter->value = 0.9;
+                            break;
+                        case 6:
+                            $parameter->value = 0.9;
+                            break;
+                        case 7:
+                            $parameter->value = 0.9;
+                            break;
+                        case 8:
+                            $parameter->value = 0.9;
+                            break;
+                        default:
+                            $parameter->value = 1;
+                    }
+                    $parameter->save();
+                }
+            }
+        }
+        if ($channelEnergy) {
+            $parameter = Parameter::find()
+                ->where(['entityUuid' => $channelEnergy['uuid']])
+                ->andWhere(['parameterTypeUuid' => ParameterType::CONSUMPTION_COEFFICIENT])
+                ->limit(1)
+                ->one();
+            if (!$parameter) {
+                for ($month = 1; $month <= 12; $month++) {
+                    $parameter = new Parameter();
+                    $parameter->uuid = MainFunctions::GUID();
+                    $parameter->entityUuid = $channelEnergy['uuid'];
+                    $parameter->parameterTypeUuid = ParameterType::CONSUMPTION_COEFFICIENT;
+                    $parameter->date = sprintf("1970%02d01000000", $month);
+                    switch ($month) {
+                        case 1:
+                            $parameter->value = 1;
+                            break;
+                        case 2:
+                            $parameter->value = 1;
+                            break;
+                        case 3:
+                            $parameter->value = 1;
+                            break;
+                        case 4:
+                            $parameter->value = 0.9;
+                            break;
+                        case 11:
+                            $parameter->value = 0.9;
+                            break;
+                        case 12:
+                            $parameter->value = 1;
+                            break;
+                        default:
+                            $parameter->value = 0.8;
+                    }
+                    $parameter->save();
+                }
+            }
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public
+    function actionBase()
+    {
+        setlocale(LC_TIME, 'ru_RU.UTF-8', 'Russian_Russia', 'Russian');
+        $objects = [];
+        $dates_title = [];
+        $mon_date_str = [];
+        $mon_date_str2[] = [];
+        $mon_date_str3[] = [];
+
+        $month_count = 1;
+        $dates = date("19700101 00:00:00", time());
+        while ($month_count <= 12) {
+            $mon_date[$month_count] = strtotime($dates);
+            $mon_date_str[$month_count] = strftime("%Y%m01000000", $mon_date[$month_count]);
+            $mon_date_str2[$month_count] = strftime("%Y%m01000000", $mon_date[$month_count]);
+            $dates_title[$month_count] = strftime("%h", $mon_date[$month_count]);
+
+            $localtime = localtime($mon_date[$month_count], true);
+            $mon = $localtime['tm_mon'];
+            $year = $localtime['tm_year'];
+            $mon++;
+            if ($mon > 11) {
+                $mon = 0;
+                $year++;
+            }
+            $dates = sprintf("%d-%02d-01 00:00:00", $year + 1900, $mon + 1);
+            $mon_date_str3[$month_count] = strftime("%Y%m01000000", strtotime($dates));
+            $month_count++;
+        }
+        $count = 0;
+        $allObjects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->all();
+        foreach ($allObjects as $object) {
+            $measureChannelHeat = MeasureChannel::getChannel($object['uuid'], MeasureType::HEAT_CONSUMED, MeasureType::MEASURE_TYPE_MONTH);
+            for ($i = 1; $i < $month_count; $i++) {
+                $sum[$i] = 0;
+            }
+            $objects[$count]['title'] = $object->getFullTitle();
+            for ($month = 1; $month < $month_count; $month++) {
+                $objects[$count]['plans'][$month]['plan'] = '';
+                $parameter_uuid = null;
+                $parameterValue = '<span class="span-plan0">n/a</span>';
+                if ($measureChannelHeat) {
+                    $parameter = Parameter::find()
+                        ->where(['entityUuid' => $measureChannelHeat['uuid']])
+                        ->andWhere(['date' => $mon_date_str2[$month]])
+                        ->andWhere(['parameterTypeUuid' => ParameterType::TARGET_CONSUMPTION])
+                        ->one();
+                    if ($parameter) {
+                        $parameterValue = "<span class='span-plan1'>" . $parameter['value'] . "</span>";
+                        $parameter_uuid = $parameter['uuid'];
+                    }
+                    $objects[$count]['plans'][$month]['plan']
+                        = Html::a($parameterValue, ['/object/plan-edit', 'month' => $mon_date_str[$month],
+                        'parameter_uuid' => $parameter_uuid,
+                        'entityUuid' => $measureChannelHeat['uuid']],
+                        [
+                            'title' => 'Редактировать',
+                            'data-toggle' => 'modal',
+                            'data-target' => '#modalPlan',
+                        ]);
+                } else {
+                    $objects[$count]['plans'][$month]['plan'] = '<span class="span-plan0">-</span>';
+                }
+                $measureValue = '<span class="span-plan0">-</span>';
+                if ($measureChannelHeat) {
+                    $measure = Measure::find()
+                        ->where(['measureChannelUuid' => $measureChannelHeat['uuid']])
+                        ->andWhere(['date' => $mon_date_str2[$month]])
+                        ->one();
+                    if ($measure) {
+                        $measureValue = "<span class='span-plan1'>" . $measure['value'] . "</span>";
+                    }
+                }
+                $objects[$count]['plans'][$month]['fact'] = $measureValue;
+            }
+            $count++;
+        }
+        return $this->render('plan', [
             'objects' => $objects,
             'month_count' => $month_count,
             'dates' => $dates_title
