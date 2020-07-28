@@ -143,6 +143,7 @@ class User extends PoliterModel implements IdentityInterface
         return [
             'username' => Yii::t('app', 'Имя пользователя'),
             'name' => Yii::t('app', 'Логин'),
+            'image' => Yii::t('app', 'Аватар'),
             'status' => Yii::t('app', 'Статус'),
             'type' => Yii::t('app', 'Тип'),
         ];
@@ -164,6 +165,19 @@ class User extends PoliterModel implements IdentityInterface
     public function rules()
     {
         return [
+            [
+                [
+                    'username',
+                    'name',
+                    'email',
+                    'type'
+                ],
+                'required'
+            ],
+            [['type', 'status'], 'integer'],
+            [['image'], 'file'],
+            [['email', 'name'], 'string', 'max' => 50, 'on' => 'default'],
+            [['username'], 'string', 'max' => 100],
             ['status', 'default', 'value' => self::STATUS_INACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_INACTIVE, self::STATUS_DELETED]],
         ];

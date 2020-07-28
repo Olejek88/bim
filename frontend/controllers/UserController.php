@@ -207,15 +207,16 @@ class UserController extends PoliterController
     public function actionNew()
     {
         $model = new User();
-        $model->type = 1;
         $am = Yii::$app->getAuthManager();
         $roles = $am->getRoles();
         $roleList = ArrayHelper::map($roles, 'name', 'description');
         $role = new Role();
         // значение по умолчанию
         $role->role = User::ROLE_OPERATOR;
+        $model->type = 1;
+        $model->auth_key = Yii::$app->security->generateRandomString();
 
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+        if ($model->load(Yii::$app->request->post())) {
             // получаем изображение для последующего сохранения
             $file = UploadedFile::getInstance($model, 'image');
             if ($file && $file->tempName) {
