@@ -4,6 +4,7 @@ namespace frontend\controllers;
 
 use common\components\MainFunctions;
 use common\models\DistrictCoordinates;
+use common\models\Event;
 use common\models\Measure;
 use common\models\MeasureChannel;
 use common\models\MeasureType;
@@ -791,23 +792,13 @@ class ObjectController extends PoliterController
     public
     function actionPlanEdit()
     {
-        if (isset($_GET["month"]))
-            $month = $_GET["month"];
-        else $month = '';
-        if (isset($_GET["entityUuid"]) && isset($_GET["month"])) {
-            $parameter = new Parameter();
-            if (isset($_GET["parameter_uuid"])) {
-                $parameter = Parameter::find()->where(['uuid' => $_GET["parameter_uuid"]])->one();
-                if (!$parameter) {
-                    $parameter = new Parameter();
-                }
+        if (isset($_GET["event_uuid"]) && isset($_GET["month"])) {
+            $event = Event::find()->where(['uuid' => $_GET["event_uuid"]])->one();
+            if ($event) {
+                return $this->renderAjax('_edit_plan', [
+                    'event' => $event
+                ]);
             }
-            return $this->renderAjax('_add_plan', [
-                'date' => $month,
-                'entityUuid' => $_GET["entityUuid"],
-                'objectUuid' => $_GET["entityUuid"],
-                'parameter' => $parameter
-            ]);
         }
         return null;
     }
@@ -1041,7 +1032,7 @@ class ObjectController extends PoliterController
                     $parameter->uuid = MainFunctions::GUID();
                     $parameter->entityUuid = $channelHeat['uuid'];
                     $parameter->parameterTypeUuid = ParameterType::CONSUMPTION_COEFFICIENT;
-                    $parameter->date = sprintf("1970%02d01000000", $month);
+                    $parameter->date = sprintf("2000%02d01000000", $month);
                     switch ($month) {
                         case 1:
                             $parameter->value = 1;
@@ -1086,7 +1077,7 @@ class ObjectController extends PoliterController
                     $parameter->uuid = MainFunctions::GUID();
                     $parameter->entityUuid = $channelWater['uuid'];
                     $parameter->parameterTypeUuid = ParameterType::CONSUMPTION_COEFFICIENT;
-                    $parameter->date = sprintf("1970%02d01000000", $month);
+                    $parameter->date = sprintf("2000%02d01000000", $month);
                     switch ($month) {
                         case 5:
                             $parameter->value = 0.9;
@@ -1119,7 +1110,7 @@ class ObjectController extends PoliterController
                     $parameter->uuid = MainFunctions::GUID();
                     $parameter->entityUuid = $channelEnergy['uuid'];
                     $parameter->parameterTypeUuid = ParameterType::CONSUMPTION_COEFFICIENT;
-                    $parameter->date = sprintf("1970%02d01000000", $month);
+                    $parameter->date = sprintf("2000%02d01000000", $month);
                     switch ($month) {
                         case 1:
                             $parameter->value = 1;

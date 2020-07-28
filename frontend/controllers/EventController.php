@@ -10,6 +10,7 @@ use frontend\models\EventSearch;
 use Yii;
 use yii\db\StaleObjectException;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -182,5 +183,127 @@ class EventController extends PoliterController
             'dataProvider' => $dataProvider,
             'objectUuid' => $objectUuid
         ]);
+    }
+
+    /**
+     * @return string
+     */
+    public
+    function actionPlan()
+    {
+        setlocale(LC_TIME, 'ru_RU.UTF-8', 'Russian_Russia', 'Russian');
+        $objects = [];
+        $dates_title = [];
+        $mon_date_str = [];
+        $mon_date_str2[] = [];
+        $mon_date_str3[] = [];
+
+        $month_count = 1;
+        $dates = date("Y0101 00:00:00", time());
+        while ($month_count <= 12) {
+            $mon_date[$month_count] = strtotime($dates);
+            $mon_date_str[$month_count] = strftime("%Y%m01000000", $mon_date[$month_count]);
+            $mon_date_str2[$month_count] = strftime("%Y%m01000000", $mon_date[$month_count]);
+            $dates_title[$month_count] = strftime("%h", $mon_date[$month_count]);
+
+            $localtime = localtime($mon_date[$month_count], true);
+            $mon = $localtime['tm_mon'];
+            $year = $localtime['tm_year'];
+            $mon++;
+            if ($mon > 11) {
+                $mon = 0;
+                $year++;
+            }
+            $dates = sprintf("%d-%02d-01 00:00:00", $year + 1900, $mon + 1);
+            $mon_date_str3[$month_count] = strftime("%Y%m01000000", strtotime($dates));
+            $month_count++;
+        }
+        $count = 0;
+        $events = Event::find()->all();
+        foreach ($events as $event) {
+            for ($i = 1; $i < $month_count; $i++) {
+                $sum[$i] = 0;
+            }
+            $objects[$count]['title'] = $event->object->getFullTitle();
+            $objects[$count]['event'] = $event->title;
+            for ($month = 1; $month < $month_count; $month++) {
+                $objects[$count]['plans'][$month]['plan'] = '';
+                $parameter_uuid = null;
+                $objects[$count]['plans'][$month]['fact'] = '';
+                $date = strftime("%Y%m01000000", strtotime($event->date));
+                if ($date == $mon_date_str[$month]) {
+                    $objects[$count]['plans'][$month]['plan']
+                        = Html::a('<span class="span-plan2">' . date("d/m", strtotime($event->date)) . '</span>',
+                        ['/event/plan-edit', 'event_uuid' => $event['uuid'], 'plan' => 1],
+                        [
+                            'title' => 'Редактировать',
+                            'data-toggle' => 'modal',
+                            'data-target' => '#modalPlan',
+                        ]);
+                    $factDate = '-';
+                    if ($event->dateFact) {
+                        $factDate = date("d/m", strtotime($event->dateFact));
+                    }
+                    $objects[$count]['plans'][$month]['fact']
+                        = Html::a('<span class="span-plan0">' . $factDate . '</span>',
+                        ['/event/plan-edit', 'event_uuid' => $event['uuid'], 'plan' => 0],
+                        [
+                            'title' => 'Редактировать',
+                            'data-toggle' => 'modal',
+                            'data-target' => '#modalPlan',
+                        ]);
+                }
+            }
+            $count++;
+        }
+        return $this->render('plan', [
+            'objects' => $objects,
+            'month_count' => $month_count,
+            'dates' => $dates_title
+        ]);
+    }
+
+    /**
+     * @return mixed
+     * @throws \Exception
+     */
+    public
+    function actionPlanEdit()
+    {
+        if (isset($_GET["event_uuid"])) {
+            $event = Event::find()->where(['uuid' => $_GET["event_uuid"]])->one();
+            if ($event) {
+                return $this->renderAjax('_add_plan', [
+                    'event' => $event,
+                    'plan' => $_GET['plan']
+                ]);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Creates a new model.
+     * @return mixed
+     */
+    public
+    function actionChange()
+    {
+        if (isset($_POST["eventUuid"])) {
+            $model = Event::find()->where(['uuid' => $_POST["eventUuid"]])->one();
+            if ($model->load(Yii::$app->request->post())) {
+                if ($model->save(false)) {
+                    return $this->redirect('../event/plan');
+                } else {
+                    $message = '';
+                    foreach ($model->errors as $key => $error) {
+                        $message .= $error[0] . '</br>';
+                    }
+                    return json_encode(['message' => $message]);
+                }
+            }
+        }
+        return $this->redirect('../event/plan');
+
     }
 }

@@ -148,6 +148,37 @@ $gridColumns = [
     ],
     [
         'class' => 'kartik\grid\EditableColumn',
+        'attribute' => 'dateFact',
+        'hAlign' => 'center',
+        'vAlign' => 'middle',
+        'contentOptions' => [
+            'class' => 'table_class',
+            'style' => 'width: 50px; text-align: center'
+        ],
+        'headerOptions' => ['class' => 'text-center'],
+        'mergeHeader' => true,
+        'content' => function ($data) {
+            return date("d-m-Y", strtotime($data->dateFact));
+        },
+        'editableOptions' => [
+            'header' => Yii::t('app', 'Дата выполнения'),
+            'size' => 'md',
+            'inputType' => Editable::INPUT_WIDGET,
+            'widgetClass' => 'kartik\datecontrol\DateControl',
+            'options' => [
+                'type' => DateControl::FORMAT_DATE,
+                'displayFormat' => 'dd-MM-yyyy',
+                'saveFormat' => 'php:Y-m-d',
+                'options' => [
+                    'pluginOptions' => [
+                        'autoclose' => true
+                    ]
+                ]
+            ]
+        ]
+    ],
+    [
+        'class' => 'kartik\grid\EditableColumn',
         'attribute' => 'description',
         'contentOptions' => [
             'class' => 'table_class'
@@ -253,7 +284,7 @@ echo GridView::widget([
     'floatHeader' => false,
     'panel' => [
         'type' => GridView::TYPE_PRIMARY,
-        'heading' => '<i class="glyphicon glyphicon-calendar"></i>&nbsp; ' . Yii::t('app', 'События объектов системы')
+        'heading' => '<i class="glyphicon glyphicon-calendar"></i>&nbsp; ' . Yii::t('app', 'Мероприятия объектов системы')
 
     ],
 ]);

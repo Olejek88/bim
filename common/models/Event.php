@@ -15,6 +15,7 @@ use yii\db\ActiveQuery;
  * @property string $objectUuid
  * @property string $eventTypeUuid
  * @property string $date [datetime]
+ * @property string $dateFact [datetime]
  * @property int $status
  * @property boolean $deleted
  * @property string $createdAt [datetime]
@@ -39,7 +40,7 @@ class Event extends PoliterModel
         return [
             [['uuid', 'title', 'objectUuid', 'date'], 'required'],
             [['uuid', 'objectUuid', 'eventTypeUuid'], 'string', 'max' => 50],
-            [['title', 'description'], 'string'],
+            [['title', 'description', 'dateFact'], 'string'],
             [['status'], 'integer'],
             [['uuid', 'objectUuid', 'eventTypeUuid'], 'filter', 'filter' => function ($param) {
                 return htmlspecialchars($param, ENT_QUOTES | ENT_HTML401);
@@ -61,6 +62,7 @@ class Event extends PoliterModel
             'uuid' => Yii::t('app', 'Uuid'),
             'objectUuid' => Yii::t('app', 'Объект'),
             'date' => Yii::t('app', 'Дата назначения'),
+            'dateFact' => Yii::t('app', 'Дата выполнения'),
             'status' => Yii::t('app', 'Статус'),
             'title' => Yii::t('app', 'Мероприятие'),
             'description' => Yii::t('app', 'Описание'),
@@ -76,7 +78,7 @@ class Event extends PoliterModel
      */
     public function fields()
     {
-        return ['uuid', 'title', 'date', 'status', 'objectUuid', 'eventTypeUuid', 'createdAt', 'changedAt', 'description', 'deleted'];
+        return ['uuid', 'title', 'date', 'dateFact', 'status', 'objectUuid', 'eventTypeUuid', 'createdAt', 'changedAt', 'description', 'deleted'];
     }
 
     /**
@@ -113,6 +115,9 @@ class Event extends PoliterModel
 
         $perm = parent::getPermissions();
         $perm['list'] = 'list' . $class;
+        $perm['plan'] = 'plan' . $class;
+        $perm['change'] = 'change' . $class;
+        $perm['plan-edit'] = 'plan-edit' . $class;
         return $perm;
     }
 }
