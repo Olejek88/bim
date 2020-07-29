@@ -184,7 +184,7 @@ class MeasureChannel extends PoliterModel
     /**
      * @param $uuid
      * @param $date
-     * @return string
+     * @return Parameter|null
      */
     public function getParameter($uuid, $date)
     {
@@ -196,8 +196,8 @@ class MeasureChannel extends PoliterModel
             ->limit(1)
             ->one();
         if ($parameter) {
-            return $parameter->value;
+            return $parameter;
         }
-        return "n/a";
+        return null;
     }
 }

@@ -949,9 +949,24 @@ class ObjectController extends PoliterController
             $objects[$count]['water'] = $object->water;
             $objects[$count]['electricity'] = $object->electricity;
 
-            $objects[$count]['heat'] = $object->getCurrent(MeasureType::HEAT_CONSUMED, true);
-            $objects[$count]['water'] = $object->getCurrent(MeasureType::COLD_WATER, true);
-            $objects[$count]['electricity'] = $object->getCurrent(MeasureType::ENERGY, true);
+            $objects[$count]['heat'] = '-';
+            $objects[$count]['water'] = '-';
+            $objects[$count]['electricity'] = '-';
+            if ($measureChannelHeat) {
+                $objects[$count]['heat'] =
+                    Html::a($object->getCurrent(MeasureType::HEAT_CONSUMED, true),
+                        ['measure-channel/dashboard', 'uuid' => $measureChannelHeat['uuid']]);
+            }
+            if ($measureChannelWater) {
+                $objects[$count]['water'] =
+                    Html::a($object->getCurrent(MeasureType::COLD_WATER, true),
+                        ['measure-channel/dashboard', 'uuid' => $measureChannelWater['uuid']]);
+            }
+            if ($measureChannelEnergy) {
+                $objects[$count]['electricity'] =
+                    Html::a($object->getCurrent(MeasureType::ENERGY, true),
+                        ['measure-channel/dashboard', 'uuid' => $measureChannelEnergy['uuid']]);
+            }
 
             for ($month = 1; $month < $month_count; $month++) {
                 $objects[$count]['plans'][$month]['plan_heat'] = '<span class="span-plan0">-</span>';
@@ -1225,5 +1240,156 @@ class ObjectController extends PoliterController
             'month_count' => $month_count,
             'dates' => $dates_title
         ]);
+    }
+
+    /**
+     * @return string
+     */
+    public function actionTarget()
+    {
+        setlocale(LC_TIME, 'ru_RU.UTF-8', 'Russian_Russia', 'Russian');
+        $type = Yii::$app->request->getQueryParam('type');
+        if (!isset($type)) {
+            $type = 'heat';
+        }
+
+        $objects = [];
+        $dates_title = [];
+        $mon_date_str = [];
+        $mon_date_str2[] = [];
+        $mon_date_str3[] = [];
+
+        $month_count = 1;
+        $dates = date("Y0101 00:00:00", time());
+        while ($month_count <= 12) {
+            $mon_date[$month_count] = strtotime($dates);
+            $mon_date_str[$month_count] = strftime("2000%m01000000", $mon_date[$month_count]);
+            $mon_date_str2[$month_count] = strftime("%Y%m01000000", $mon_date[$month_count]);
+            $dates_title[$month_count] = strftime("%h", $mon_date[$month_count]);
+
+            $localtime = localtime($mon_date[$month_count], true);
+            $mon = $localtime['tm_mon'];
+            $year = $localtime['tm_year'];
+            $mon++;
+            if ($mon > 11) {
+                $mon = 0;
+                $year++;
+            }
+            $dates = sprintf("%d-%02d-01 00:00:00", $year + 1900, $mon + 1);
+            $mon_date_str3[$month_count] = strftime("%Y%m01000000", strtotime($dates));
+            $month_count++;
+        }
+        $count = 0;
+        $allObjects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->all();
+        foreach ($allObjects as $object) {
+            /** @var MeasureChannel $measureChannel */
+            $measureChannel = null;
+            $parameter_uuid = null;
+            $baseConsumption = 0;
+            if ($type == 'heat') {
+                $measureChannel = MeasureChannel::getChannel($object['uuid'], MeasureType::HEAT_CONSUMED, MeasureType::MEASURE_TYPE_MONTH);
+                $objects[$count]['base'] = "n/a";
+                if ($measureChannel) {
+                    $baseConsumption = $measureChannel->getParameter(ParameterType::BASE_CONSUMPTION, date("Y0101000000", time()));
+                    if ($baseConsumption) {
+                        $objects[$count]['base'] = $baseConsumption['value'];
+                        $parameter_uuid = $baseConsumption['uuid'];
+                    }
+                    $objects[$count]['base'] = Html::a($objects[$count]['base'],
+                        ['/object/parameter-edit', 'parameter_uuid' => $parameter_uuid, 'entityUuid' => $measureChannel['uuid'],
+                            'month' => date("Y0101000000", time()), 'parameterTypeUuid' => ParameterType::BASE_CONSUMPTION],
+                        ['title' => 'Редактировать', 'data-toggle' => 'modal', 'data-target' => '#modalEditParameter']);
+                }
+            }
+            if ($type == 'water') {
+                $measureChannel = MeasureChannel::getChannel($object['uuid'], MeasureType::COLD_WATER, MeasureType::MEASURE_TYPE_MONTH);
+                $objects[$count]['base'] = "n/a";
+                if ($measureChannel) {
+                    $baseConsumption = $measureChannel->getParameter(ParameterType::BASE_CONSUMPTION, Parameter::DEFAULT_DATE);
+                    if ($baseConsumption) {
+                        $objects[$count]['base'] = $baseConsumption['value'];
+                    }
+                    $objects[$count]['base'] = Html::a($objects[$count]['base'],
+                        ['/object/parameter-edit', 'parameter_uuid' => $parameter_uuid, 'entityUuid' => $measureChannel['uuid'],
+                            'month' => date("Y0101000000", time()), 'parameterTypeUuid' => ParameterType::BASE_CONSUMPTION],
+                        ['title' => 'Редактировать', 'data-toggle' => 'modal', 'data-target' => '#modalEditParameter']);
+                }
+            }
+
+            if ($type == 'energy') {
+                $measureChannel = MeasureChannel::getChannel($object['uuid'], MeasureType::ENERGY, MeasureType::MEASURE_TYPE_MONTH);
+                $objects[$count]['base'] = "n/a";
+                if ($measureChannel) {
+                    $baseConsumption = $measureChannel->getParameter(ParameterType::BASE_CONSUMPTION, Parameter::DEFAULT_DATE);
+                    if ($baseConsumption) {
+                        $objects[$count]['base'] = $baseConsumption['value'];
+                    }
+                    $objects[$count]['base'] = Html::a($objects[$count]['base'],
+                        ['/object/parameter-edit', 'parameter_uuid' => $parameter_uuid, 'entityUuid' => $measureChannel['uuid'],
+                            'month' => date("Y0101000000", time()), 'parameterTypeUuid' => ParameterType::BASE_CONSUMPTION],
+                        ['title' => 'Редактировать', 'data-toggle' => 'modal', 'data-target' => '#modalEditParameter']);
+                }
+            }
+            for ($i = 1; $i < $month_count; $i++) {
+                $sum[$i] = 0;
+            }
+            $objects[$count]['title'] = $object->getFullTitle();
+
+            for ($month = 1; $month < $month_count; $month++) {
+                $objects[$count]['plans'][$month]['coefficient'] = '-';
+                $objects[$count]['plans'][$month]['consumption'] = '-';
+                $parameter_uuid = null;
+                $parameterValue = '<span class="span-plan0">n/a</span>';
+                if ($measureChannel) {
+                    $parameter = $measureChannel->getParameter(ParameterType::CONSUMPTION_COEFFICIENT, $mon_date_str[$month]);
+                    if ($parameter) {
+                        $parameterValue = "<span class='span-plan1'>" . $parameter['value'] . "</span>";
+                        $parameter_uuid = $parameter['uuid'];
+                        $objects[$count]['plans'][$month]['consumption'] = '-';
+                        if ($baseConsumption) {
+                            $objects[$count]['plans'][$month]['consumption'] = $parameter['value'] * $baseConsumption['value'];
+                        }
+                    }
+                    $objects[$count]['plans'][$month]['coefficient']
+                        = Html::a($parameterValue, ['/object/parameter-edit', 'month' => $mon_date_str[$month], 'parameterTypeUuid' => ParameterType::CONSUMPTION_COEFFICIENT,
+                        'parameter_uuid' => $parameter_uuid, 'entityUuid' => $measureChannel['uuid']],
+                        ['title' => 'Редактировать', 'data-toggle' => 'modal', 'data-target' => '#modalEditParameter']);
+                }
+            }
+            $count++;
+        }
+        if ($type == 'heat' || $type == 'water' || $type == 'energy') {
+            return $this->render('target', [
+                'objects' => $objects,
+                'month_count' => $month_count,
+                'dates' => $dates_title
+            ]);
+        }
+        return null;
+    }
+
+    /**
+     * @return mixed
+     * @throws \Exception
+     */
+    public
+    function actionParameterEdit()
+    {
+        if (isset($_GET["entityUuid"])) {
+            $parameter = null;
+            if (isset($_GET["parameter_uuid"])) {
+                $parameter = Parameter::find()->where(['uuid' => $_GET["parameter_uuid"]])->one();
+            }
+            if (!$parameter) {
+                $parameter = new Parameter();
+            }
+            return $this->renderAjax('../parameter/_edit', [
+                'parameter' => $parameter,
+                'parameterTypeUuid' => $_GET["parameterTypeUuid"],
+                'entityUuid' => $_GET["entityUuid"],
+                'date' => $_GET["month"]
+            ]);
+        }
+        return null;
     }
 }

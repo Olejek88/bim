@@ -23,6 +23,8 @@ use yii\db\Expression;
  */
 class Parameter extends PoliterModel
 {
+    const DEFAULT_DATE = '2000-01-01 00:00:00';
+
     /**
      * Название таблицы
      *

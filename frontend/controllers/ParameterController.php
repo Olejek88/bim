@@ -162,7 +162,11 @@ class ParameterController extends PoliterController
     public
     function actionSave()
     {
-        $model = new Parameter();
+        if (isset($_POST['parameterUuid']))
+            $model = Parameter::find()->where(['uuid' => $_POST['parameterUuid']])->one();
+        else
+            $model = new Parameter();
+
         if ($model->load(Yii::$app->request->post())) {
             if ($model->save(false)) {
                 MainFunctions::register(Yii::t('app', 'Добавлен параметр ')

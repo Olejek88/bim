@@ -238,6 +238,8 @@ class Objects extends PoliterModel
         $perm['districts'] = 'districts' . $class;
         $perm['plan-edit'] = 'plan-edit' . $class;
         $perm['table'] = 'table' . $class;
+        $perm['target'] = 'target' . $class;
+        $perm['parameter-edit'] = 'parameter-edit' . $class;
         return $perm;
     }
 
@@ -345,7 +347,7 @@ class Objects extends PoliterModel
         $measureChannel = MeasureChannel::find()
             ->where(['objectUuid' => $this->uuid])
             ->andWhere(['measureTypeUuid' => $uuid])
-            ->andWhere(['type' => MeasureType::CURRENT])
+            //->andWhere(['type' => MeasureType::CURRENT])
             ->limit(1)
             ->one();
         if ($measureChannel) {
