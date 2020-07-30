@@ -1252,6 +1252,7 @@ class ObjectController extends PoliterController
         if (!isset($type)) {
             $type = 'heat';
         }
+        $analyse = Yii::$app->request->getQueryParam('analyse');
 
         $objects = [];
         $dates_title = [];
@@ -1338,6 +1339,8 @@ class ObjectController extends PoliterController
             for ($month = 1; $month < $month_count; $month++) {
                 $objects[$count]['plans'][$month]['coefficient'] = '-';
                 $objects[$count]['plans'][$month]['consumption'] = '-';
+                $objects[$count]['plans'][$month]['diff'] = "-";
+                $objects[$count]['plans'][$month]['fact'] = "-";
                 $parameter_uuid = null;
                 $parameterValue = '<span class="span-plan0">n/a</span>';
                 if ($measureChannel) {
@@ -1354,18 +1357,44 @@ class ObjectController extends PoliterController
                         = Html::a($parameterValue, ['/object/parameter-edit', 'month' => $mon_date_str[$month], 'parameterTypeUuid' => ParameterType::CONSUMPTION_COEFFICIENT,
                         'parameter_uuid' => $parameter_uuid, 'entityUuid' => $measureChannel['uuid']],
                         ['title' => 'Редактировать', 'data-toggle' => 'modal', 'data-target' => '#modalEditParameter']);
+
+                    $measure = Measure::find()
+                        ->where(['measureChannelUuid' => $measureChannel['uuid']])
+                        ->andWhere(['date' => $mon_date_str2[$month]])
+                        ->one();
+                    if ($measure) {
+                        $objects[$count]['plans'][$month]['fact'] = "<span class='span-plan1'>" . $measure['value'] . "</span>";
+                        if ($baseConsumption) {
+                            $targetConsumption = $parameter['value'] * $baseConsumption['value'];
+                            if ($targetConsumption > 0) {
+                                $objects[$count]['plans'][$month]['diff'] =
+                                    number_format(($targetConsumption - $measure['value']) * 100 / $targetConsumption, 2);
+                                if ($objects[$count]['plans'][$month]['diff'] > 0) {
+                                    $objects[$count]['plans'][$month]['diff'] =
+                                        '<span class="progress" style="margin-top: 0 !important;"><span class="critical2">' . $objects[$count]['plans'][$month]['diff'] . '</span></span>';
+                                } else {
+                                    $objects[$count]['plans'][$month]['diff'] =
+                                        '<span class="progress" style="margin-top: 0 !important;"><span class="critical3">' . $objects[$count]['plans'][$month]['diff'] . '</span></span>';
+                                }
+                            }
+                        }
+                    }
                 }
             }
             $count++;
         }
-        if ($type == 'heat' || $type == 'water' || $type == 'energy') {
-            return $this->render('target', [
+        if ($analyse) {
+            return $this->render('target-analyse', [
                 'objects' => $objects,
                 'month_count' => $month_count,
                 'dates' => $dates_title
             ]);
         }
-        return null;
+        return $this->render('target', [
+            'objects' => $objects,
+            'month_count' => $month_count,
+            'dates' => $dates_title
+        ]);
     }
 
     /**
