@@ -19,7 +19,7 @@ class m200726_075416_add_new_parameter_types extends Migration
      */
     public function safeUp()
     {
-        $this->addColumn('event', 'dateFact', $this->timestamp());
+        $this->addColumn('event', 'dateFact', $this->timestamp()->defaultValue(null));
         self::insertRefs(self::PARAMETER_TYPE, 'Базовый уровень потребления', ParameterType::BASE_CONSUMPTION);
         self::insertRefs(self::PARAMETER_TYPE, 'Коэффициент потребления месяца', ParameterType::CONSUMPTION_COEFFICIENT);
         $allObjects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->all();

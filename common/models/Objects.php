@@ -238,6 +238,7 @@ class Objects extends PoliterModel
         $perm['districts'] = 'districts' . $class;
         $perm['plan-edit'] = 'plan-edit' . $class;
         $perm['table'] = 'table' . $class;
+        $perm['month'] = 'month' . $class;
         $perm['target'] = 'target' . $class;
         $perm['parameter-edit'] = 'parameter-edit' . $class;
         return $perm;

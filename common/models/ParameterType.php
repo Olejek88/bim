@@ -10,6 +10,7 @@ use Yii;
  * @property integer $_id
  * @property string $uuid
  * @property string $title
+ * @property integer $type
  * @property string $createdAt
  * @property string $changedAt
  */
@@ -21,6 +22,13 @@ class ParameterType extends PoliterModel
 
     const BASE_CONSUMPTION = 'D803C6CC-D567-4C37-85B7-8DBC0E43A272';
     const CONSUMPTION_COEFFICIENT = '10C48145-4EB3-43A9-9F5F-6E0CACB67CBD';
+
+    const SQUARE = '2707720F-07DB-44BA-B25E-6DC3E9F40E7E';
+    const WALL_WIDTH = '99B2881E-F250-4731-91E1-63102DE150DB';
+    const KNT_HEAT_CONDUCT = 'AB8326AA-21F8-45BF-B575-BC035A3D5CB3';
+    const STAGE_COUNT = '25885EBA-C790-4B10-BBF5-28F7F6CE2B67';
+    const KNT_ROOF = '9E5072FA-60CD-44DC-9350-26EA77366233';
+    const SUM_AVG_HEAT = '4AB9304B-4B83-4E61-AE65-2E8A2E2E2B3F';
 
     /**
      * @inheritdoc

@@ -941,7 +941,7 @@ class ObjectController extends PoliterController
                 $sumWater[$i] = 0;
                 $sumPower[$i] = 0;
             }
-            $objects[$count]['title'] = Html::a($object->getFullTitle(), ['object/dashboard', 'uuid' => $object['uuid']]);
+            $objects[$count]['title'] = Html::a($object->getFullTitle(), ['object/month', 'uuid' => $object['uuid']]);
             $objects[$count]['region'] = $object->getSubDistrict();
             $objects[$count]['type'] = $object->objectSubType->title;
             $objects[$count]['efficiency'] = $object->getParameter(ParameterType::ENERGY_EFFICIENCY);
@@ -973,15 +973,23 @@ class ObjectController extends PoliterController
                 $objects[$count]['plans'][$month]['plan_water'] = '<span class="span-plan0">-</span>';
                 $objects[$count]['plans'][$month]['plan_electricity'] = '<span class="span-plan0">-</span>';
                 if ($measureChannelHeat) {
-                    $objects[$count]['plans'][$month]['plan_heat'] = $measureChannelHeat->getParameter(ParameterType::TARGET_CONSUMPTION, $mon_date_str2[$month]);
+                    $parameterHeat = $measureChannelHeat->getParameter(ParameterType::TARGET_CONSUMPTION, $mon_date_str2[$month]);
+                    if ($parameterHeat) {
+                        $objects[$count]['plans'][$month]['plan_heat'] = $parameterHeat['value'];
+                    }
                 }
                 $objects[$count]['plans'][$month]['plan_water'] = '<span class="span-plan0">-</span>';
                 if ($measureChannelWater) {
-                    $objects[$count]['plans'][$month]['plan_water'] = $measureChannelWater->getParameter(ParameterType::TARGET_CONSUMPTION, $mon_date_str2[$month]);
+                    $parameterWater = $measureChannelWater->getParameter(ParameterType::TARGET_CONSUMPTION, $mon_date_str2[$month]);
+                    if ($parameterWater) {
+                        $objects[$count]['plans'][$month]['plan_water'] = $parameterWater['value'];
+                    }
                 }
                 $objects[$count]['plans'][$month]['plan_electricity'] = '<span class="span-plan0">-</span>';
                 if ($measureChannelEnergy) {
-                    $objects[$count]['plans'][$month]['plan_electricity'] = $measureChannelEnergy->getParameter(ParameterType::TARGET_CONSUMPTION, $mon_date_str2[$month]);
+                    $parameterEnergy = $measureChannelEnergy->getParameter(ParameterType::TARGET_CONSUMPTION, $mon_date_str2[$month]);
+                    if ($parameterEnergy)
+                        $objects[$count]['plans'][$month]['plan_electricity'] = $parameterEnergy['value'];
                 }
                 $objects[$count]['plans'][$month]['fact_heat'] = '<span class="span-plan0">-</span>';
                 $objects[$count]['plans'][$month]['fact_water'] = '<span class="span-plan0">-</span>';
@@ -1421,4 +1429,133 @@ class ObjectController extends PoliterController
         }
         return null;
     }
+
+    /**
+     * @return mixed
+     */
+    public
+    function actionMonth()
+    {
+        $request = Yii::$app->request;
+        $objectUuid = $request->get('uuid');
+        if ($objectUuid) {
+            /** @var Objects $object */
+            $object = Objects::find()->where(['uuid' => $objectUuid])->limit(1)->one();
+            if ($object) {
+                $data['month'] = [];
+                $measures_heat = [];
+                $measures_water = [];
+                $measures_energy = [];
+
+                $measureChannelHeat = MeasureChannel::getChannel($object['uuid'], MeasureType::HEAT_CONSUMED, MeasureType::MEASURE_TYPE_MONTH);
+                $measureChannelWater = MeasureChannel::getChannel($object['uuid'], MeasureType::COLD_WATER, MeasureType::MEASURE_TYPE_MONTH);
+                $measureChannelEnergy = MeasureChannel::getChannel($object['uuid'], MeasureType::ENERGY, MeasureType::MEASURE_TYPE_MONTH);
+                if ($measureChannelHeat) {
+                    $measures_heat = Measure::find()
+                        ->where(['measureChannelUuid' => $measureChannelHeat['uuid']])
+                        ->orderBy('date DESC')
+                        ->limit(24)
+                        ->all();
+                }
+                if ($measureChannelWater) {
+                    $measures_water = Measure::find()
+                        ->where(['measureChannelUuid' => $measureChannelWater['uuid']])
+                        ->orderBy('date DESC')
+                        ->limit(24)
+                        ->all();
+                }
+                if ($measureChannelEnergy) {
+                    $measures_energy = Measure::find()
+                        ->where(['measureChannelUuid' => $measureChannelEnergy['uuid']])
+                        ->orderBy('date DESC')
+                        ->limit(24)
+                        ->all();
+                }
+
+                $mon_date_str = [];
+                $values['heat'] = "{ name: 'Тепло', data: [";
+                $categories['heat'] = "";
+                $values['water'] = "{ name: 'Вода', data: [";
+                $categories['water'] = "";
+                $values['energy'] = "{ name: 'Электро', data: [";
+                $categories['energy'] = "";
+
+                $zero_heat = 0;
+                $zero_water = 0;
+                $zero_energy = 0;
+
+                $localtime = localtime(time(), true);
+                $mon = $localtime['tm_mon'];
+                $year = $localtime['tm_year'];
+                $month_count = 0;
+                while ($month_count < 12) {
+                    $mon_date_str[$month_count] = sprintf("%d-%02d-01 00:00:00", $year + 1900, $mon);
+                    $data['month'][$month_count]['date'] = sprintf("%d-%02d-01", $year + 1900, $mon);
+                    $data['month'][$month_count]['heat'] = "-";
+                    $data['month'][$month_count]['water'] = "-";
+                    $data['month'][$month_count]['energy'] = "-";
+                    foreach ($measures_heat as $measure) {
+                        if ($measure['date'] == $mon_date_str[$month_count]) {
+                            $data['month'][$month_count]['heat'] = $measure['value'];
+                            $categories['heat'] .= '\'' . date("Y-m", strtotime($measure->date)) . '\',';
+                            if ($zero_heat > 0) {
+                                $values['heat'] .= ",";
+                            }
+                            $values['heat'] .= $measure->value;
+                            $zero_heat++;
+                            break;
+                        }
+                    }
+                    foreach ($measures_water as $measure) {
+                        if ($measure['date'] == $mon_date_str[$month_count]) {
+                            $data['month'][$month_count]['water'] = $measure['value'];
+                            $categories['water'] .= '\'' . date("d H:i", strtotime($measure->date)) . '\',';
+                            if ($zero_water > 0) {
+                                $values['water'] .= ",";
+                            }
+                            $values['water'] .= $measure->value;
+                            $zero_water++;
+                            break;
+                        }
+                    }
+                    foreach ($measures_energy as $measure) {
+                        if ($measure['date'] == $mon_date_str[$month_count]) {
+                            $data['month'][$month_count]['energy'] = $measure['value'];
+                            $categories['energy'] .= '\'' . date("d H:i", strtotime($measure->date)) . '\',';
+                            if ($zero_energy > 0) {
+                                $values['energy'] .= ",";
+                            }
+                            $values['energy'] .= $measure->value;
+                            $zero_energy++;
+                            break;
+                        }
+                    }
+                    $mon--;
+                    if ($mon < 1) {
+                        $mon = 12;
+                        $year--;
+                    }
+                    $month_count++;
+                }
+                $categories['heat'] = substr($categories['heat'], 0, -1);
+                $categories['water'] = substr($categories['water'], 0, -1);
+                $categories['energy'] = substr($categories['energy'], 0, -1);
+                $values['heat'] .= "]}";
+                $values['water'] .= "]}";
+                $values['energy'] .= "]}";
+
+                return $this->render('bar-month', [
+                    'object' => $object,
+                    'measures' => $data,
+                    'categories' => $categories,
+                    'measureChannelHeat' => $measureChannelHeat,
+                    'measureChannelWater' => $measureChannelWater,
+                    'measureChannelEnergy' => $measureChannelEnergy,
+                    'values' => $values
+                ]);
+            }
+        }
+        return null;
+    }
+
 }

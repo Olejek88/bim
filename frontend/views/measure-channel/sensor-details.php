@@ -48,8 +48,8 @@ $categories .= "]";
                             <tr class="danger">
                                 <td class="text-center">
                                     <div id="container<?php echo $num ?>" style="height: 250px; width: 430px"></div>
-                                    <script src="/js/vendor/lib/HighCharts/highcharts.js"></script>
-                                    <script src="/js/vendor/lib/HighCharts/modules/exporting.js"></script>
+                                    <script src="/js/HighCharts/highcharts.js"></script>
+                                    <script src="/js/HighCharts/modules/exporting.js"></script>
                                     <script type="text/javascript">
                                         Highcharts.chart('container<?php echo $num ?>', {
                                             data: {
