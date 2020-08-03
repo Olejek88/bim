@@ -1442,7 +1442,7 @@ class ObjectController extends PoliterController
             /** @var Objects $object */
             $object = Objects::find()->where(['uuid' => $objectUuid])->limit(1)->one();
             if ($object) {
-                $data['month'] = [];
+                $data = [];
                 $measures_heat = [];
                 $measures_water = [];
                 $measures_energy = [];
@@ -1490,13 +1490,14 @@ class ObjectController extends PoliterController
                 $month_count = 0;
                 while ($month_count < 12) {
                     $mon_date_str[$month_count] = sprintf("%d-%02d-01 00:00:00", $year + 1900, $mon);
-                    $data['month'][$month_count]['date'] = sprintf("%d-%02d-01", $year + 1900, $mon);
-                    $data['month'][$month_count]['heat'] = "-";
-                    $data['month'][$month_count]['water'] = "-";
-                    $data['month'][$month_count]['energy'] = "-";
+                    $data[$month_count]['date'] = Html::a(sprintf("%d-%02d-01", $year + 1900, $mon),
+                        ['/object/days', 'year' => $year, 'month' => $mon, 'uuid' => $objectUuid]);
+                    $data[$month_count]['heat'] = "-";
+                    $data[$month_count]['water'] = "-";
+                    $data[$month_count]['energy'] = "-";
                     foreach ($measures_heat as $measure) {
                         if ($measure['date'] == $mon_date_str[$month_count]) {
-                            $data['month'][$month_count]['heat'] = $measure['value'];
+                            $data[$month_count]['heat'] = $measure['value'];
                             $categories['heat'] .= '\'' . date("Y-m", strtotime($measure->date)) . '\',';
                             if ($zero_heat > 0) {
                                 $values['heat'] .= ",";
@@ -1508,7 +1509,7 @@ class ObjectController extends PoliterController
                     }
                     foreach ($measures_water as $measure) {
                         if ($measure['date'] == $mon_date_str[$month_count]) {
-                            $data['month'][$month_count]['water'] = $measure['value'];
+                            $data[$month_count]['water'] = $measure['value'];
                             $categories['water'] .= '\'' . date("d H:i", strtotime($measure->date)) . '\',';
                             if ($zero_water > 0) {
                                 $values['water'] .= ",";
@@ -1520,7 +1521,7 @@ class ObjectController extends PoliterController
                     }
                     foreach ($measures_energy as $measure) {
                         if ($measure['date'] == $mon_date_str[$month_count]) {
-                            $data['month'][$month_count]['energy'] = $measure['value'];
+                            $data[$month_count]['energy'] = $measure['value'];
                             $categories['energy'] .= '\'' . date("d H:i", strtotime($measure->date)) . '\',';
                             if ($zero_energy > 0) {
                                 $values['energy'] .= ",";
@@ -1558,4 +1559,135 @@ class ObjectController extends PoliterController
         return null;
     }
 
+    /**
+     * @return mixed
+     */
+    public
+    function actionDays()
+    {
+        $request = Yii::$app->request;
+        $objectUuid = $request->get('uuid');
+        $year = $request->get('year');
+        $month = $request->get('month');
+        if ($objectUuid && $month && $year) {
+            /** @var Objects $object */
+            $object = Objects::find()->where(['uuid' => $objectUuid])->limit(1)->one();
+            if ($object) {
+                $data = [];
+                $measures_heat = [];
+                $measures_water = [];
+                $measures_energy = [];
+
+                $measureChannelHeat = MeasureChannel::getChannel($object['uuid'], MeasureType::HEAT_CONSUMED, MeasureType::MEASURE_TYPE_DAYS);
+                $measureChannelWater = MeasureChannel::getChannel($object['uuid'], MeasureType::COLD_WATER, MeasureType::MEASURE_TYPE_DAYS);
+                $measureChannelEnergy = MeasureChannel::getChannel($object['uuid'], MeasureType::ENERGY, MeasureType::MEASURE_TYPE_DAYS);
+
+                $startDate = sprintf("%d%02d01000000", $year + 1900, $month);
+                $endDate = sprintf("%d%02d31235959", $year + 1900, $month);
+
+                if ($measureChannelHeat) {
+                    $measures_heat = Measure::find()
+                        ->where(['measureChannelUuid' => $measureChannelHeat['uuid']])
+                        ->andWhere(['>=', 'date', $startDate])
+                        ->andWhere(['<', 'date', $endDate])
+                        ->orderBy('date DESC')
+                        ->all();
+                }
+                if ($measureChannelWater) {
+                    $measures_water = Measure::find()
+                        ->where(['measureChannelUuid' => $measureChannelWater['uuid']])
+                        ->orderBy('date DESC')
+                        ->andWhere(['>=', 'date', $startDate])
+                        ->andWhere(['<', 'date', $endDate])
+                        ->all();
+                }
+                if ($measureChannelEnergy) {
+                    $measures_energy = Measure::find()
+                        ->where(['measureChannelUuid' => $measureChannelEnergy['uuid']])
+                        ->orderBy('date DESC')
+                        ->andWhere(['>=', 'date', $startDate])
+                        ->andWhere(['<', 'date', $endDate])
+                        ->all();
+                }
+
+                $mon_date_str = [];
+                $values['heat'] = "{ name: 'Тепло', data: [";
+                $categories['heat'] = "";
+                $values['water'] = "{ name: 'Вода', data: [";
+                $categories['water'] = "";
+                $values['energy'] = "{ name: 'Электро', data: [";
+                $categories['energy'] = "";
+
+                $zero_heat = 0;
+                $zero_water = 0;
+                $zero_energy = 0;
+
+                $time = strtotime($startDate);
+                $day = date('t', $time);
+                $cnt = 0;
+                while ($day) {
+                    $mon_date_str[$cnt] = sprintf("%d-%02d-%02d 00:00:00", $year + 1900, $month, $day);
+                    $data[$cnt]['date'] = sprintf("%d-%02d-%02d", $year + 1900, $month, $day);
+                    $data[$cnt]['heat'] = "-";
+                    $data[$cnt]['water'] = "-";
+                    $data[$cnt]['energy'] = "-";
+                    foreach ($measures_heat as $measure) {
+                        if ($measure['date'] == $mon_date_str[$cnt]) {
+                            $data[$cnt]['heat'] = $measure['value'];
+                            $categories['heat'] .= '\'' . date("Y-m", strtotime($measure->date)) . '\',';
+                            if ($zero_heat > 0) {
+                                $values['heat'] .= ",";
+                            }
+                            $values['heat'] .= $measure->value;
+                            $zero_heat++;
+                            break;
+                        }
+                    }
+                    foreach ($measures_water as $measure) {
+                        if ($measure['date'] == $mon_date_str[$cnt]) {
+                            $data[$cnt]['water'] = $measure['value'];
+                            $categories['water'] .= '\'' . date("d H:i", strtotime($measure->date)) . '\',';
+                            if ($zero_water > 0) {
+                                $values['water'] .= ",";
+                            }
+                            $values['water'] .= $measure->value;
+                            $zero_water++;
+                            break;
+                        }
+                    }
+                    foreach ($measures_energy as $measure) {
+                        if ($measure['date'] == $mon_date_str[$cnt]) {
+                            $data[$cnt]['energy'] = $measure['value'];
+                            $categories['energy'] .= '\'' . date("d H:i", strtotime($measure->date)) . '\',';
+                            if ($zero_energy > 0) {
+                                $values['energy'] .= ",";
+                            }
+                            $values['energy'] .= $measure->value;
+                            $zero_energy++;
+                            break;
+                        }
+                    }
+                    $day--;
+                    $cnt++;
+                }
+                $categories['heat'] = substr($categories['heat'], 0, -1);
+                $categories['water'] = substr($categories['water'], 0, -1);
+                $categories['energy'] = substr($categories['energy'], 0, -1);
+                $values['heat'] .= "]}";
+                $values['water'] .= "]}";
+                $values['energy'] .= "]}";
+
+                return $this->render('bar-days', [
+                    'object' => $object,
+                    'measures' => $data,
+                    'categories' => $categories,
+                    'measureChannelHeat' => $measureChannelHeat,
+                    'measureChannelWater' => $measureChannelWater,
+                    'measureChannelEnergy' => $measureChannelEnergy,
+                    'values' => $values
+                ]);
+            }
+        }
+        return null;
+    }
 }

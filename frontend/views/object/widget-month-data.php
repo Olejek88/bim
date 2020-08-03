@@ -5,7 +5,7 @@
 
 <div class="box box-info">
     <div class="box-header with-border">
-        <h3 class="box-title">Данные по месяцам</h3>
+        <h3 class="box-title">Данные за период</h3>
         <div class="box-tools pull-right">
             <div class="btn-group">
                 <button type="button" class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown">
@@ -30,13 +30,12 @@
                 <tbody>
                 <?php
                 $cnt = 0;
-                foreach ($measures['month'] as $data) {
+                foreach ($measures as $data) {
                     print '<tr><td>' . $data['date'] . '</td>';
                     print '<td style="text-align: center">' . $data['heat'] . '</td>';
                     print '<td style="text-align: center">' . $data['water'] . '</td>';
                     print '<td style="text-align: center">' . $data['energy'] . '</td>';
                     print '</tr>';
-                    if ($cnt++ > 12) break;
                 }
                 ?>
                 </tbody>
