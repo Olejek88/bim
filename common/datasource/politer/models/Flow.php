@@ -1,6 +1,6 @@
 <?php
 
-namespace common\models;
+namespace common\datasource\politer\models;
 
 use Yii;
 use yii\base\InvalidConfigException;

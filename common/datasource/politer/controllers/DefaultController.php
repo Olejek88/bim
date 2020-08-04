@@ -1,23 +1,28 @@
 <?php
 
 
-namespace frontend\controllers;
+namespace common\datasource\politer\controllers;
 
 use Codeception\Util\HttpCode;
 use common\components\MainFunctions;
-use common\models\Flows;
+use common\datasource\politer\models\Flows;
 use common\models\MeasureChannel;
 use common\models\MeasureType;
 use common\models\Objects;
 use common\models\ObjectType;
 use Exception;
+use frontend\controllers\PoliterController;
 use Yii;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
-use yii\web\Controller;
 
-class FlowsController extends Controller
+/**
+ *
+ * @property-read array|string[][] $permissions
+ */
+class DefaultController extends PoliterController
 {
+    protected $modelClass = \common\datasource\politer\models\DefaultController::class;
 
     /**
      * {@inheritdoc}
@@ -47,6 +52,7 @@ class FlowsController extends Controller
 
         $localMeasureChannels = MeasureChannel::find()
             ->with('object')
+            ->where(['deleted' => false, 'data_source' => $this->module->id])
             ->asArray()
             ->all();
         $localMeasureChannels = ArrayHelper::map($localMeasureChannels, 'param_id', function ($model) {
@@ -175,6 +181,7 @@ class FlowsController extends Controller
                 $measureChannel->original_name = $flow->NAME;
                 $measureChannel->param_id = '' . $flow->ID;
                 $measureChannel->type = 0; // в документации типы есть, но реально они не возвращаются
+                $measureChannel->data_source = $this->module->id;
                 if (!$measureChannel->save()) {
                     foreach ($measureChannel->errors as $key => $error) {
                         $errors .= $error[0] . ', ';

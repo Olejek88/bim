@@ -8,22 +8,31 @@ return [
             'password' => '',
             'charset' => 'utf8',
         ],
-        'oracle' => [
-            'class' => 'neconix\yii2oci8\Oci8Connection',
-            'dsn' => 'oci:dbname=;charset=UTF8;',
-            'username' => '',
-            'password' => '',
-            'attributes' => [PDO::ATTR_PERSISTENT => true],
-            'enableSchemaCache' => true, // Oracle dictionaries is too slow :(, enable caching
-            'schemaCacheDuration' => 60 * 60, // 1 hour
-            'on afterOpen' => function ($event) {
-                // специфическая инициализация в конкретной базе
-                /** @var neconix\yii2oci8\Oci8Connection $db */
-                $db = $event->sender;
-                $q = /** @lang oracle sql */
-                    'select PTER_LINK_API.Login(:login, :pass) AS "UserId" FROM dual';
-                $cmd = $db->createCommand($q, [':login' => '', ':pass' => '']);
-                $cmd->execute();
+        'mailer' => [
+            'class' => 'yii\swiftmailer\Mailer',
+            'viewPath' => '@common/mail',
+        ],
+    ],
+    'modules' => [
+        'politer' => [
+            'class' => 'common\datasource\politer\Module',
+            'description' => 'База Политер',
+            'oracle' => [
+                'class' => 'neconix\yii2oci8\Oci8Connection',
+                'dsn' => 'oci:dbname=;charset=UTF8;',
+                'username' => '',
+                'password' => '',
+                'attributes' => [PDO::ATTR_PERSISTENT => true],
+                'enableSchemaCache' => true, // Oracle dictionaries is too slow :(, enable caching
+                'schemaCacheDuration' => 60 * 60, // 1 hour
+                'on afterOpen' => function ($event) {
+                    // специфическая инициализация в конкретной базе
+                    /** @var neconix\yii2oci8\Oci8Connection $db */
+                    $db = $event->sender;
+                    $q = /** @lang oracle sql */
+                        'select PTER_LINK_API.Login(:login, :pass) AS "UserId" FROM dual';
+                    $cmd = $db->createCommand($q, [':login' => '', ':pass' => '']);
+                    $cmd->execute();
 
 //                /* A session configuration example */
 //                $q = <<<SQL
@@ -33,11 +42,8 @@ return [
 //end;
 //SQL;
 //                $event->sender->createCommand($q)->execute();
-            },
-        ],
-        'mailer' => [
-            'class' => 'yii\swiftmailer\Mailer',
-            'viewPath' => '@common/mail',
+                },
+            ],
         ],
     ],
 ];

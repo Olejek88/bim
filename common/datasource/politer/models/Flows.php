@@ -1,6 +1,6 @@
 <?php
 
-namespace common\models;
+namespace common\datasource\politer\models;
 
 use Yii;
 use yii\base\InvalidConfigException;
@@ -29,7 +29,7 @@ class Flows extends ActiveRecord
      */
     public static function getDb()
     {
-        return Yii::$app->get('oracle');
+        return Yii::$app->get('politerDb');
     }
 
     public static function getTableSchema()
@@ -49,19 +49,5 @@ class Flows extends ActiveRecord
     public static function tableName()
     {
         return 'table(PTER_LINK_API.GetFlows())';
-    }
-
-    /**
-     * @return array
-     */
-    public function getPermissions()
-    {
-        $class = explode('\\', get_class($this));
-        $class = $class[count($class) - 1];
-
-        return [
-            'tree' => ['name' => 'tree' . $class, 'description' => 'Дерево параметров внешней базы'],
-            'link-obj-form' => ['name' => 'link-obj-form' . $class, 'description' => 'Создание связи параметров из внешеней базы с объектами'],
-        ];
     }
 }

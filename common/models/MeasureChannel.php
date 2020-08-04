@@ -22,6 +22,7 @@ use yii\db\Expression;
  * @property string $original_name
  * @property string $param_id
  * @property integer $type
+ * @property string $data_source
  *
  * @property MeasureType $measureType
  * @property Objects $object
@@ -64,7 +65,9 @@ class MeasureChannel extends PoliterModel
         return [
             [['uuid', 'title', 'objectUuid', 'measureTypeUuid'], 'required'],
             [['createdAt', 'changedAt'], 'safe'],
-            [['uuid', 'objectUuid', 'measureTypeUuid', 'param_id'], 'string', 'max' => 50],
+            [['uuid', 'objectUuid', 'measureTypeUuid'], 'string', 'max' => 50],
+            [['param_id'], 'string', 'max' => 255],
+            [['data_source'], 'string', 'max' => 128],
             [['type'], 'integer'],
             [['title', 'original_name'], 'string', 'max' => 250],
             [['path'], 'string', 'max' => 512],

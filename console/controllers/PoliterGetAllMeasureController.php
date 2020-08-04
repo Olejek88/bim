@@ -3,12 +3,16 @@
 namespace console\controllers;
 
 use common\components\MainFunctions;
-use common\models\FlowArchive;
+use common\datasource\DataSourceTrait;
+use common\datasource\politer\models\FlowArchive;
 use common\models\Measure;
 use common\models\MeasureChannel;
 use Exception;
+use Yii;
+use yii\base\Module;
 use yii\console\Controller;
 use yii\console\ExitCode;
+use yii\helpers\Console;
 
 /**
  * Class PoliterAccessController
@@ -17,6 +21,18 @@ use yii\console\ExitCode;
 class PoliterGetAllMeasureController extends Controller
 {
     public $defaultAction = 'run';
+    public $pmodule;
+
+    /**
+     * @param $actionID
+     * @return array|string[]
+     */
+    public function options($actionID)
+    {
+        $options = parent::options($actionID);
+        $options[] = 'pmodule';
+        return $options;
+    }
 
     /**
      * @return int
@@ -24,9 +40,25 @@ class PoliterGetAllMeasureController extends Controller
      */
     public function actionRun()
     {
-//        $this->stdout("Hello?\n $dbName \n", Console::BOLD|Console::FG_RED);
+        if ($this->pmodule == null) {
+            $this->stdout("You must specify --pmodule" . PHP_EOL, Console::BOLD | Console::FG_RED);
+            return ExitCode::UNSPECIFIED_ERROR;
+        } else {
+            /** @var DataSourceTrait|Module $module */
+            $module = Yii::$app->getModule($this->pmodule);
+            if ($module == null) {
+                $this->stdout("You specify wrong --pmodule={$this->pmodule}" . PHP_EOL, Console::BOLD | Console::FG_RED);
+                return ExitCode::UNSPECIFIED_ERROR;
+            } else if (!str_contains($module::className(), 'common\datasource\politer\\')) {
+                $this->stdout("{$this->pmodule} is not politer module" . PHP_EOL, Console::BOLD | Console::FG_RED);
+                return ExitCode::UNSPECIFIED_ERROR;
+            }
+        }
 
-        $mcs = MeasureChannel::find()->where(['deleted' => false])->select(['uuid', 'param_id', 'type'])->asArray()->all();
+        $this->stdout("pmodule: {$module->description}" . PHP_EOL, Console::BOLD | Console::FG_GREEN);
+
+        $mcs = MeasureChannel::find()->where(['deleted' => false, 'data_source' => $module->id])
+            ->select(['uuid', 'param_id', 'type'])->asArray()->all();
         foreach ($mcs as $mc) {
             $archives = FlowArchive::find()->where(['ID' => $mc['param_id']])->asArray()->all();
             foreach ($archives as $archive) {
