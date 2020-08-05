@@ -42,6 +42,8 @@ class PoliterService extends Worker
                 continue;
             }
 
+            // передаём в модуль worker для возможности протоколирования
+            $module->setWorker($this);
             if (empty($this->checkLostDate[$prefix])) {
                 $hour = date('G');
                 $checkDate = date('Y-m-d 03:00:00');

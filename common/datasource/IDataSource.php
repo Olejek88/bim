@@ -4,6 +4,8 @@
 namespace common\datasource;
 
 
+use inpassor\daemon\Worker;
+
 interface IDataSource
 {
     /**
@@ -15,4 +17,9 @@ interface IDataSource
      * @param $date string Дата в формате 'Y-m-d H:i:s'
      */
     public function getLostData($date);
+
+    /**
+     * @param $worker Worker
+     */
+    public function setWorker(&$worker);
 }

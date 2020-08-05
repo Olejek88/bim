@@ -13,6 +13,7 @@ use common\models\Measure;
 use common\models\MeasureChannel;
 use common\models\MeasureType;
 use Exception;
+use inpassor\daemon\Worker;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
@@ -38,7 +39,15 @@ class Module extends \yii\base\Module implements IDataSource
     }
 
     /**
-     * @param $date
+     * @param Worker $worker
+     */
+    public function setWorker(&$worker)
+    {
+        $this->worker = $worker;
+    }
+
+    /**
+     * @param $date string
      * @throws Exception
      */
     public function getData($date)
@@ -141,7 +150,7 @@ class Module extends \yii\base\Module implements IDataSource
 
     /**
      * @param $measure Measure|null
-     * @param $flows2 array of Flows2
+     * @param $flows2 Flows2
      * @param $mcUuid string Measure channel uuid
      * @param bool $isSameDate Для текущих значений всегда true, для создания новой записи для другого часа, дня,
      *                          месяца false.
@@ -173,12 +182,18 @@ class Module extends \yii\base\Module implements IDataSource
         $m->date = Flows2::getDatetime($flows2['TIME']);
 
         if (!$m->save()) {
-            // TODO: запротоколировать ошибки записи
+            $action = $isSameDate == true ? 'обновлении' : 'создании';
+            $message = "Ошибки при $action измерения(param_id={$flows2['ID']}): ";
+            foreach ($m->errors as $key => $error) {
+                $message .= $error[0] . ',';
+            }
+
+            self::log($message);
         }
     }
 
     /**
-     * @param $date
+     * @param $date string
      * @throws InvalidConfigException
      */
     public function getLostData($date)
@@ -299,9 +314,13 @@ class Module extends \yii\base\Module implements IDataSource
                     $m->date = $archive->TIME;
                     $m->value = $archive->VALUE;
                     if (!$m->save()) {
-                        // TODO: запротоколировать ошибки записи
-                    }
+                        $message = "Ошибки при создании пропущенного измерения(param_id={$archive['ID']}): ";
+                        foreach ($m->errors as $key => $error) {
+                            $message .= $error[0] . ',';
+                        }
 
+                        self::log($message);
+                    }
                 }
             }
         }
@@ -367,9 +386,13 @@ class Module extends \yii\base\Module implements IDataSource
                     $m->date = $archive->TIME;
                     $m->value = $archive->VALUE;
                     if (!$m->save()) {
-                        // TODO: запротоколировать ошибки записи
-                    }
+                        $message = "Ошибки при создании пропущенного измерения(param_id={$archive['ID']}): ";
+                        foreach ($m->errors as $key => $error) {
+                            $message .= $error[0] . ',';
+                        }
 
+                        self::log($message);
+                    }
                 }
             }
         }
