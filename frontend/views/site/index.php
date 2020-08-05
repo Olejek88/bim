@@ -2,10 +2,14 @@
 
 /* @var $leafLet */
 
+/* @var $title */
+
 use dosamigos\leaflet\widgets\Map;
 use frontend\assets\SelectAreaFeatureAsset;
 
 $this->title = Yii::t('app', 'ПолиТЭР::Карта');
+if (isset($title))
+    $this->title = $title;
 $this->registerJs('$(window).on("resize", function () { $("#w0").height($(window).height()-50); $("#w0").width($(window).width()-50); }).trigger("resize");');
 $this->registerJs('$("#modalAdd").on("hidden.bs.modal",
 function () {

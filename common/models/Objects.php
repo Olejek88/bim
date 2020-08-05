@@ -305,6 +305,66 @@ class Objects extends PoliterModel
     }
 
     /**
+     * @param $type
+     * 1 - heat + main
+     * 2 - water + main
+     * 3 - energy + main
+     * @return array
+     * @throws \Exception
+     */
+    public function getParamsByDistrict($type)
+    {
+        if ($this->objectTypeUuid == ObjectType::SUB_DISTRICT) {
+            $coordinates = DistrictCoordinates::find()->where(['districtUuid' => $this->uuid])->one();
+            if ($coordinates) {
+                $result = [];
+                $avg = 0;
+                $cnt = 0;
+                $sum_square = 0;
+                $sum_volume = 0;
+                $sum = 0;
+                $ee = 0;
+                /** @var Objects[] $objects */
+                $objects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->all();
+                foreach ($objects as $object) {
+                    $p = new LatLng(['lat' => $object->latitude, 'lng' => $object->longitude]);
+                    if (MainFunctions::isPointInPolygon($p, json_decode($coordinates['coordinates']))) {
+                        $volume = $object->getParameter(ParameterType::VOLUME, 0);
+                        $square = $object->getParameter(ParameterType::SQUARE, 0);
+                        if ($type == 4) {
+                            $ee += intval($object->getParameter(ParameterType::ENERGY_EFFICIENCY, 0));
+                        }
+                        if ($type == 1)
+                            $measureChannel = MeasureChannel::getChannel($object['uuid'], MeasureType::HEAT_CONSUMED, MeasureType::MEASURE_TYPE_MONTH);
+                        if ($type == 2)
+                            $measureChannel = MeasureChannel::getChannel($object['uuid'], MeasureType::COLD_WATER, MeasureType::MEASURE_TYPE_MONTH);
+                        if ($type == 3)
+                            $measureChannel = MeasureChannel::getChannel($object['uuid'], MeasureType::ENERGY, MeasureType::MEASURE_TYPE_MONTH);
+                        if (isset($measureChannel)) {
+                            $heat['avg'] = Measure::find()->where(['measureChannelUuid' => $measureChannel['uuid']])
+                                ->orderBy('date DESC')->limit(24)->average('value');
+                            $heat['summary'] = Measure::find()->where(['measureChannelUuid' => $measureChannel['uuid']])
+                                ->orderBy('date DESC')->limit(24)->sum('value');
+                            $avg += $heat['avg'];
+                            $sum += $heat['summary'];
+                            $cnt++;
+                            $sum_square += intval($square);
+                            $sum_volume += intval($volume);
+                        }
+                    }
+                }
+                $result['avg'] = number_format($avg, 2);
+                $result['cnt'] = $cnt;
+                $result['square'] = $sum_square;
+                $result['volume'] = $sum_volume;
+                $result['sum'] = $sum;
+                $result['ee'] = $ee;
+                return $result;
+            }
+        }
+    }
+
+    /**
      * @return array|ActiveRecord
      */
     public function getSubDistrict()
@@ -324,9 +384,10 @@ class Objects extends PoliterModel
 
     /**
      * @param $uuid
+     * @param string $default
      * @return string
      */
-    public function getParameter($uuid)
+    public function getParameter($uuid, $default = "n/a")
     {
         /** @var Parameter $parameter */
         $parameter = Parameter::find()
@@ -336,7 +397,30 @@ class Objects extends PoliterModel
         if ($parameter) {
             return $parameter->value;
         }
-        return "n/a";
+        return $default;
+    }
+
+    /**
+     * @param $parameterTypeUuid
+     * @param $value
+     * @throws \Exception
+     */
+    public function checkCreateParameter($parameterTypeUuid, $value)
+    {
+        /** @var Parameter $parameter */
+        $parameter = Parameter::find()
+            ->where(['entityUuid' => $this->uuid])
+            ->andWhere(['parameterTypeUuid' => $parameterTypeUuid])
+            ->one();
+        if (!$parameter) {
+            $parameter = new Parameter();
+            $parameter->uuid = MainFunctions::GUID();
+            $parameter->entityUuid = $this->uuid;
+            $parameter->parameterTypeUuid = $parameterTypeUuid;
+            $parameter->date = date("Y-m-d 00:00:00");
+            $parameter->value = $value;
+            $parameter->save();
+        }
     }
 
     /**

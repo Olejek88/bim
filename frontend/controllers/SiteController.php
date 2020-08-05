@@ -67,7 +67,7 @@ class SiteController extends Controller
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'dashboard', 'error', 'timeline', 'config', 'trash', 'stats'],
+                        'actions' => ['logout', 'index', 'dashboard', 'error', 'timeline', 'config', 'trash', 'stats', 'map'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -187,9 +187,155 @@ class SiteController extends Controller
     }
 
     /**
+     * Displays homepage.
+     *
+     * @return string
+     * @throws Exception
+     */
+    public function actionMap()
+    {
+        $regionGroupHeat = new SubGroup();
+        $regionGroupHeat->setTitle(Yii::t('app', 'Районы по теплу'));
+        $regionGroupWater = new SubGroup();
+        $regionGroupWater->setTitle(Yii::t('app', 'Районы по воде'));
+        $regionGroupEnergy = new SubGroup();
+        $regionGroupEnergy->setTitle(Yii::t('app', 'Районы по энергии'));
+        $regionGroupEE = new SubGroup();
+        $regionGroupEE->setTitle(Yii::t('app', 'Районы по энергоэффективности'));
+
+        $districts = DistrictCoordinates::find()->all();
+        /** @var DistrictCoordinates $district */
+        foreach ($districts as $district) {
+            if ($district->district->deleted == 0) {
+                $district_coordinates = json_decode($district->coordinates);
+                $coordinates_latlng = [];
+                foreach ($district_coordinates as $coordinate) {
+                    $coordinates_latlng[] = new LatLng(['lat' => $coordinate->lat, 'lng' => $coordinate->lng]);
+                }
+
+                $result = $district->district->getParamsByDistrict(1);
+                $polygon = new Polygon(['latLngs' => $coordinates_latlng, 'popupContent' => '<b>'
+                    . htmlspecialchars($district->district->getFullTitle()) . '</b><br/>'
+                    . 'Среднее энергопотребление: <b>' . $result['avg'] . '</b><br/>'
+                    . 'Количество объектов: <b>' . $result['cnt'] . '</b><br/>'
+                    . 'Суммарная площадь: <b>' . $result['square'] . '</b><br/>'
+                    . 'Сумарное энергопотребление: <b>' . $result['sum'] . '</b><br/>'
+                    . 'Средний класс энергоэффективности: <b>B--</b><br/>'
+                ]);
+                if ($result['avg'] > 100) {
+                    $polygon->clientOptions = ['color' => 'red'];
+                } elseif ($result['avg'] > 100) {
+                    $polygon->clientOptions = ['color' => 'yellow'];
+                } else {
+                    $polygon->clientOptions = ['color' => 'green'];
+                }
+                $regionGroupHeat->addLayer($polygon);
+
+                $result = $district->district->getParamsByDistrict(2);
+                $polygon = new Polygon(['latLngs' => $coordinates_latlng, 'popupContent' => '<b>'
+                    . htmlspecialchars($district->district->getFullTitle()) . '</b><br/>'
+                    . 'Среднее потребление воды: <b>' . $result['avg'] . '</b><br/>'
+                    . 'Количество объектов: <b>' . $result['cnt'] . '</b><br/>'
+                    . 'Суммарная площадь: <b>' . $result['square'] . '</b><br/>'
+                    . 'Сумарное потребление: <b>' . $result['sum'] . '</b><br/>'
+                ]);
+                if ($result['avg'] > 100) {
+                    $polygon->clientOptions = ['color' => 'red'];
+                } elseif ($result['avg'] > 100) {
+                    $polygon->clientOptions = ['color' => 'yellow'];
+                } else {
+                    $polygon->clientOptions = ['color' => 'green'];
+                }
+                $regionGroupWater->addLayer($polygon);
+
+                $result = $district->district->getParamsByDistrict(3);
+                $polygon = new Polygon(['latLngs' => $coordinates_latlng, 'popupContent' => '<b>'
+                    . htmlspecialchars($district->district->getFullTitle()) . '</b><br/>'
+                    . 'Среднее энергопотребление: <b>' . $result['avg'] . '</b><br/>'
+                    . 'Количество объектов: <b>' . $result['cnt'] . '</b><br/>'
+                    . 'Суммарная площадь: <b>' . $result['square'] . '</b><br/>'
+                    . 'Сумарное энергопотребление: <b>' . $result['sum'] . '</b><br/>'
+                    . 'Средний класс энергоэффективности: <b>B--</b><br/>'
+                ]);
+                if ($result['avg'] > 100) {
+                    $polygon->clientOptions = ['color' => 'red'];
+                } elseif ($result['avg'] > 100) {
+                    $polygon->clientOptions = ['color' => 'yellow'];
+                } else {
+                    $polygon->clientOptions = ['color' => 'green'];
+                }
+                $regionGroupEnergy->addLayer($polygon);
+
+                $result = $district->district->getParamsByDistrict(4);
+                $polygon = new Polygon(['latLngs' => $coordinates_latlng, 'popupContent' => '<b>'
+                    . htmlspecialchars($district->district->getFullTitle()) . '</b><br/>'
+                    . 'Среднее энергопотребление: <b>' . $result['avg'] . '</b><br/>'
+                    . 'Количество объектов: <b>' . $result['cnt'] . '</b><br/>'
+                    . 'Суммарная площадь: <b>' . $result['square'] . '</b><br/>'
+                    . 'Сумарное энергопотребление: <b>' . $result['sum'] . '</b><br/>'
+                    . 'Средний класс энергоэффективности: <b>' . $result['ee'] . '</b><br/>'
+                ]);
+                if ($result['avg'] > 100) {
+                    $polygon->clientOptions = ['color' => 'red'];
+                } elseif ($result['avg'] > 100) {
+                    $polygon->clientOptions = ['color' => 'yellow'];
+                } else {
+                    $polygon->clientOptions = ['color' => 'green'];
+                }
+                $regionGroupEE->addLayer($polygon);
+            }
+        }
+
+        $layer['regionGroupEE'] = $regionGroupEE;
+        $layer['regionGroupHeat'] = $regionGroupHeat;
+        $layer['regionGroupWater'] = $regionGroupWater;
+        $layer['regionGroupEnergy'] = $regionGroupEnergy;
+
+        $center = new LatLng(['lat' => 55.16, 'lng' => 61.37]);
+
+        $tileLayer = new TileLayer([
+            'urlTemplate' => 'https://api.tiles.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw',
+            'clientOptions' => [
+                'subdomains' => ['1', '2', '3', '4'],
+            ],
+        ]);
+        $leaflet = new LeafLet([
+            'center' => $center, // set the center
+            'zoom' => 15
+        ]);
+
+        $layers = new Layers();
+        $leaflet->addLayer($tileLayer);
+
+        $subGroupPlugin = new SubgroupCluster();
+        $subGroupPlugin->addSubGroup($layer['regionGroupEE']);
+        $subGroupPlugin->addSubGroup($layer['regionGroupHeat']);
+        $subGroupPlugin->addSubGroup($layer['regionGroupWater']);
+        $subGroupPlugin->addSubGroup($layer['regionGroupEnergy']);
+        $layers->setOverlays([]);
+
+        $layers->setName('ctrlLayer');
+
+        $leaflet->addControl($layers);
+        $layers->position = 'bottomleft';
+
+        // install to LeafLet component
+        $leaflet->plugins->install($subGroupPlugin);
+
+        return $this->render(
+            'index',
+            [
+                'leafLet' => $leaflet,
+                'title' => 'Картограмма распределения ресурсов'
+            ]
+        );
+    }
+
+    /**
      * Signs user up.
      *
      * @return mixed
+     * @throws \yii\base\Exception
      */
     public function actionSignup()
     {

@@ -77,7 +77,7 @@ $this->title = Yii::t('app', 'ПолиТЭР::Гипертаблица объе�
             echo '<tr data-key="1">';
             echo '<td class="kv-align-middle">' . $object['title'] . '</td>';
             if ($object['region'])
-                echo '<td class="kv-align-middle">' . $object['region']['title'] . '</td>';
+                echo '<td class="kv-align-middle">' . Html::a($object['region']['title'], ['object/table', 'district' => $object['region']['uuid']]) . '</td>';
             else
                 echo '<td class="kv-align-middle">-</td>';
             echo '<td class="text-center kv-align-middle">' . $object['type'] . '</td>';
