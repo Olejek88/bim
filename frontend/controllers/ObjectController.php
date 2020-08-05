@@ -8,6 +8,7 @@ use common\models\Event;
 use common\models\Measure;
 use common\models\MeasureChannel;
 use common\models\MeasureType;
+use common\models\ObjectDistrict;
 use common\models\Objects;
 use common\models\ObjectSubType;
 use common\models\ObjectType;
@@ -930,7 +931,15 @@ class ObjectController extends PoliterController
         }
         $count = 0;
         /** @var Objects[] $allObjects */
-        $allObjects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->all();
+        $districtUuid = Yii::$app->request->get('district');
+        if ($districtUuid) {
+            $district = Objects::find()->where(['uuid' => $districtUuid])->limit(1)->one();
+            if ($district) {
+                $allObjects = $district->getObjectsByDistrict(100);
+            }
+        } else {
+            $allObjects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->all();
+        }
         foreach ($allObjects as $object) {
             $measureChannelHeat = MeasureChannel::getChannel($object['uuid'], MeasureType::HEAT_CONSUMED, MeasureType::MEASURE_TYPE_MONTH);
             $measureChannelWater = MeasureChannel::getChannel($object['uuid'], MeasureType::COLD_WATER, MeasureType::MEASURE_TYPE_MONTH);
@@ -1024,8 +1033,12 @@ class ObjectController extends PoliterController
             }
             $count++;
         }
+        $districts = Objects::find()->where(['objectTypeUuid' => ObjectType::SUB_DISTRICT])->all();
+        $districts = ArrayHelper::map($districts, 'uuid', 'title');
+
         return $this->render('table', [
             'objects' => $objects,
+            'districts' => $districts,
             'month_count' => $month_count,
             'dates' => $dates_title
         ]);
@@ -1689,5 +1702,32 @@ class ObjectController extends PoliterController
             }
         }
         return null;
+    }
+
+    /**
+     * Метод не факт что будет нужен, так как все меняется регулярно
+     * @return mixed
+     * @throws \Exception
+     */
+    public
+    function checkObjectDistricts()
+    {
+        $districts = Objects::find()->where(['objectTypeUuid' => ObjectType::SUB_DISTRICT])->all();
+        foreach ($districts as $district) {
+            $objects = $district->getObjectsByDistrict(100);
+            foreach ($objects as $object) {
+                $objectDistrict = ObjectDistrict::find()
+                    ->where(['districtUuid' => $district['uuid']])
+                    ->andWhere(['objectUuid' => $object['uuid']])
+                    ->one();
+                if (!$objectDistrict) {
+                    $objectDistrict = new ObjectDistrict();
+                    $objectDistrict->uuid = MainFunctions::GUID();
+                    $objectDistrict->districtUuid = $district['uuid'];
+                    $objectDistrict->objectUuid = $object['uuid'];
+                    $objectDistrict->save();
+                }
+            }
+        }
     }
 }

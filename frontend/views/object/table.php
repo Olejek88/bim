@@ -1,8 +1,12 @@
 <?php
 /* @var $objects
+ * @var $districts
  * @var $dates
  * @var $month_count
  */
+
+use kartik\select2\Select2;
+use yii\helpers\Html;
 
 $this->title = Yii::t('app', 'ПолиТЭР::Гипертаблица объектов');
 ?>
@@ -10,7 +14,32 @@ $this->title = Yii::t('app', 'ПолиТЭР::Гипертаблица объе�
     <table class="kv-grid-table table table-hover table-bordered table-condensed kv-table-wrap">
         <thead>
         <tr class="kartik-sheet-style" style="height: 20px">
-            <th class="kv-align-middle" data-col-seq="0" colspan="25">Сводная таблица объектов</th>
+            <th class="kv-align-middle" data-col-seq="0" colspan="5">
+                <form action="">
+                    <?php
+                    echo Select2::widget([
+                        'data' => $districts,
+                        'id' => 'district',
+                        'name' => 'district',
+                        'language' => 'ru',
+                        'options' => [
+                            'placeholder' => Yii::t('app', 'Выберите объект')
+                        ],
+                        'pluginOptions' => [
+                            'allowClear' => true
+                        ],
+                        'addon' => [
+                            'append' => [
+                                'content' => Html::submitButton(Yii::t('app', 'Выбрать'),
+                                    ['class' => 'btn btn-success']),
+                                'asButton' => true
+                            ]
+                        ]
+                    ]);
+                    ?>
+                </form>
+            </th>
+            <th class="kv-align-middle" data-col-seq="0" colspan="20">Сводная таблица объектов</th>
         </tr>
         <tr class="kartik-sheet-style" style="height: 20px">
             <th class="kv-align-middle" data-col-seq="0" rowspan="2">Объект</th>
