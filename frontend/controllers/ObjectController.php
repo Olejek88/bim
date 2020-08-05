@@ -687,6 +687,17 @@ class ObjectController extends PoliterController
     public
     function actionDashboard()
     {
+        if (isset($_POST['editableAttribute'])) {
+            $model = Parameter::find()
+                ->where(['_id' => $_POST['editableKey']])
+                ->one();
+            if ($_POST['editableAttribute'] == 'value') {
+                $model['value'] = $_POST['Parameter'][$_POST['editableIndex']]['value'];
+            }
+            $model->save();
+            return json_encode('');
+        }
+
         $request = Yii::$app->request;
         $objectUuid = $request->get('uuid');
         if ($objectUuid) {
@@ -697,6 +708,7 @@ class ObjectController extends PoliterController
                 $parameters = $searchModel->search(Yii::$app->request->queryParams);
                 $parameters->pagination->pageSize = 20;
                 $parameters->query->andWhere(['entityUuid' => $object->uuid]);
+                $parameters->query->andWhere(['parameter_type.type' => 1]);
 
                 $searchModel = new EventSearch();
                 $events = $searchModel->search(Yii::$app->request->queryParams);

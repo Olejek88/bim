@@ -2,6 +2,7 @@
 /* @var $parameters */
 
 use kartik\grid\GridView;
+use kartik\popover\PopoverX;
 
 ?>
 
@@ -33,10 +34,12 @@ use kartik\grid\GridView;
                 'mergeHeader' => true,
                 'header' => Yii::t('app', 'Дата'),
                 'headerOptions' => ['class' => 'text-center'],
+                'content' => function ($data) {
+                    return date("d-m-Y", strtotime($data->date));
+                }
             ],
             [
                 'attribute' => 'parameterTypeUuid',
-                'hAlign' => 'center',
                 'vAlign' => 'middle',
                 'format' => 'raw',
                 'contentOptions' => [
@@ -48,6 +51,7 @@ use kartik\grid\GridView;
                 }
             ],
             [
+                'class' => 'kartik\grid\EditableColumn',
                 'attribute' => 'value',
                 'vAlign' => 'middle',
                 'contentOptions' => [
@@ -57,6 +61,11 @@ use kartik\grid\GridView;
                 'header' => Yii::t('app', 'Значение'),
                 'mergeHeader' => true,
                 'headerOptions' => ['class' => 'text-center'],
+                'editableOptions' => function () {
+                    return [
+                        'placement' => PopoverX::ALIGN_LEFT
+                    ];
+                },
             ]
         ];
 

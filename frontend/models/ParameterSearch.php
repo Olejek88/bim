@@ -40,7 +40,7 @@ class ParameterSearch extends Parameter
     public function search($params)
     {
         $query = Parameter::find();
-
+        $query->joinWith('parameterType');
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([

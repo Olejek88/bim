@@ -213,9 +213,10 @@ class SiteController extends Controller
                     $coordinates_latlng[] = new LatLng(['lat' => $coordinate->lat, 'lng' => $coordinate->lng]);
                 }
 
+                $tileLink = Html::a(htmlspecialchars($district->district->getFullTitle()), ['/object/table', 'districtUuid' => $district['uuid']]);
                 $result = $district->district->getParamsByDistrict(1);
                 $polygon = new Polygon(['latLngs' => $coordinates_latlng, 'popupContent' => '<b>'
-                    . htmlspecialchars($district->district->getFullTitle()) . '</b><br/>'
+                    . $tileLink . '</b><br/>'
                     . 'Среднее энергопотребление: <b>' . $result['avg'] . '</b><br/>'
                     . 'Количество объектов: <b>' . $result['cnt'] . '</b><br/>'
                     . 'Суммарная площадь: <b>' . $result['square'] . '</b><br/>'
@@ -233,7 +234,7 @@ class SiteController extends Controller
 
                 $result = $district->district->getParamsByDistrict(2);
                 $polygon = new Polygon(['latLngs' => $coordinates_latlng, 'popupContent' => '<b>'
-                    . htmlspecialchars($district->district->getFullTitle()) . '</b><br/>'
+                    . $tileLink . '</b><br/>'
                     . 'Среднее потребление воды: <b>' . $result['avg'] . '</b><br/>'
                     . 'Количество объектов: <b>' . $result['cnt'] . '</b><br/>'
                     . 'Суммарная площадь: <b>' . $result['square'] . '</b><br/>'
@@ -250,7 +251,7 @@ class SiteController extends Controller
 
                 $result = $district->district->getParamsByDistrict(3);
                 $polygon = new Polygon(['latLngs' => $coordinates_latlng, 'popupContent' => '<b>'
-                    . htmlspecialchars($district->district->getFullTitle()) . '</b><br/>'
+                    . $tileLink . '</b><br/>'
                     . 'Среднее энергопотребление: <b>' . $result['avg'] . '</b><br/>'
                     . 'Количество объектов: <b>' . $result['cnt'] . '</b><br/>'
                     . 'Суммарная площадь: <b>' . $result['square'] . '</b><br/>'
@@ -268,7 +269,7 @@ class SiteController extends Controller
 
                 $result = $district->district->getParamsByDistrict(4);
                 $polygon = new Polygon(['latLngs' => $coordinates_latlng, 'popupContent' => '<b>'
-                    . htmlspecialchars($district->district->getFullTitle()) . '</b><br/>'
+                    . $tileLink . '</b><br/>'
                     . 'Среднее энергопотребление: <b>' . $result['avg'] . '</b><br/>'
                     . 'Количество объектов: <b>' . $result['cnt'] . '</b><br/>'
                     . 'Суммарная площадь: <b>' . $result['square'] . '</b><br/>'
