@@ -18,7 +18,7 @@ class m200731_110415_add_type_parameter_type extends Migration
      */
     public function safeUp()
     {
-        //$this->addColumn(self::PARAMETER_TYPE, 'type', $this->integer()->defaultValue(0));
+        $this->addColumn(self::PARAMETER_TYPE, 'type', $this->integer()->defaultValue(0));
         self::insertRefs(self::PARAMETER_TYPE, 'Площадь помещений', ParameterType::SQUARE, 1);
         self::insertRefs(self::PARAMETER_TYPE, 'Объем помещений', ParameterType::VOLUME, 1);
         self::insertRefs(self::PARAMETER_TYPE, 'Средняя ширина стен', ParameterType::WALL_WIDTH, 1);
@@ -27,6 +27,7 @@ class m200731_110415_add_type_parameter_type extends Migration
         self::insertRefs(self::PARAMETER_TYPE, 'Коэффициент теплопроводности крыши', ParameterType::KNT_ROOF, 1);
         self::insertRefs(self::PARAMETER_TYPE, 'Среднее расчетное потребление тепла на м2', ParameterType::SUM_AVG_HEAT, 1);
         self::insertRefs(self::PARAMETER_TYPE, 'Количество персонала/жителей', ParameterType::PERSONAL_CNT, 1);
+        self::insertRefs(self::PARAMETER_TYPE, 'Коэффициент теплопроводности окон', ParameterType::KNT_WINDOW, 1);
         /** @var Objects [] $allObjects */
         $allObjects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->all();
         foreach ($allObjects as $object) {

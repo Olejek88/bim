@@ -965,7 +965,7 @@ class ObjectController extends PoliterController
             $objects[$count]['title'] = Html::a($object->getFullTitle(), ['object/month', 'uuid' => $object['uuid']]);
             $objects[$count]['region'] = $object->getSubDistrict();
             $objects[$count]['type'] = $object->objectSubType->title;
-            $objects[$count]['efficiency'] = $object->getParameter(ParameterType::ENERGY_EFFICIENCY);
+            $objects[$count]['efficiency'] = $object->getParameter(ParameterType::ENERGY_EFFICIENCY, n);
             $objects[$count]['equipment'] = $object->getParameter(ParameterType::POWER_EQUIPMENT);
             $objects[$count]['water'] = $object->water;
             $objects[$count]['electricity'] = $object->electricity;
@@ -1742,4 +1742,114 @@ class ObjectController extends PoliterController
             }
         }
     }
+
+    /**
+     * @return string
+     */
+    public function actionEfficiency()
+    {
+        setlocale(LC_TIME, 'ru_RU.UTF-8', 'Russian_Russia', 'Russian');
+        $objects = [];
+        /** @var Objects[] $allObjects */
+        $districtUuid = Yii::$app->request->get('district');
+        if ($districtUuid) {
+            $district = Objects::find()->where(['uuid' => $districtUuid])->limit(1)->one();
+            if ($district) {
+                $allObjects = $district->getObjectsByDistrict(100);
+            }
+        } else {
+            $allObjects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->all();
+        }
+        $time = localtime(time(), true);
+        $year[0] = $time['tm_year'] + 1900;
+        $year[1] = $year[0] - 1;
+        $year[2] = $year[0] - 2;
+        $date[0] = sprintf("%d0101000000", $year[0]);
+        $date[10] = sprintf("%d1231000000", $year[0]);
+        $date[1] = sprintf("%d0101000000", $year[1]);
+        $date[11] = sprintf("%d1231000000", $year[0]);
+        $date[2] = sprintf("%d0101000000", $year[2]);
+        $date[12] = sprintf("%d1231000000", $year[0]);
+        $count = 0;
+        foreach ($allObjects as $object) {
+            $measureChannelHeat = MeasureChannel::getChannel($object['uuid'], MeasureType::HEAT_CONSUMED, MeasureType::MEASURE_TYPE_MONTH);
+            //$measureChannelWater = MeasureChannel::getChannel($object['uuid'], MeasureType::COLD_WATER, MeasureType::MEASURE_TYPE_MONTH);
+            //$measureChannelEnergy = MeasureChannel::getChannel($object['uuid'], MeasureType::ENERGY, MeasureType::MEASURE_TYPE_MONTH);
+
+            $objects[$count]['title'] = Html::a($object->getFullTitle(), ['object/month', 'uuid' => $object['uuid']]);
+            $objects[$count]['region'] = $object->getSubDistrict();
+            $objects[$count]['type'] = $object->objectSubType->title;
+            $objects[$count]['equipment'] = $object->getParameter(ParameterType::POWER_EQUIPMENT);
+            $objects[$count]['water'] = $object->water;
+            $objects[$count]['electricity'] = $object->electricity;
+            $objects[$count]['square'] = $object->getParameter(ParameterType::SQUARE);
+            $objects[$count]['wall_width'] = $object->getParameter(ParameterType::WALL_WIDTH);
+            $objects[$count]['cnt_wall'] = $object->getParameter(ParameterType::KNT_HEAT_CONDUCT);
+            $objects[$count]['cnt_roof'] = $object->getParameter(ParameterType::KNT_ROOF);
+            $objects[$count]['cnt_window'] = $object->getParameter(ParameterType::KNT_WINDOW);
+
+            $objects[$count]['volume'] = $object->getParameter(ParameterType::VOLUME);
+            $objects[$count]['stage'] = $object->getParameter(ParameterType::STAGE_COUNT);
+            $objects[$count]['workers'] = $object->getParameter(ParameterType::PERSONAL_CNT);
+
+            $objects[$count]['efficiency'][0] = $object->getParameter(ParameterType::ENERGY_EFFICIENCY, $date[0]);
+            $objects[$count]['efficiency'][1] = $object->getParameter(ParameterType::ENERGY_EFFICIENCY, $date[1]);
+            $objects[$count]['efficiency'][2] = $object->getParameter(ParameterType::ENERGY_EFFICIENCY, $date[2]);
+
+            $objects[$count]['base_heat'] = '-';
+            $objects[$count]['base_water'] = '-';
+            $objects[$count]['base_energy'] = '-';
+            $objects[$count]['consumption'][0] = '';
+            $objects[$count]['consumption'][1] = '';
+            $objects[$count]['consumption'][2] = '';
+            if ($measureChannelHeat) {
+                $base = $measureChannelHeat->getParameter(ParameterType::BASE_CONSUMPTION, Parameter::DEFAULT_DATE);
+                $parameter_uuid = null;
+                $value = '-';
+                if ($base) {
+                    $parameter_uuid = $base['uuid'];
+                    $value = $base['value'];
+                }
+                $objects[$count]['base_heat'] = Html::a($value,
+                    ['/object/parameter-edit', 'parameter_uuid' => $parameter_uuid, 'entityUuid' => $measureChannelHeat['uuid'],
+                        'month' => "20000101000000", 'parameterTypeUuid' => ParameterType::BASE_CONSUMPTION],
+                    ['title' => 'Редактировать', 'data-toggle' => 'modal', 'data-target' => '#modalEditParameter']);
+
+                $measure = Measure::find()
+                    ->where(['measureChannelUuid' => $measureChannelHeat['uuid']])
+                    ->andWhere(['>=', 'date', $date[0]])
+                    ->andWhere(['<=', 'date', $date[10]])
+                    ->sum('value');
+                if ($measure && $objects[$count]['square']) {
+                    $objects[$count]['consumption'][0] = "<span class='span-plan1'>" . number_format($measure / $objects[$count]['square'], 4) . "</span>";
+                }
+                $measure = Measure::find()
+                    ->where(['measureChannelUuid' => $measureChannelHeat['uuid']])
+                    ->andWhere(['>=', 'date', $date[1]])
+                    ->andWhere(['<=', 'date', $date[11]])
+                    ->sum('value');
+                if ($measure && $objects[$count]['square']) {
+                    $objects[$count]['consumption'][1] = "<span class='span-plan1'>" . number_format($measure / $objects[$count]['square'], 4) . "</span>";
+                }
+                $measure = Measure::find()
+                    ->where(['measureChannelUuid' => $measureChannelHeat['uuid']])
+                    ->andWhere(['>=', 'date', $date[2]])
+                    ->andWhere(['<=', 'date', $date[12]])
+                    ->sum('value');
+                if ($measure && $objects[$count]['square']) {
+                    $objects[$count]['consumption'][2] = "<span class='span-plan1'>" . number_format($measure / $objects[$count]['square'], 4) . "</span>";
+                }
+            }
+            $count++;
+        }
+        $districts = Objects::find()->where(['objectTypeUuid' => ObjectType::SUB_DISTRICT])->all();
+        $districts = ArrayHelper::map($districts, 'uuid', 'title');
+
+        return $this->render('efficiency', [
+            'objects' => $objects,
+            'districts' => $districts,
+            'year' => $year
+        ]);
+    }
+
 }

@@ -241,6 +241,7 @@ class Objects extends PoliterModel
         $perm['month'] = 'month' . $class;
         $perm['days'] = 'days' . $class;
         $perm['target'] = 'target' . $class;
+        $perm['efficiency'] = 'efficiency' . $class;
         $perm['parameter-edit'] = 'parameter-edit' . $class;
         return $perm;
     }
@@ -384,16 +385,26 @@ class Objects extends PoliterModel
 
     /**
      * @param $uuid
+     * @param $date
      * @param string $default
      * @return string
      */
-    public function getParameter($uuid, $default = "n/a")
+    public function getParameter($uuid, $date = null, $default = "n/a")
     {
         /** @var Parameter $parameter */
-        $parameter = Parameter::find()
-            ->where(['entityUuid' => $this->uuid])
-            ->andWhere(['parameterTypeUuid' => $uuid])
-            ->one();
+        if ($date) {
+            $parameter = Parameter::find()
+                ->where(['entityUuid' => $this->uuid])
+                ->andWhere(['date' => $date])
+                ->andWhere(['parameterTypeUuid' => $uuid])
+                ->orderBy('date desc')
+                ->one();
+        } else {
+            $parameter = Parameter::find()
+                ->where(['entityUuid' => $this->uuid])
+                ->andWhere(['parameterTypeUuid' => $uuid])
+                ->one();
+        }
         if ($parameter) {
             return $parameter->value;
         }
