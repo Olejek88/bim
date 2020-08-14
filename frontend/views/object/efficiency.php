@@ -10,6 +10,7 @@ $this->registerJs('$("#modalEditParameter").on("hidden.bs.modal",
 function () {
     $(this).removeData();    
 })');
+$this->registerCssFile('/css/site.css');
 
 use yii\helpers\Html; ?>
 <div id="requests-table-container" class="panel table-responsive kv-grid-container" style="overflow: auto">
@@ -34,8 +35,8 @@ use yii\helpers\Html; ?>
             <th class="kv-align-middle" data-col-seq="0" rowspan="1" colspan="3">Энергоэффективность</th>
         </tr>
         <tr>
-            <th class="kv-align-middle" data-col-seq="0" rowspan="1">Воды</th>
             <th class="kv-align-middle" data-col-seq="0" rowspan="1">Тепла</th>
+            <th class="kv-align-middle" data-col-seq="0" rowspan="1">Воды</th>
             <th class="kv-align-middle" data-col-seq="0" rowspan="1">Энергии</th>
             <th class="kv-align-middle" data-col-seq="0" rowspan="1">Стен</th>
             <th class="kv-align-middle" data-col-seq="0" rowspan="1">Крыши</th>

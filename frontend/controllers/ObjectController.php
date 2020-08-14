@@ -1767,9 +1767,9 @@ class ObjectController extends PoliterController
         $date[0] = sprintf("%d0101000000", $year[0]);
         $date[10] = sprintf("%d1231000000", $year[0]);
         $date[1] = sprintf("%d0101000000", $year[1]);
-        $date[11] = sprintf("%d1231000000", $year[0]);
+        $date[11] = sprintf("%d1231000000", $year[1]);
         $date[2] = sprintf("%d0101000000", $year[2]);
-        $date[12] = sprintf("%d1231000000", $year[0]);
+        $date[12] = sprintf("%d1231000000", $year[2]);
         $count = 0;
         foreach ($allObjects as $object) {
             $measureChannelHeat = MeasureChannel::getChannel($object['uuid'], MeasureType::HEAT_CONSUMED, MeasureType::MEASURE_TYPE_MONTH);
@@ -1821,7 +1821,9 @@ class ObjectController extends PoliterController
                     ->andWhere(['<=', 'date', $date[10]])
                     ->sum('value');
                 if ($measure && $objects[$count]['square']) {
-                    $objects[$count]['consumption'][0] = "<span class='span-plan1'>" . number_format($measure / $objects[$count]['square'], 4) . "</span>";
+                    $objects[$count]['consumption'][0] = number_format($measure / $objects[$count]['square'], 4);
+                    $objects[$count]['efficiency'][0] =
+                        MainFunctions::getEfficiency($measure, $measureChannelHeat, $objects[$count]['square'], 1);
                 }
                 $measure = Measure::find()
                     ->where(['measureChannelUuid' => $measureChannelHeat['uuid']])
@@ -1829,7 +1831,9 @@ class ObjectController extends PoliterController
                     ->andWhere(['<=', 'date', $date[11]])
                     ->sum('value');
                 if ($measure && $objects[$count]['square']) {
-                    $objects[$count]['consumption'][1] = "<span class='span-plan1'>" . number_format($measure / $objects[$count]['square'], 4) . "</span>";
+                    $objects[$count]['consumption'][1] = number_format($measure / $objects[$count]['square'], 4);
+                    $objects[$count]['efficiency'][1] =
+                        MainFunctions::getEfficiency($measure, $measureChannelHeat, $objects[$count]['square'], 1);
                 }
                 $measure = Measure::find()
                     ->where(['measureChannelUuid' => $measureChannelHeat['uuid']])
@@ -1837,7 +1841,9 @@ class ObjectController extends PoliterController
                     ->andWhere(['<=', 'date', $date[12]])
                     ->sum('value');
                 if ($measure && $objects[$count]['square']) {
-                    $objects[$count]['consumption'][2] = "<span class='span-plan1'>" . number_format($measure / $objects[$count]['square'], 4) . "</span>";
+                    $objects[$count]['consumption'][2] = number_format($measure / $objects[$count]['square'], 4);
+                    $objects[$count]['efficiency'][2] =
+                        MainFunctions::getEfficiency($measure, $measureChannelHeat, $objects[$count]['square'], 1);
                 }
             }
             $count++;

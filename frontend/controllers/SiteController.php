@@ -161,13 +161,13 @@ class SiteController extends Controller
         $leaflet->addLayer($tileLayer);
 
         $subGroupPlugin = new SubgroupCluster();
-        $subGroupPlugin->addSubGroup($layer['objectGroup']);
+        //$subGroupPlugin->addSubGroup($layer['objectGroup']);
         $subGroupPlugin->addSubGroup($layer['regionGroup']);
         $subGroupPlugin->addSubGroup($layer['alarmGroup']);
 
-        //$subGroupPlugin->addSubGroup($layer['heatGroup']);
-        //$subGroupPlugin->addSubGroup($layer['waterGroup']);
-        //$subGroupPlugin->addSubGroup($layer['powerGroup']);
+        $subGroupPlugin->addSubGroup($layer['heatGroup']);
+        $subGroupPlugin->addSubGroup($layer['waterGroup']);
+        $subGroupPlugin->addSubGroup($layer['powerGroup']);
         $layers->setOverlays([]);
 
         $layers->setName('ctrlLayer');
@@ -899,7 +899,7 @@ class SiteController extends Controller
         ]);
 
         $alarms = Alarm::find()
-            ->where(['status' => Alarm::STATUS_FIXED])
+            ->where(['status' => Alarm::STATUS_ACTIVE])
             ->orderBy('createdAt desc')
             ->limit(30)
             ->all();
@@ -932,7 +932,8 @@ class SiteController extends Controller
             $data = '';
             /** @var Measure $measureEnergy */
             $measureEnergy = Measure::find()->joinWith('measureChannel')
-                ->where(['or', ['measure_channel.measureTypeUuid' => MeasureType::ENERGY], ['measure_channel.measureTypeUuid' => MeasureType::POWER]])
+                ->where(['or', ['measure_channel.measureTypeUuid' => MeasureType::ENERGY],
+                    ['measure_channel.measureTypeUuid' => MeasureType::POWER]])
                 ->andWhere(['objectUuid' => $object->uuid])
                 ->orderBy('date desc')
                 ->limit(1)

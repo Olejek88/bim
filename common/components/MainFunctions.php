@@ -3,9 +3,13 @@
 namespace common\components;
 
 use common\models\ActionRegister;
+use common\models\MeasureChannel;
+use common\models\Parameter;
+use common\models\ParameterType;
 use common\models\User;
 use dosamigos\leaflet\types\LatLng;
 use Yii;
+use yii\db\ActiveRecord;
 
 /**
  * Class MainFunctions
@@ -148,5 +152,40 @@ class MainFunctions
             return $inside;
         }
         return false;
+    }
+
+    /**
+     * @param $heat
+     * @param MeasureChannel|ActiveRecord $channel
+     * @param $square
+     * @param int $returnType
+     * returnType - 0 (only number)
+     * returnType - 1 (colored span)
+     * returnType - 2 (colored span with A-G)
+     * @return float|int|string
+     */
+    static function getEfficiency($heat, $channel, $square, $returnType = 0)
+    {
+        $base = $channel->getParameter(ParameterType::BASE_CONSUMPTION, Parameter::DEFAULT_DATE);
+        if (!$channel || !$square || $square == 0 || !$base)
+            return "";
+        // $base
+        // $heat
+        $efficiency = number_format(($heat - $base["value"]) / $base["value"], 2);
+        if ($returnType == 0)
+            return $efficiency;
+        if ($efficiency < 0.6)
+            return '<div class="colorLabel" style="background-color: #00a65a">[A]' . $efficiency . '</div>';
+        if ($efficiency < 0.7)
+            return '<div class="colorLabel" style="background-color: #00ca6d">[B]' . $efficiency . '</div>';
+        if ($efficiency < 0.85)
+            return '<div class="colorLabel" style="background-color: #01FF70">[C]' . $efficiency . '</div>';
+        if ($efficiency < 1)
+            return '<div class="colorLabel" style="background-color: #ccd232">[D]' . $efficiency . '</div>';
+        if ($efficiency < 1.25)
+            return '<div class="colorLabel" style="background-color: #f0ad4e">[E]' . $efficiency . '</div>';
+        if ($efficiency < 1.5)
+            return '<div class="colorLabel" style="background-color: #a83800">[F]' . $efficiency . '</div>';
+        return '<div class="colorLabel" style="background-color: #c82829">[G]' . $efficiency . '</div>';
     }
 }
