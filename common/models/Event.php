@@ -17,11 +17,13 @@ use yii\db\ActiveQuery;
  * @property string $date [datetime]
  * @property string $dateFact [datetime]
  * @property int $status
+ * @property double $cnt_coverage
  * @property boolean $deleted
  * @property string $createdAt [datetime]
  * @property string $changedAt [datetime]
  *
  */
+
 class Event extends PoliterModel
 {
     /**
@@ -42,6 +44,7 @@ class Event extends PoliterModel
             [['uuid', 'objectUuid', 'eventTypeUuid'], 'string', 'max' => 50],
             [['title', 'description', 'dateFact'], 'string'],
             [['status'], 'integer'],
+            [['cnt_coverage'], 'double'],
             [['uuid', 'objectUuid', 'eventTypeUuid'], 'filter', 'filter' => function ($param) {
                 return htmlspecialchars($param, ENT_QUOTES | ENT_HTML401);
             }
@@ -66,6 +69,7 @@ class Event extends PoliterModel
             'status' => Yii::t('app', 'Статус'),
             'title' => Yii::t('app', 'Мероприятие'),
             'description' => Yii::t('app', 'Описание'),
+            'cnt_coverage' => Yii::t('app', 'Коэффициент охвата'),
             'eventTypeUuid' => Yii::t('app', 'Тип'),
             'eventType' => Yii::t('app', 'Тип'),
             'createdAt' => Yii::t('app', 'Создан'),
@@ -78,7 +82,8 @@ class Event extends PoliterModel
      */
     public function fields()
     {
-        return ['uuid', 'title', 'date', 'dateFact', 'status', 'objectUuid', 'eventTypeUuid', 'createdAt', 'changedAt', 'description', 'deleted'];
+        return ['uuid', 'title', 'date', 'dateFact', 'status', 'objectUuid', 'eventTypeUuid',
+            'createdAt', 'changedAt', 'description', 'cnt_coverage', 'deleted'];
     }
 
     /**

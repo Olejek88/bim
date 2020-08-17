@@ -113,6 +113,9 @@ class EventController extends PoliterController
     {
         $event = new Event();
         $objects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->orderBy('title')->all();
+        $objects = ArrayHelper::map($objects, 'uuid', function ($data) {
+            return $data->getFullTitle();
+        });
         $request = Yii::$app->request;
         $objectUuid = $request->get('objectUuid');
         return $this->renderAjax('_add_form', [

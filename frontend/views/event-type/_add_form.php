@@ -1,8 +1,11 @@
 <?php
-/* @var $model EventType */
+/* @var $model EventType
+ * @var $types
+ */
 
 use common\components\MainFunctions;
 use common\models\EventType;
+use kartik\select2\Select2;
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
 
@@ -28,6 +31,32 @@ use yii\helpers\Html;
     }
     ?>
     <?= $form->field($model, 'title')->textInput() ?>
+    <?= $form->field($model, 'source')->widget(Select2::class,
+        [
+            'data' => array(
+                '0' => 'Общий',
+                '1' => 'Тепло',
+                '2' => 'Вода',
+                '3' => 'Электроэнергия'
+            ),
+            'options' => [
+                'placeholder' => Yii::t('app', 'Выберите тип..'),
+                'style' => ['height' => '42px', 'padding-top' => '10px']
+            ],
+            'pluginOptions' => [
+                'allowClear' => true
+            ],
+        ]);
+    echo $form->field($model, 'parameterTypeUuid')->widget(Select2::class,
+        [
+            'data' => $types,
+            'options' => ['placeholder' => Yii::t('app', 'Выберите тип параметра ...')],
+            'pluginOptions' => [
+                'allowClear' => true
+            ],
+        ]);
+    ?>
+    <?= $form->field($model, 'cnt_effect')->textInput() ?>
     <?php echo '<label id="error" style="color: red"></label>'; ?>
 </div>
 <div class="modal-footer">

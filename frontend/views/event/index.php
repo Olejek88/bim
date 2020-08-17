@@ -179,6 +179,18 @@ $gridColumns = [
     ],
     [
         'class' => 'kartik\grid\EditableColumn',
+        'attribute' => 'cnt_coverage',
+        'mergeHeader' => true,
+        'contentOptions' => [
+            'class' => 'table_class'
+        ],
+        'editableOptions' => [
+            'size' => 'lg'
+        ],
+        'headerOptions' => ['class' => 'text-center'],
+    ],
+    [
+        'class' => 'kartik\grid\EditableColumn',
         'attribute' => 'description',
         'contentOptions' => [
             'class' => 'table_class'

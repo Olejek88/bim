@@ -3,9 +3,11 @@
 namespace frontend\controllers;
 
 use common\models\EventType;
+use common\models\ParameterType;
 use frontend\models\EventSearchType;
 use Yii;
 use yii\db\StaleObjectException;
+use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -21,12 +23,21 @@ class EventTypeController extends PoliterController
      */
     public function actionIndex()
     {
-        if (isset($_POST['editableEvent'])) {
+        if (isset($_POST['editableAttribute'])) {
             $model = EventType::find()
                 ->where(['_id' => $_POST['editableKey']])
                 ->one();
-            if ($_POST['editableEvent'] == 'title') {
+            if ($_POST['editableAttribute'] == 'title') {
                 $model['title'] = $_POST['EventType'][$_POST['editableIndex']]['title'];
+            }
+            if ($_POST['editableAttribute'] == 'source') {
+                $model['source'] = $_POST['EventType'][$_POST['editableIndex']]['source'];
+            }
+            if ($_POST['editableAttribute'] == 'parameterTypeUuid') {
+                $model['parameterTypeUuid'] = $_POST['EventType'][$_POST['editableIndex']]['parameterTypeUuid'];
+            }
+            if ($_POST['editableAttribute'] == 'cnt_effect') {
+                $model['cnt_effect'] = $_POST['EventType'][$_POST['editableIndex']]['cnt_effect'];
             }
             $model->save();
             return json_encode('');
@@ -36,8 +47,12 @@ class EventTypeController extends PoliterController
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 50;
 
+        $types = ParameterType::find()->where(['type' => 2])->orderBy('title')->all();
+        $types = ArrayHelper::map($types, 'uuid', 'title');
+
         return $this->render('index', [
             'searchModel' => $searchModel,
+            'types' => $types,
             'dataProvider' => $dataProvider,
         ]);
     }
@@ -106,9 +121,12 @@ class EventTypeController extends PoliterController
     public
     function actionNew()
     {
-        $EventType = new EventType();
+        $eventType = new EventType();
+        $types = ParameterType::find()->orderBy('title DESC')->all();
+        $types = ArrayHelper::map($types, 'uuid', 'title');
         return $this->renderAjax('_add_form', [
-            'model' => $EventType
+            'model' => $eventType,
+            'types' => $types
         ]);
     }
 

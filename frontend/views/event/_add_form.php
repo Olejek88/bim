@@ -2,11 +2,11 @@
 /* @var $event Event */
 /* @var $objectUuid */
 
-/* @var Objects[] $objects */
+/* @var $objects */
 
 use common\components\MainFunctions;
 use common\models\Event;
-use common\models\Objects;
+use kartik\date\DatePicker;
 use kartik\select2\Select2;
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
@@ -55,6 +55,22 @@ use yii\helpers\Html;
         }
     }
     echo $form->field($event, 'description')->textInput(['maxlength' => true]);
+    echo '<p style="width: 300px; margin-bottom: 0; font-weight: bold">Дата назначения</p>';
+    echo DatePicker::widget(
+        [
+            'model' => $event,
+            'attribute' => 'date',
+            'value' => date("Ymdhis"),
+            'language' => Yii::t('app', 'ru'),
+            'size' => 'ms',
+            'pluginOptions' => [
+                'autoclose' => true,
+                'format' => 'yyyy-mm-dd',
+            ]
+        ]
+    );
+    echo '<br/>';
+    echo $form->field($event, 'cnt_coverage')->textInput();
     echo '<br/>';
     echo '<label id="error" style="color: red"></label>';
     ?>

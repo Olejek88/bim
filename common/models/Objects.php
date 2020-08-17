@@ -229,6 +229,7 @@ class Objects extends PoliterModel
         $perm['tree'] = 'tree' . $class;
         $perm['deleted'] = 'deleted' . $class;
         $perm['save'] = 'save' . $class;
+        $perm['predictive'] = 'predictive' . $class;
         $perm['edit'] = 'edit' . $class;
         $perm['plan'] = 'plan' . $class;
         $perm['restore'] = 'restore' . $class;
