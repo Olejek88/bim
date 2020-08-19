@@ -178,8 +178,14 @@ class EventController extends PoliterController
 
         $request = Yii::$app->request;
         $objectUuid = $request->get('objectUuid');
-
         $dataProvider->query->where(['objectUuid' => $objectUuid]);
+
+        $dateStart = $request->get('dateStart');
+        $dateEnd = $request->get('dateEnd');
+        if ($dateStart)
+            $dataProvider->query->where(['>=', 'date', $dateStart]);
+        if ($dateEnd)
+            $dataProvider->query->where(['<=', 'date', $dateEnd]);
 
         return $this->renderAjax('_list', [
             'searchModel' => $searchModel,

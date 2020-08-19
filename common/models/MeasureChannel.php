@@ -200,4 +200,27 @@ class MeasureChannel extends PoliterModel
         }
         return null;
     }
+
+    public function getSumYear($heat, $date)
+    {
+        $time = localtime(time(), true);
+        $yearStart = sprintf("%d0101000000", $time['tm_year'] + 1900);
+        $yearEnd = sprintf("%d1231000000", $time['tm_year'] + 1900);
+
+        if ($date >= $yearStart && $date <= $yearEnd) {
+            $periodStart = sprintf("2000%d01000000", $time['tm_mon'] + 1);
+            $sumParameters = Parameter::find()
+                ->where(['parameterTypeUuid' => ParameterType::CONSUMPTION_COEFFICIENT])
+                ->andWhere(['entityUuid' => $this->uuid])
+                ->andWhere(['>=', 'date', $periodStart])
+                ->sum('value');
+        } else {
+            $sumParameters = Parameter::find()
+                ->where(['parameterTypeUuid' => ParameterType::CONSUMPTION_COEFFICIENT])
+                ->andWhere(['entityUuid' => $this->uuid])
+                ->andWhere(['>=', 'date', "20000101000000"])
+                ->andWhere(['<=', 'date', "20001231000000"])
+                ->sum('value');
+        }
+    }
 }
