@@ -1903,8 +1903,8 @@ class ObjectController extends PoliterController
                 ['/object/parameters', 'objectUuid' => $object['uuid']],
                 ['title' => 'Параметры', 'data-toggle' => 'modal', 'data-target' => '#modalParameters']);
             $objects[$count]['links'] .= Html::a('<span class="fa fa-list"></span>',
-                ['/events/list', 'objectUuid' => $object['uuid']],
-                ['title' => 'Мероприятия', 'data-toggle' => 'modal', 'data-target' => '#modalParameters']);
+                ['/event/list', 'objectUuid' => $object['uuid']],
+                ['title' => 'Мероприятия', 'data-toggle' => 'modal', 'data-target' => '#modalEvents']);
 
             $objects[$count]['square'] = $object->getParameter(ParameterType::SQUARE);
             $objects[$count]['stage'] = $object->getParameter(ParameterType::STAGE_COUNT);
@@ -1976,45 +1976,46 @@ class ObjectController extends PoliterController
                 if ($average_cnt > 0 || $currentYearCons) {
                     $events = Event::find()
                         ->where(['objectUuid' => $object['uuid']])
-                        ->andWhere(['>=', 'date', 'NOW()'])
+                        ->andWhere('date > CURDATE()')
                         ->andWhere(['<=', 'date', $date[14]])
                         ->orderBy('date')
                         ->all();
+                    // суммарный коэффициент канала
+                    $sumParameters = Parameter::find()
+                        ->where(['parameterTypeUuid' => ParameterType::CONSUMPTION_COEFFICIENT])
+                        ->andWhere(['entityUuid' => $measureChannelHeat['uuid']])
+                        ->andWhere(['>=', 'date', "20000101000000"])
+                        ->andWhere(['<=', 'date', "20001231000000"])
+                        ->sum('value');
+                    $sumParametersRest = Parameter::find()
+                        ->where(['parameterTypeUuid' => ParameterType::CONSUMPTION_COEFFICIENT])
+                        ->andWhere(['entityUuid' => $measureChannelHeat['uuid']])
+                        ->andWhere(['>=', 'date', strftime("2000%m01000000", time())])
+                        ->sum('value');
+                    $kntRest = 1;
+                    if ($sumParameters) {
+                        $kntRest = $sumParametersRest / $sumParameters;
+                    }
+                    $average = 0;
+                    if ($currentYearCons) {
+                        // обратный коэффициент прогноза до конца года
+                        $average = $objects[$count]['consumption'][0] * (1 / (1 - $kntRest));
+                        $average_cnt++;
+                    }
+                    // average это по сути среднее за три года
+                    if ($average_cnt > 0) {
+                        $average += ($objects[$count]['consumption'][2] + $objects[$count]['consumption'][1]);
+                        $average /= $average_cnt;
+                    }
+                    $eventsImpact[0] = 0;
+                    $eventsImpact[1] = 0;
+                    $eventsImpact[2] = 0;
+                    $eventsCount[0] = 0;
+                    $eventsCount[1] = 0;
+                    $eventsCount[2] = 0;
+
                     // если нет запланированных событий за период, то тоже нет смыла считать
                     if (count($events)) {
-                        // суммарный коэффициент канала
-                        $sumParameters = Parameter::find()
-                            ->where(['parameterTypeUuid' => ParameterType::CONSUMPTION_COEFFICIENT])
-                            ->andWhere(['entityUuid' => $measureChannelHeat['uuid']])
-                            ->andWhere(['>=', 'date', "20000101000000"])
-                            ->andWhere(['<=', 'date', "20001231000000"])
-                            ->sum('value');
-                        $sumParametersRest = Parameter::find()
-                            ->where(['parameterTypeUuid' => ParameterType::CONSUMPTION_COEFFICIENT])
-                            ->andWhere(['entityUuid' => $measureChannelHeat['uuid']])
-                            ->andWhere(['>=', 'date', strftime("2000%m01000000", time())])
-                            ->sum('value');
-                        $kntRest = 1;
-                        if ($sumParameters) {
-                            $kntRest = $sumParametersRest / $sumParameters;
-                        }
-                        $average = 0;
-                        if ($currentYearCons) {
-                            // обратный коэффициент прогноза до конца года
-                            $average = $objects[$count]['consumption'][0] * 1 / $kntRest;
-                            $average_cnt++;
-                        }
-                        // average это по сути среднее за три года
-                        if ($average_cnt > 0) {
-                            $average += ($objects[$count]['consumption'][2] + $objects[$count]['consumption'][1]);
-                            $average /= $average_cnt;
-                        }
-                        $eventsImpact[0] = 0;
-                        $eventsImpact[1] = 0;
-                        $eventsImpact[2] = 0;
-                        $eventsCount[0] = 0;
-                        $eventsCount[1] = 0;
-                        $eventsCount[2] = 0;
                         foreach ($events as $event) {
                             $eventImpact = $event['cnt_coverage'] * $event->eventType->cnt_effect;
                             $objects[$count]['prediction'][1] = $average * (1 - $eventImpact);
@@ -2028,35 +2029,35 @@ class ObjectController extends PoliterController
                                 $eventsCount[0]++;
                             }
                             // дата события приходится на следующий год
-                            if (strtotime($event['date']) >= strtotime($date[1]) && strtotime($event['date']) <= strtotime($date[11])) {
+                            if (strtotime($event['date']) >= strtotime($date[3]) && strtotime($event['date']) <= strtotime($date[13])) {
                                 $eventsImpact[1] += $event['cnt_coverage'] * $event->eventType->cnt_effect * ObjectController::getMonthCoefficient(date('n', strtotime($event['date'])));
                                 $eventsImpact[2] += $event['cnt_coverage'] * $event->eventType->cnt_effect;
                                 $eventsCount[1]++;
                             }
                             // дата события приходится на последний год
-                            if (strtotime($event['date']) >= strtotime($date[0]) && strtotime($event['date']) <= strtotime($date[10])) {
+                            if (strtotime($event['date']) >= strtotime($date[4]) && strtotime($event['date']) <= strtotime($date[14])) {
                                 $eventsImpact[2] += $event['cnt_coverage'] * $event->eventType->cnt_effect * ObjectController::getMonthCoefficient(date('n', strtotime($event['date'])));
                                 $eventsCount[2]++;
                             }
                         }
-                        if ($objects[$count]['consumption'][0] > 0) {
-                            $objects[$count]['prediction'][0] = $objects[$count]['consumption'][0]
-                                + $kntRest * $objects[$count]['consumption'][0] * (1 - $eventsImpact[0]);
-                        } else {
-                            $objects[$count]['prediction'][0] = $average * (1 - $eventsImpact[0]);
-                        }
-                        $objects[$count]['prediction'][1] = $average * (1 - $eventsImpact[1]);
-                        $objects[$count]['prediction'][2] = $average * (1 - $eventsImpact[2]);
-                        $objects[$count]['events'][0] = $eventsImpact[0] . ' (' . Html::a($eventsCount[0],
-                                ['/events/list', 'objectUuid' => $object['uuid'], 'dateStart' => $date[0], 'dateEnd' => $date[10]],
-                                ['title' => 'События', 'data-toggle' => 'modal', 'data-target' => '#modalEvents']) . ')';
-                        $objects[$count]['events'][1] = $eventsImpact[0] . ' (' . Html::a($eventsCount[1],
-                                ['/events/list', 'objectUuid' => $object['uuid'], 'dateStart' => $date[3], 'dateEnd' => $date[13]],
-                                ['title' => 'События', 'data-toggle' => 'modal', 'data-target' => '#modalEvents']) . ')';
-                        $objects[$count]['events'][2] = $eventsImpact[0] . ' (' . Html::a($eventsCount[2],
-                                ['/events/list', 'objectUuid' => $object['uuid'], 'dateStart' => $date[4], 'dateEnd' => $date[14]],
-                                ['title' => 'События', 'data-toggle' => 'modal', 'data-target' => '#modalEvents']) . ')';
                     }
+                    if ($objects[$count]['consumption'][0] > 0) {
+                        $objects[$count]['prediction'][0] = number_format($objects[$count]['consumption'][0]
+                            + $kntRest * $objects[$count]['consumption'][0] * (1 - $eventsImpact[0]), 2, ".", "");
+                    } else {
+                        $objects[$count]['prediction'][0] = number_format($average * (1 - $eventsImpact[0]), 2, ".", "");
+                    }
+                    $objects[$count]['prediction'][1] = number_format($average * (1 - $eventsImpact[1]), 2, ".", "");
+                    $objects[$count]['prediction'][2] = number_format($average * (1 - $eventsImpact[2]), 2, ".", "");
+                    $objects[$count]['events'][0] = number_format($eventsImpact[0], 4) . ' (' . Html::a($eventsCount[0],
+                            ['/event/list', 'objectUuid' => $object['uuid'], 'dateStart' => $date[0], 'dateEnd' => $date[10]],
+                            ['title' => 'События', 'data-toggle' => 'modal', 'data-target' => '#modalEvents']) . ')';
+                    $objects[$count]['events'][1] = number_format($eventsImpact[1], 4) . ' (' . Html::a($eventsCount[1],
+                            ['/event/list', 'objectUuid' => $object['uuid'], 'dateStart' => $date[3], 'dateEnd' => $date[13]],
+                            ['title' => 'События', 'data-toggle' => 'modal', 'data-target' => '#modalEvents']) . ')';
+                    $objects[$count]['events'][2] = number_format($eventsImpact[2], 4) . ' (' . Html::a($eventsCount[2],
+                            ['/event/list', 'objectUuid' => $object['uuid'], 'dateStart' => $date[4], 'dateEnd' => $date[14]],
+                            ['title' => 'События', 'data-toggle' => 'modal', 'data-target' => '#modalEvents']) . ')';
                 }
             }
             $count++;

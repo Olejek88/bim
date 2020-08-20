@@ -4,6 +4,8 @@
 
 /* @var $objects */
 
+/* @var $types */
+
 use common\components\MainFunctions;
 use common\models\Event;
 use kartik\date\DatePicker;
@@ -54,6 +56,18 @@ use yii\helpers\Html;
                 ]);
         }
     }
+    echo $form->field($event, 'eventTypeUuid')->widget(Select2::class,
+        [
+            'data' => $types,
+            'language' => Yii::t('app', 'ru'),
+            'options' => [
+                'placeholder' => Yii::t('app', 'Выберите тип события..'),
+                'style' => ['height' => '42px', 'padding-top' => '10px']
+            ],
+            'pluginOptions' => [
+                'allowClear' => true
+            ],
+        ]);
     echo $form->field($event, 'description')->textInput(['maxlength' => true]);
     echo '<p style="width: 300px; margin-bottom: 0; font-weight: bold">Дата назначения</p>';
     echo DatePicker::widget(

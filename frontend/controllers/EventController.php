@@ -118,9 +118,13 @@ class EventController extends PoliterController
         });
         $request = Yii::$app->request;
         $objectUuid = $request->get('objectUuid');
+        $types = EventType::find()->orderBy('title')->all();
+        $types = ArrayHelper::map($types, 'uuid', 'title');
+
         return $this->renderAjax('_add_form', [
             'event' => $event,
             'objects' => $objects,
+            'types' => $types,
             'objectUuid' => $objectUuid
         ]);
     }
@@ -135,7 +139,7 @@ class EventController extends PoliterController
         $model = new Event();
         if ($model->load(Yii::$app->request->post())) {
             if ($model->save(false)) {
-                return $this->redirect('../event/index');
+                return $this->redirect($_SERVER['HTTP_REFERER']);
             } else {
                 $message = '';
                 foreach ($model->errors as $key => $error) {
@@ -183,9 +187,9 @@ class EventController extends PoliterController
         $dateStart = $request->get('dateStart');
         $dateEnd = $request->get('dateEnd');
         if ($dateStart)
-            $dataProvider->query->where(['>=', 'date', $dateStart]);
+            $dataProvider->query->andWhere(['>=', 'date', $dateStart]);
         if ($dateEnd)
-            $dataProvider->query->where(['<=', 'date', $dateEnd]);
+            $dataProvider->query->andWhere(['<=', 'date', $dateEnd]);
 
         return $this->renderAjax('_list', [
             'searchModel' => $searchModel,

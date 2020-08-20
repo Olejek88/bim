@@ -10,6 +10,12 @@ $this->registerJs('$("#modalEditParameter").on("hidden.bs.modal",
 function () {
     $(this).removeData();    
 })');
+
+$this->registerJs('$("#modalEvents").on("hidden.bs.modal",
+function () {
+    $(this).removeData();    
+})');
+
 $this->registerCssFile('/css/site.css');
 
 ?>
@@ -32,15 +38,15 @@ $this->registerCssFile('/css/site.css');
             <th class="kv-align-middle" data-col-seq="0" rowspan="1" colspan="3">Прогноз</th>
         </tr>
         <tr>
-            <th class="kv-align-middle" data-col-seq="0" rowspan="1"><?= $year[0] ?></th>
-            <th class="kv-align-middle" data-col-seq="0" rowspan="1"><?= $year[1] ?></th>
             <th class="kv-align-middle" data-col-seq="0" rowspan="1"><?= $year[2] ?></th>
-            <th class="kv-align-middle" data-col-seq="0" rowspan="1"><?= $year[0] ?></th>
             <th class="kv-align-middle" data-col-seq="0" rowspan="1"><?= $year[1] ?></th>
-            <th class="kv-align-middle" data-col-seq="0" rowspan="1"><?= $year[2] ?></th>
             <th class="kv-align-middle" data-col-seq="0" rowspan="1"><?= $year[0] ?></th>
-            <th class="kv-align-middle" data-col-seq="0" rowspan="1"><?= $year[1] ?></th>
-            <th class="kv-align-middle" data-col-seq="0" rowspan="1"><?= $year[2] ?></th>
+            <th class="kv-align-middle" data-col-seq="0" rowspan="1"><?= $year[0] ?></th>
+            <th class="kv-align-middle" data-col-seq="0" rowspan="1"><?= $year[3] ?></th>
+            <th class="kv-align-middle" data-col-seq="0" rowspan="1"><?= $year[4] ?></th>
+            <th class="kv-align-middle" data-col-seq="0" rowspan="1"><?= $year[0] ?></th>
+            <th class="kv-align-middle" data-col-seq="0" rowspan="1"><?= $year[3] ?></th>
+            <th class="kv-align-middle" data-col-seq="0" rowspan="1"><?= $year[4] ?></th>
         </tr>
         </thead>
         <tbody>
@@ -52,15 +58,15 @@ $this->registerCssFile('/css/site.css');
             echo '<td class="kv-align-middle text-center">' . $object['square'] . '</td>';
             echo '<td class="kv-align-middle text-center">' . $object['stage'] . '</td>';
             echo '<td class="kv-align-middle text-center">' . $object['base_heat'] . '</td>';
-            echo '<td class="kv-align-middle text-center">' . $object['consumption'][0] . '</td>';
-            echo '<td class="kv-align-middle text-center">' . $object['consumption'][1] . '</td>';
             echo '<td class="kv-align-middle text-center">' . $object['consumption'][2] . '</td>';
+            echo '<td class="kv-align-middle text-center">' . $object['consumption'][1] . '</td>';
+            echo '<td class="kv-align-middle text-center">' . $object['consumption'][0] . '</td>';
             echo '<td class="kv-align-middle text-center">' . $object['events'][0] . '</td>';
             echo '<td class="kv-align-middle text-center">' . $object['events'][1] . '</td>';
             echo '<td class="kv-align-middle text-center">' . $object['events'][2] . '</td>';
-            echo '<td class="kv-align-middle text-center">' . $object['predictive'][0] . '</td>';
-            echo '<td class="kv-align-middle text-center">' . $object['predictive'][1] . '</td>';
-            echo '<td class="kv-align-middle text-center">' . $object['predictive'][2] . '</td>';
+            echo '<td class="kv-align-middle text-center">' . $object['prediction'][0] . '</td>';
+            echo '<td class="kv-align-middle text-center">' . $object['prediction'][1] . '</td>';
+            echo '<td class="kv-align-middle text-center">' . $object['prediction'][2] . '</td>';
             echo '</tr>';
         }
         ?>
@@ -69,7 +75,13 @@ $this->registerCssFile('/css/site.css');
 </div>
 
 <div class="modal remote fade" id="modalEvents">
-    <div class="modal-dialog" style="width: 1050px">
+    <div class="modal-dialog" style="width: 1050px; height: 550px">
+        <div class="modal-content loader-lg" style="margin: 10px; padding: 10px">
+        </div>
+    </div>
+</div>
+<div class="modal remote fade" id="modalEditParameter">
+    <div class="modal-dialog" style="width: 450px">
         <div class="modal-content loader-lg" style="margin: 10px; padding: 10px">
         </div>
     </div>
