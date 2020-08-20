@@ -1,5 +1,6 @@
 <?php
 /* @var $categories
+ * @var $categories2
  * @var $bar
  * @var $channels
  * @var $registers
@@ -17,6 +18,7 @@
  * @var $eventTypesCount
  * @var $layer
  * @var $values
+ * @var $values2
  */
 $this->title = Yii::t('app', 'ПолиТЭР::Сводная');
 $this->registerJsFile('/js/HighCharts/highcharts.js');
@@ -55,6 +57,22 @@ $this->registerJsFile('/js/HighCharts/modules/exporting.js');
     <!-- Left col -->
     <div class="col-md-7">
         <?= $this->render('widget-map', ['layer' => $layer]); ?>
+        <div class="row">
+            <div class="col-md-12">
+                <?php
+                echo $this->render('widget-channel-bar', ['categories' => $categories, 'title' => 'Температура воздуха по месяцам',
+                    'id' => 1, 'values' => $values]);
+                ?>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <?php
+                echo $this->render('widget-channel-bar', ['categories' => $categories2, 'title' => 'Температура воздуха по дням',
+                    'id' => 2, 'values' => $values2]);
+                ?>
+            </div>
+        </div>
         <div class="row">
             <div class="col-md-12">
                 <?php

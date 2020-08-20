@@ -4,7 +4,11 @@
 use kartik\grid\GridView;
 
 ?>
-
+<style>
+    .grid-view td {
+        white-space: pre-line;
+    }
+</style>
 <div class="box box-info">
     <div class="box-header with-border">
         <h3 class="box-title"><?php echo Yii::t('app', 'События') ?></h3>

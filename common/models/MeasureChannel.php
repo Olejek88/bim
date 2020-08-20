@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\components\MainFunctions;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -201,26 +202,28 @@ class MeasureChannel extends PoliterModel
         return null;
     }
 
-    public function getSumYear($heat, $date)
+    /**
+     * @param $type
+     * @return Parameter|null
+     * @throws \Exception
+     */
+    public function createNewChannel($type)
     {
-        $time = localtime(time(), true);
-        $yearStart = sprintf("%d0101000000", $time['tm_year'] + 1900);
-        $yearEnd = sprintf("%d1231000000", $time['tm_year'] + 1900);
-
-        if ($date >= $yearStart && $date <= $yearEnd) {
-            $periodStart = sprintf("2000%d01000000", $time['tm_mon'] + 1);
-            $sumParameters = Parameter::find()
-                ->where(['parameterTypeUuid' => ParameterType::CONSUMPTION_COEFFICIENT])
-                ->andWhere(['entityUuid' => $this->uuid])
-                ->andWhere(['>=', 'date', $periodStart])
-                ->sum('value');
-        } else {
-            $sumParameters = Parameter::find()
-                ->where(['parameterTypeUuid' => ParameterType::CONSUMPTION_COEFFICIENT])
-                ->andWhere(['entityUuid' => $this->uuid])
-                ->andWhere(['>=', 'date', "20000101000000"])
-                ->andWhere(['<=', 'date', "20001231000000"])
-                ->sum('value');
+        $object = Objects::find()->where(['objectTypeUuid' => ObjectType::CITY])->andWhere(['deleted' => 0])->limit(1)->one();
+        if ($object) {
+            $measureChannel = new MeasureChannel();
+            $measureChannel->uuid = MainFunctions::GUID();
+            $measureChannel->title = 'Температура наружного воздуха';
+            $measureChannel->objectUuid = $object['uuid'];
+            $measureChannel->measureTypeUuid = MeasureType::TEMPERATURE_AIR;
+            $measureChannel->deleted = 0;
+            $measureChannel->path = 'external';
+            $measureChannel->original_name = '';
+            $measureChannel->param_id = 0;
+            $measureChannel->type = $type;
+            $measureChannel->status = 1;
+            $measureChannel->save();
         }
+        return null;
     }
 }

@@ -424,6 +424,57 @@ class SiteController extends Controller
             }
         }
 
+        $values = "{ name: 'Температура', data: [";
+        $categories = "";
+        $values2 = "{ name: 'Температура', data: [";
+        $categories2 = "";
+        $zero_month = 0;
+        $zero_day = 0;
+        $object = Objects::find()->where(['objectTypeUuid' => ObjectType::CITY])->andWhere(['deleted' => 0])->limit(1)->one();
+        if ($object) {
+            $measureChannelMonth = MeasureChannel::getChannel($object['uuid'], MeasureType::TEMPERATURE_AIR, MeasureType::MEASURE_TYPE_MONTH);
+            $measureChannelDay = MeasureChannel::getChannel($object['uuid'], MeasureType::TEMPERATURE_AIR, MeasureType::MEASURE_TYPE_DAYS);
+            if ($measureChannelMonth) {
+                $measures = Measure::find()
+                    ->where(['measureChannelUuid' => $measureChannelMonth['uuid']])
+                    ->orderBy('date DESC')
+                    ->limit(24)
+                    ->asArray()
+                    ->all();
+                $measures = array_reverse($measures);
+                foreach ($measures as $measure) {
+                    $categories .= '\'' . date("Y-m", strtotime($measure['date'])) . '\',';
+                    if ($zero_month > 0) {
+                        $values .= ",";
+                    }
+                    $values .= $measure['value'];
+                    $zero_month++;
+                }
+            }
+
+            if ($measureChannelDay) {
+                $measures = Measure::find()
+                    ->where(['measureChannelUuid' => $measureChannelDay['uuid']])
+                    ->orderBy('date DESC')
+                    ->limit(60)
+                    ->asArray()
+                    ->all();
+                $measures = array_reverse($measures);
+                foreach ($measures as $measure) {
+                    $categories2 .= '\'' . date("d-m", strtotime($measure['date'])) . '\',';
+                    if ($zero_day > 0) {
+                        $values2 .= ",";
+                    }
+                    $values2 .= $measure['value'];
+                    $zero_day++;
+                }
+            }
+            $categories = substr($categories, 0, -1);
+            $categories2 = substr($categories2, 0, -1);
+            $values .= "]}";
+            $values2 .= "]}";
+        }
+
         $searchModel = new MeasureChannelSearch();
         $channels = $searchModel->search(Yii::$app->request->queryParams);
         $channels->query->limit(10);
@@ -435,6 +486,10 @@ class SiteController extends Controller
             ['layer' => $layer,
                 'registers' => $registers,
                 'events' => $events,
+                'categories' => $categories,
+                'values' => $values,
+                'categories2' => $categories2,
+                'values2' => $values2,
                 'objectsTypeCount' => $objectsTypeCount,
                 'objectsSubTypeCount' => $objectsSubTypeCount,
                 'objectsCount' => $objectsCount,
@@ -446,9 +501,7 @@ class SiteController extends Controller
                 'parametersCount' => $parametersCount,
                 'parameterTypesCount' => $parameterTypesCount,
                 'channels' => $channels,
-                'objects' => $fullTree,
-                'categories' => [],
-                'values' => []]
+                'objects' => $fullTree]
         );
     }
 
