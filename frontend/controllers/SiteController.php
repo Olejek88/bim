@@ -1067,5 +1067,4 @@ class SiteController extends Controller
 
         return $layer;
     }
-
 }

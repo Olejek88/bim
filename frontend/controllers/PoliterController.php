@@ -44,7 +44,6 @@ class PoliterController extends Controller
     public function beforeAction($action)
     {
         if (parent::beforeAction($action)) {
-
             $access = false;
             try {
                 /* @var PoliterModel $modelClass */

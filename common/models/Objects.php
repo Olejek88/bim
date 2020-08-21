@@ -244,6 +244,7 @@ class Objects extends PoliterModel
         $perm['target'] = 'target' . $class;
         $perm['efficiency'] = 'efficiency' . $class;
         $perm['parameter-edit'] = 'parameter-edit' . $class;
+        $perm['report'] = 'report' . $class;
         return $perm;
     }
 

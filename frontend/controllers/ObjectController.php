@@ -18,6 +18,7 @@ use dosamigos\leaflet\layers\Marker;
 use dosamigos\leaflet\types\Icon;
 use dosamigos\leaflet\types\LatLng;
 use dosamigos\leaflet\types\Point;
+use Exception;
 use frontend\models\ActionRegisterSearch;
 use frontend\models\AlarmSearch;
 use frontend\models\EventSearch;
@@ -2100,5 +2101,83 @@ class ObjectController extends PoliterController
             default:
                 return 0;
         }
+    }
+
+    /**
+     * Dashboard
+     *
+     * @return string
+     * @throws Exception
+     */
+    public function actionReport()
+    {
+        $this->enableCsrfValidation = false;
+        $objects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])
+            ->andWhere(['deleted' => 0])->all();
+        $measure_types = MeasureType::find()->all();
+        $parameter_types = ParameterType::find()->where('type>0')->all();
+        $data[] = [];
+        $data[0]['parameter_title'] = [];
+        $data[0]['measure_title'] = [];
+        $data[0]['title'] = 'нет объектов';
+        $object_count = 0;
+        $parameter_count = 0;
+        $measure_count = 0;
+        if (isset($_POST['forms'])) {
+            foreach ($parameter_types as $parameter_type) {
+                if (isset($_POST['parameter' . $parameter_type['_id']])) {
+                    $data[0]['parameter_title'][] = $parameter_type['title'];
+                    $parameter_count++;
+                }
+            }
+            foreach ($measure_types as $measure_type) {
+                if (isset($_POST['measure' . $measure_type['_id']])) {
+                    $data[0]['measure_title'][] = $measure_type['title'];
+                    $measure_count++;
+                }
+            }
+
+            foreach ($objects as $object) {
+                if (isset($_POST['object' . $object['_id']])) {
+                    $data[$object_count]['title'] = $object->getFullTitle();
+                    $data[$object_count]['parameters'] = [];
+                    $data[$object_count]['measures'] = [];
+                    foreach ($parameter_types as $parameter_type) {
+                        if (isset($_POST['parameter' . $parameter_type['_id']])) {
+                            $data[$object_count]['parameters'][] = $object->getParameter($parameter_type['uuid']);
+                        }
+                    }
+                    foreach ($measure_types as $measure_type) {
+                        if (isset($_POST['measure' . $measure_type['_id']])) {
+                            $data[$object_count]['measures'][$measure_count] = '';
+                            $measureChannel = MeasureChannel::find()
+                                ->where(['objectUuid' => $object['uuid']])
+                                ->andWhere(['measureTypeUuid' => $measure_type['uuid']])
+                                ->limit(1)
+                                ->one();
+                            if ($measureChannel) {
+                                $data[$object_count]['measures'][] = $measureChannel->getLastMeasure();
+                            }
+                        }
+                    }
+                    $object_count++;
+                }
+            }
+
+            return $this->render(
+                'report_custom',
+                ['data' => $data,
+                    'count' => 1 + $parameter_count + $measure_count
+                ]
+            );
+        }
+
+        return $this->render(
+            'report',
+            ['objects' => $objects,
+                'measure_types' => $measure_types,
+                'parameter_types' => $parameter_types
+            ]
+        );
     }
 }
