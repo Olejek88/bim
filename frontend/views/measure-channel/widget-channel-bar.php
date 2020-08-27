@@ -6,8 +6,8 @@
  * @var $id
  */
 
-$this->registerJsFile('/js/vendor/lib/HighCharts/highcharts.js');
-$this->registerJsFile('/js/vendor/lib/HighCharts/modules/exporting.js');
+$this->registerJsFile('/jsHighCharts/highcharts.js');
+$this->registerJsFile('/jsHighCharts/modules/exporting.js');
 ?>
 <div class="box">
     <div class="box-header with-border">

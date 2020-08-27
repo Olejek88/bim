@@ -1,18 +1,16 @@
 <?php
 
-/* @var $title
- * @var $categories
+/* @var $categories
  * @var $values
- * @var $id
  */
 
-$this->registerJsFile('/jsHighCharts/highcharts.js');
-$this->registerJsFile('/jsHighCharts/modules/exporting.js');
+$this->registerJsFile('/js/HighCharts/highcharts.js');
+$this->registerJsFile('/js/HighCharts/modules/exporting.js');
 ?>
+
 <div class="box">
     <div class="box-header with-border">
-        <h3 class="box-title"><?php echo $title ?></h3>
-
+        <h3 class="box-title"><?php echo Yii::t('app', 'Температурный анализ') ?></h3>
         <div class="box-tools pull-right">
             <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
             <div class="btn-group">
@@ -25,11 +23,14 @@ $this->registerJsFile('/jsHighCharts/modules/exporting.js');
     <div class="box-body">
         <div class="row">
             <div class="col-md-12">
+                <p class="text-center">
+                    <strong><?php echo Yii::t('app', 'Расклад потребления по месяцам за три года') ?></strong>
+                </p>
                 <div class="chart">
-                    <div id="container<?= $id ?>" style="height: 250px;"></div>
+                    <div id="container" style="height: 350px;"></div>
                     <script type="text/javascript">
                         document.addEventListener("DOMContentLoaded", function () {
-                            Highcharts.chart('container<?= $id?>', {
+                            Highcharts.chart('container', {
                                 data: {
                                     table: 'datatable'
                                 },
@@ -58,14 +59,15 @@ $this->registerJsFile('/jsHighCharts/modules/exporting.js');
                                     pointFormat: '{series.name}: {point.y}<br/>' + '<?php echo Yii::t('app', 'Всего')?>' + ' : {point.stackTotal}'
                                 },
                                 colors: [
-                                    '#00c0ef',
                                     '#dd4b39',
-                                    '#00a65a',
-                                    '#f39c12'
+                                    '#00c0ef',
+                                    '#cd4b39',
+                                    '#10c0ef',
+                                    '#bd4b39',
+                                    '#20c0ef'
                                 ],
                                 plotOptions: {
                                     column: {
-                                        stacking: 'normal',
                                         dataLabels: {
                                             enabled: true,
                                             color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
@@ -73,9 +75,8 @@ $this->registerJsFile('/jsHighCharts/modules/exporting.js');
                                     }
                                 },
                                 yAxis: {
-                                    min: 0,
                                     title: {
-                                        text: '<?php echo $title ?>'
+                                        text: '<?php echo Yii::t('app', 'Распределение по месяцам')?>'
                                     }
                                 },
                                 series: [<?php echo $values; ?>]

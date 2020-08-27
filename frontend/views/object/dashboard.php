@@ -26,6 +26,12 @@ $this->title = Yii::t('app', 'ПолиТЭР::Информация об объе
 </div>
 
 <div class="row">
+    <div class="col-md-12">
+        <?= $this->render('widget-object-temperature', ['categories' => $categories, 'values' => $values]); ?>
+    </div>
+</div>
+
+<div class="row">
     <div class="col-md-8">
         <?= $this->render('widget-object-channels', ['channels' => $channels]); ?>
     </div>

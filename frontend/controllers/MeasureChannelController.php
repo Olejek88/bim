@@ -251,7 +251,7 @@ class MeasureChannelController extends Controller
                     ->orderBy('date')
                     ->limit(30)
                     ->all();
-                $measures = array_reverse($measures);
+                $measures_reverse = array_reverse($measures);
 
                 $values = '';
                 $values .= "{ name: 'Тренд',";
@@ -259,7 +259,7 @@ class MeasureChannelController extends Controller
                 $zero = 0;
                 $categories = "";
                 foreach ($measures as $measure) {
-                    $categories .= '\'' . date("d H:i", strtotime($measure->date)) . '\',';
+                    $categories .= '\'' . date("m/Y", strtotime($measure->date)) . '\',';
                     if ($zero > 0) {
                         $values .= ",";
                     }
@@ -268,12 +268,13 @@ class MeasureChannelController extends Controller
                 }
                 $categories = substr($categories, 0, -1);
                 $values .= "]}";
+
                 return $this->render('dashboard', [
                     'channel' => $measureChannel,
                     'name' => $name,
                     'categories' => $categories,
                     'values' => $values,
-                    'measures' => $measures
+                    'measures' => $measures_reverse
                 ]);
             }
         }

@@ -17,8 +17,8 @@ use yii\helpers\Html;
  * @var $values
  */
 
-$this->registerJsFile('/js/vendor/lib/HighCharts/highcharts.js');
-$this->registerJsFile('/js/vendor/lib/HighCharts/modules/exporting.js');
+$this->registerJsFile('/js/HighCharts/highcharts.js');
+$this->registerJsFile('/js/HighCharts/modules/exporting.js');
 ?>
 <div class="box">
     <div class="box-header with-border">

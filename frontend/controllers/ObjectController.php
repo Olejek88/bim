@@ -12,6 +12,8 @@ use common\models\ObjectDistrict;
 use common\models\Objects;
 use common\models\ObjectSubType;
 use common\models\ObjectType;
+use common\models\Orders;
+use common\models\OrderStatus;
 use common\models\Parameter;
 use common\models\ParameterType;
 use dosamigos\leaflet\layers\Marker;
@@ -784,6 +786,117 @@ class ObjectController extends PoliterController
                         $data['month'][$cnt]['power'] = $measure['value'];
                 }
 
+                $time = localtime(time(), true);
+                $year[0] = $time['tm_year'] + 1900;
+                $year[1] = $year[0] - 1;
+                $year[2] = $year[0] - 2;
+                $date[0] = sprintf("%d0101000000", $year[0]);
+                $date[10] = sprintf("%d1231000000", $year[0]);
+                $date[1] = sprintf("%d0101000000", $year[1]);
+                $date[11] = sprintf("%d1231000000", $year[1]);
+                $date[2] = sprintf("%d0101000000", $year[2]);
+                $date[12] = sprintf("%d1231000000", $year[2]);
+
+                $heatGroup = [];
+                for ($c = 0; $c <= 5; $c++) {
+                    for ($m = 1; $m <= 12; $m++) {
+                        $heatGroup[$c][$m] = 0;
+                    }
+                }
+
+                $measureChannelHeat = MeasureChannel::find()
+                    ->where(['objectUuid' => $object['uuid']])
+                    ->andWhere(['deleted' => 0])
+                    ->andWhere(['type' => MeasureType::MEASURE_TYPE_MONTH])
+                    ->andWhere(['measureTypeUuid' => MeasureType::HEAT_CONSUMED])
+                    ->limit(1)
+                    ->one();
+                $objectCity = Objects::find()->where(['objectTypeUuid' => ObjectType::CITY])->andWhere(['deleted' => 0])->limit(1)->one();
+                $measureChannelMonth = null;
+                if ($objectCity) {
+                    $measureChannelMonth = MeasureChannel::getChannel($objectCity['uuid'], MeasureType::TEMPERATURE_AIR, MeasureType::MEASURE_TYPE_MONTH);
+                }
+                if ($measureChannelMonth) {
+                    $temperatures = Measure::find()
+                        ->where(['measureChannelUuid' => $measureChannelMonth['uuid']])
+                        ->orderBy('date DESC')
+                        ->asArray()
+                        ->all();
+                    foreach ($temperatures as $measure) {
+                        $measure_month = intval(date("m", strtotime($measure['date'])));
+                        $measure_year = date("Y", strtotime($measure['date']));
+                        if ($measure_year == $year[0]) {
+                            $heatGroup[5][$measure_month] = $measure['value'];
+                        }
+                        if ($measure_year == $year[1]) {
+                            $heatGroup[3][$measure_month] = $measure['value'];
+                        }
+                        if ($measure_year == $year[2]) {
+                            $heatGroup[1][$measure_month] = $measure['value'];
+                        }
+                    }
+                }
+
+                if ($measureChannelHeat) {
+                    $measures = Measure::find()->where(['measureChannelUuid' => $measureChannelHeat['uuid']])->all();
+                    foreach ($measures as $measure) {
+                        $measure_month = intval(date("m", strtotime($measure['date'])));
+                        $measure_year = date("Y", strtotime($measure['date']));
+                        if ($measure_year == $year[0]) {
+                            $heatGroup[4][$measure_month] = $measure['value'];
+                        }
+                        if ($measure_year == $year[1]) {
+                            $heatGroup[2][$measure_month] = $measure['value'];
+                        }
+                        if ($measure_year == $year[2]) {
+                            $heatGroup[0][$measure_month] = $measure['value'];
+                        }
+                    }
+                }
+
+                $years[0]['title'] = 'Тепло ' . $year[2];
+                $years[1]['title'] = 'Тнв ' . $year[2];
+                $years[2]['title'] = 'Тепло ' . $year[1];
+                $years[3]['title'] = 'Тнв ' . $year[1];
+                $years[4]['title'] = 'Тепло ' . $year[0];
+                $years[5]['title'] = 'Тнв ' . $year[0];
+
+                $first = 0;
+                $categories = "'" . Yii::t('app', 'Январь') . "','" .
+                    Yii::t('app', 'Февраль') . "','" .
+                    Yii::t('app', 'Март') . "','" .
+                    Yii::t('app', 'Апрель') . "','" .
+                    Yii::t('app', 'Май') . "','" .
+                    Yii::t('app', 'Июнь') . "','" .
+                    Yii::t('app', 'Июль') . "','" .
+                    Yii::t('app', 'Август') . "','" .
+                    Yii::t('app', 'Сентябрь') . "','" .
+                    Yii::t('app', 'Октябрь') . "','" .
+                    Yii::t('app', 'Ноябрь') . "','" .
+                    Yii::t('app', 'Декабрь') . "'";
+
+                $bar = '';
+                for ($c = 0; $c <= 5; $c++) {
+                    if ($first > 0) {
+                        $bar .= "," . PHP_EOL;
+                    }
+
+                    $bar .= "{ name: '" . $years[$c]['title'] . "',";
+                    $bar .= "data: [";
+                    $zero = 0;
+                    for ($m = 1; $m <= 12; $m++) {
+                        if (isset($heatGroup[$c][$m])) {
+                            if ($zero > 0) {
+                                $bar .= ",";
+                            }
+                            $bar .= $heatGroup[$c][$m];
+                            $zero++;
+                        }
+                    }
+                    $bar .= "]}";
+                    $first++;
+                }
+
                 return $this->render('dashboard', [
                     'object' => $object,
                     'coordinates' => $coordinates,
@@ -793,7 +906,9 @@ class ObjectController extends PoliterController
                     'channels' => $channels,
                     'alarms' => $alarms,
                     'registers' => $registers,
-                    'measures' => $data
+                    'measures' => $data,
+                    'categories' => $categories,
+                    'values' => $bar
                 ]);
             }
         }
@@ -2180,6 +2295,119 @@ class ObjectController extends PoliterController
                 'measure_types' => $measure_types,
                 'parameter_types' => $parameter_types
             ]
+        );
+    }
+
+    /**
+     * @param $measureChannelUuid
+     * @return string|null
+     */
+    public function actionTemperature($measureChannelUuid)
+    {
+        $time = localtime(time(), true);
+        $year[0] = $time['tm_year'] + 1900;
+        $year[1] = $year[0] - 1;
+        $year[2] = $year[0] - 2;
+        $date[0] = sprintf("%d0101000000", $year[0]);
+        $date[10] = sprintf("%d1231000000", $year[0]);
+        $date[1] = sprintf("%d0101000000", $year[1]);
+        $date[11] = sprintf("%d1231000000", $year[1]);
+        $date[2] = sprintf("%d0101000000", $year[2]);
+        $date[12] = sprintf("%d1231000000", $year[2]);
+
+        $heatGroup = [];
+        for ($c = 0; $c <= 5; $c++) {
+            for ($m = 1; $m <= 12; $m++) {
+                $heatGroup[$c][$m] = 0;
+            }
+        }
+
+        $object = Objects::find()->where(['objectTypeUuid' => ObjectType::CITY])->andWhere(['deleted' => 0])->limit(1)->one();
+        if (!$object) return null;
+
+        $measureChannelMonth = MeasureChannel::getChannel($object['uuid'], MeasureType::TEMPERATURE_AIR, MeasureType::MEASURE_TYPE_MONTH);
+        if (!$measureChannelMonth) return null;
+
+        $temperatures = Measure::find()
+            ->where(['measureChannelUuid' => $measureChannelMonth['uuid']])
+            ->orderBy('date DESC')
+            ->asArray()
+            ->all();
+        foreach ($temperatures as $measure) {
+            $measure_month = intval(date("m", strtotime($measure['date'])));
+            $measure_year = date("Y", strtotime($measure['date']));
+            if ($measure_year == $year[0]) {
+                $heatGroup[5][$measure_month] = $measure['value'];
+            }
+            if ($measure_year == $year[1]) {
+                $heatGroup[3][$measure_month] = $measure['value'];
+            }
+            if ($measure_year == $year[2]) {
+                $heatGroup[1][$measure_month] = $measure['value'];
+            }
+        }
+
+        $measures = Measure::find()->where(['measureChannelUuid' => $measureChannelUuid])->all();
+        foreach ($measures as $measure) {
+            $measure_month = intval(date("m", strtotime($measure['date'])));
+            $measure_year = date("Y", strtotime($measure['date']));
+            if ($measure_year == $year[0]) {
+                $heatGroup[4][$measure_month] = $measure['value'];
+            }
+            if ($measure_year == $year[1]) {
+                $heatGroup[2][$measure_month] = $measure['value'];
+            }
+            if ($measure_year == $year[2]) {
+                $heatGroup[0][$measure_month] = $measure['value'];
+            }
+        }
+
+        $years[0]['title'] = $year[2];
+        $years[1]['title'] = $year[2];
+        $years[2]['title'] = $year[1];
+        $years[3]['title'] = $year[1];
+        $years[4]['title'] = $year[0];
+        $years[5]['title'] = $year[0];
+
+        $first = 0;
+        $categories = "'" . Yii::t('app', 'Январь') . "','" .
+            Yii::t('app', 'Февраль') . "','" .
+            Yii::t('app', 'Март') . "','" .
+            Yii::t('app', 'Апрель') . "','" .
+            Yii::t('app', 'Май') . "','" .
+            Yii::t('app', 'Июнь') . "','" .
+            Yii::t('app', 'Июль') . "','" .
+            Yii::t('app', 'Август') . "','" .
+            Yii::t('app', 'Сентябрь') . "','" .
+            Yii::t('app', 'Октябрь') . "','" .
+            Yii::t('app', 'Ноябрь') . "','" .
+            Yii::t('app', 'Декабрь') . "'";
+
+        $bar = '';
+        for ($c = 0; $c <= 5; $c++) {
+            if ($first > 0) {
+                $bar .= "," . PHP_EOL;
+            }
+
+            $bar .= "{ name: '" . $years[$c]['title'] . "',";
+            $bar .= "data: [";
+            $zero = 0;
+            for ($m = 1; $m <= 12; $m++) {
+                if (isset($heatGroup[$c][$m])) {
+                    if ($zero > 0) {
+                        $bar .= ",";
+                    }
+                    $bar .= $heatGroup[$c][$m];
+                    $zero++;
+                }
+            }
+            $bar .= "]}";
+            $first++;
+        }
+        return $this->render(
+            'temperatures',
+            ['categories' => $categories,
+                'values' => $bar]
         );
     }
 }
