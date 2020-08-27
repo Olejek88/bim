@@ -8,7 +8,8 @@ $this->title = Yii::t('app', 'ПолиТЭР::Календарь целей');
 
 $this->registerJs('$("#modalPlan").on("hidden.bs.modal",
 function () {
-    $(this).removeData();    
+    $(this).removeData();
+     window.location.replace("plan");
 })');
 
 ?>

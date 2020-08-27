@@ -74,9 +74,15 @@ class EventController extends PoliterController
             }
             if ($_POST['editableAttribute'] == 'status') {
                 $model['status'] = $_POST['Event'][$_POST['editableIndex']]['status'];
+                if ($_POST['Event'][$_POST['editableIndex']]['status'] == 1 && $model['status'] == 0) {
+                    $model['dateFact'] = date("Y-m-d H:i:s");
+                }
             }
             if ($_POST['editableAttribute'] == 'date') {
                 $model['date'] = $_POST['Event'][$_POST['editableIndex']]['date'];
+            }
+            if ($_POST['editableAttribute'] == 'dateFact') {
+                $model['dateFact'] = $_POST['Event'][$_POST['editableIndex']]['dateFact'];
             }
             if ($_POST['editableAttribute'] == 'description') {
                 $model['description'] = $_POST['Event'][$_POST['editableIndex']]['description'];

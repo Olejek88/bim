@@ -262,6 +262,7 @@ class ObjectController extends PoliterController
         $type = $request->post('type');
 
         if ($selected_node && $type) {
+            $selected_node = rtrim($selected_node, 'k');
             if (is_numeric($selected_node)) {
                 if ($type == 'channel') {
                     $channelById = MeasureChannel::find()->where(['_id' => $selected_node])
@@ -404,7 +405,7 @@ class ObjectController extends PoliterController
                                 ['/object/dashboard', 'uuid' => $object['uuid']]
                             );
                             $type = '';
-                            if ($object->source) $type .= '<span class="fa fa-plug" title="Поставщик"></span>&nbsp;&nbsp;';
+                            if ($object->source) $type .= '<span class="fa fa-plug" title="Поставщик"></span>&nbsp;';
                             $type .= '<span class="fa fa-thermometer" title="Учет тепла"></span>&nbsp';
                             if ($object->water) $type .= '<span class="fa fa-tint" title="Учет ХВС"></span>&nbsp';
                             if ($object->electricity) $type .= '<span class="fa fa-bolt" title="Учет электроэнергии"></span>';
@@ -553,18 +554,6 @@ class ObjectController extends PoliterController
         $object_uuid = null;
         $object_type = null;
         if ($_POST['selected_node'] && $type) {
-            /** @var Objects $currentObject */
-            $object = Objects::find()->where(['_id' => $_POST['selected_node']])->one();
-            if (true) {
-                return $this->renderAjax('_add_form', [
-                    'object' => $object,
-                    'objects' => $objects,
-                    'objectSubTypes' => $objectSubTypes,
-                    'objectTypes' => $objectTypes,
-                    'object_type' => $object_type
-                ]);
-            }
-
             /** @var MeasureChannel $measureChannel */
             $measureChannel = MeasureChannel::find()->where(['_id' => $_POST['selected_node']])->one();
             if ($type == 'channel' && $measureChannel) {
@@ -575,6 +564,18 @@ class ObjectController extends PoliterController
                     'types' => $types,
                     'object_uuid' => $object_uuid,
                     'objects' => null
+                ]);
+            }
+
+            /** @var Objects $currentObject */
+            $object = Objects::find()->where(['_id' => $_POST['selected_node']])->one();
+            if (true) {
+                return $this->renderAjax('_add_form', [
+                    'object' => $object,
+                    'objects' => $objects,
+                    'objectSubTypes' => $objectSubTypes,
+                    'objectTypes' => $objectTypes,
+                    'object_type' => $object_type
                 ]);
             }
         }
@@ -806,8 +807,8 @@ class ObjectController extends PoliterController
     public
     function actionPlanEdit()
     {
-        if (isset($_GET["event_uuid"]) && isset($_GET["month"])) {
-            $event = Event::find()->where(['uuid' => $_GET["event_uuid"]])->one();
+        if (isset($_GET["entityUuid"]) && isset($_GET["month"])) {
+            $event = Event::find()->where(['uuid' => $_GET["entityUuid"]])->one();
             if ($event) {
                 return $this->renderAjax('_edit_plan', [
                     'event' => $event
@@ -880,8 +881,9 @@ class ObjectController extends PoliterController
                         $parameter_uuid = $parameter['uuid'];
                     }
                     $objects[$count]['plans'][$month]['plan']
-                        = Html::a($parameterValue, ['/object/plan-edit', 'month' => $mon_date_str[$month],
+                        = Html::a($parameterValue, ['/object/parameter-edit', 'month' => $mon_date_str[$month],
                         'parameter_uuid' => $parameter_uuid,
+                        'parameterTypeUuid' => ParameterType::TARGET_CONSUMPTION,
                         'entityUuid' => $measureChannelHeat['uuid']],
                         [
                             'title' => 'Редактировать',
@@ -966,7 +968,7 @@ class ObjectController extends PoliterController
             $objects[$count]['title'] = Html::a($object->getFullTitle(), ['object/month', 'uuid' => $object['uuid']]);
             $objects[$count]['region'] = $object->getSubDistrict();
             $objects[$count]['type'] = $object->objectSubType->title;
-            $objects[$count]['efficiency'] = $object->getParameter(ParameterType::ENERGY_EFFICIENCY, n);
+            $objects[$count]['efficiency'] = $object->getParameter(ParameterType::ENERGY_EFFICIENCY);
             $objects[$count]['equipment'] = $object->getParameter(ParameterType::POWER_EQUIPMENT);
             $objects[$count]['water'] = $object->water;
             $objects[$count]['electricity'] = $object->electricity;
@@ -1901,7 +1903,7 @@ class ObjectController extends PoliterController
 
             $objects[$count]['title'] = Html::a($object->getFullTitle(), ['object/month', 'uuid' => $object['uuid']]);
             $objects[$count]['links'] = Html::a('<span class="fa fa-database"></span>&nbsp;',
-                ['/object/parameters', 'objectUuid' => $object['uuid']],
+                ['/parameter/list', 'uuid' => $object['uuid']],
                 ['title' => 'Параметры', 'data-toggle' => 'modal', 'data-target' => '#modalParameters']);
             $objects[$count]['links'] .= Html::a('<span class="fa fa-list"></span>',
                 ['/event/list', 'objectUuid' => $object['uuid']],

@@ -20,7 +20,7 @@
                                           <a href="/event/view?id=' . $event['_id'] . '">
                                           <small><i class="fa fa-clock-o"></i> ' . $event['createdAt'] . '</small>
                                           <p style="white-space: normal">
-                                          <i class="fa fa-users text-aqua" style="margin: 3px"></i>' . $event['title'];
+                                          <i class="fa fa-users text-aqua" style="margin: 3px"></i>' . $event['object']->getFullTitle() . ' - ' . $event['title'];
                     echo '</p></a></li>';
                 }
                 ?>

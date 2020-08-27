@@ -62,7 +62,7 @@ use yii\helpers\Html;
 
     echo $form->field($model, 'type')->widget(Select2::class,
         [
-            'data' => ['0' => 'Текущие', '1' => 'Часовой', '2' => 'Дневной'],
+            'data' => ['0' => 'Текущие', '1' => 'Часовой', '2' => 'Дневной', '4' => 'По месяцам', '7' => 'На дату'],
             'options' => ['placeholder' => Yii::t('app', 'Выберите тип ...')],
             'pluginOptions' => [
                 'allowClear' => true

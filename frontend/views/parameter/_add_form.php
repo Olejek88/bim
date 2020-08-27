@@ -92,7 +92,8 @@ use yii\helpers\Url;
                 let message = JSON.parse(code);
                 if (message.code === 0) {
                     $('#modalAddParameter').modal('hide');
-                    let ajax = document.getElementById('modalParameterContent');
+                    $('#modalPlan').modal('hide');
+                    let ajax = document.getElementById('modalPlan');
                     ajax.value = true
                 } else {
                     let div = document.getElementById('error');

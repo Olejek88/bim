@@ -11,6 +11,11 @@ function () {
     $(this).removeData();    
 })');
 
+$this->registerJs('$("#modalParameters").on("hidden.bs.modal",
+function () {
+    $(this).removeData();    
+})');
+
 $this->registerJs('$("#modalEvents").on("hidden.bs.modal",
 function () {
     $(this).removeData();    
@@ -82,6 +87,12 @@ $this->registerCssFile('/css/site.css');
 </div>
 <div class="modal remote fade" id="modalEditParameter">
     <div class="modal-dialog" style="width: 450px">
+        <div class="modal-content loader-lg" style="margin: 10px; padding: 10px">
+        </div>
+    </div>
+</div>
+<div class="modal remote fade" id="modalParameters">
+    <div class="modal-dialog" style="width: 1050px">
         <div class="modal-content loader-lg" style="margin: 10px; padding: 10px">
         </div>
     </div>

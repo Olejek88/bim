@@ -238,26 +238,26 @@ echo FancytreeWidget::widget(
                         }                       
                     }')
                     ],
-                    'event' => [
-                        'name' => Yii::t('app', 'Добавить событие'),
-                        'icon' => 'add',
-                        'callback' => new JsExpression('function(key, opt) {
-                            var node = $.ui.fancytree.getNode(opt.$trigger);
-                            $.ajax({
-                                url: "../event/add",
-                                type: "post",
-                                data: {
-                                    selected_node: node.key,
-                                    folder: node.folder,
-                                    uuid: node.data.uuid
-                                },
-                                success: function (data) { 
-                                    $(\'#modalAddEvent\').modal(\'show\');
-                                    $(\'#modalContentEvent\').html(data);
-                                }
-                            });
-                    }')
-                    ],
+                    /*                    'event' => [
+                                            'name' => Yii::t('app', 'Добавить событие'),
+                                            'icon' => 'add',
+                                            'callback' => new JsExpression('function(key, opt) {
+                                                var node = $.ui.fancytree.getNode(opt.$trigger);
+                                                $.ajax({
+                                                    url: "../event/add",
+                                                    type: "post",
+                                                    data: {
+                                                        selected_node: node.key,
+                                                        folder: node.folder,
+                                                        uuid: node.data.uuid
+                                                    },
+                                                    success: function (data) {
+                                                        $(\'#modalAddEvent\').modal(\'show\');
+                                                        $(\'#modalContentEvent\').html(data);
+                                                    }
+                                                });
+                                        }')
+                                        ],*/
                     'delete' => [
                         'name' => Yii::t('app', 'Удалить'),
                         'icon' => "delete",
