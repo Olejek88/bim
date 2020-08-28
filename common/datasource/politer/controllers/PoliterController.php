@@ -11,7 +11,6 @@ use common\models\MeasureType;
 use common\models\Objects;
 use common\models\ObjectType;
 use Exception;
-use frontend\controllers\PoliterController;
 use Yii;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
@@ -20,9 +19,9 @@ use yii\helpers\ArrayHelper;
  *
  * @property-read array|string[][] $permissions
  */
-class DefaultController extends PoliterController
+class PoliterController extends \frontend\controllers\PoliterController
 {
-    protected $modelClass = \common\datasource\politer\models\DefaultController::class;
+    protected $modelClass = \common\datasource\politer\models\PoliterController::class;
 
     /**
      * {@inheritdoc}
@@ -48,6 +47,11 @@ class DefaultController extends PoliterController
      */
     public function actionIndex()
     {
+        // для того чтоб правильно формировались url, редиректим на полный путь модуля
+        if (Yii::$app->controller->id == 'default') {
+            return Yii::$app->response->redirect('/' . $this->module->id . '/politer/index');
+        }
+
         $data = Flows::find()->asArray()->all();
 
         $localMeasureChannels = MeasureChannel::find()

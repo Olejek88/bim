@@ -16,6 +16,9 @@ return [
     'modules' => [
         'politer' => [
             'class' => 'common\datasource\politer\Module',
+            'controllerMap' => [
+                'default' => 'common\datasource\politer\controllers\PoliterController'
+            ],
             'description' => 'База Политер',
             'oracle' => [
                 'class' => 'neconix\yii2oci8\Oci8Connection',
@@ -43,6 +46,18 @@ return [
 //SQL;
 //                $event->sender->createCommand($q)->execute();
                 },
+            ],
+        ],
+        'vega' => [
+            'class' => 'common\datasource\vega\Module',
+            'controllerMap' => [
+                'default' => 'common\datasource\vega\controllers\VegaController'
+            ],
+            'description' => 'LoraWan Политер',
+            'server' => [
+                'host' => 'ws://127.0.0.1:8002',
+                'login' => '',
+                'password' => '',
             ],
         ],
     ],

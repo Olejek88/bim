@@ -7,7 +7,7 @@ namespace common\datasource\politer\models;
  * Класс для задания штатными средствами прав доступа для контроллера DefaultController в модуле
  * @package common\datasource\politer\models
  */
-class DefaultController
+class PoliterController
 {
     /**
      * @return array
@@ -15,8 +15,8 @@ class DefaultController
     public function getPermissions()
     {
         return [
-            'index' => ['name' => 'indexDefault', 'description' => 'Список доступных параметров внешней базы'],
-            'link-obj-form' => ['name' => 'link-obj-formDefault', 'description' => 'Создание связи параметров из внешеней базы с объектами'],
+            'index' => ['name' => 'indexPoliter', 'description' => 'Список доступных параметров внешней базы'],
+            'link-obj-form' => ['name' => 'link-obj-formPoliter', 'description' => 'Создание связи параметров из внешеней базы с объектами'],
         ];
     }
 }
