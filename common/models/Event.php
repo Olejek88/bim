@@ -121,6 +121,8 @@ class Event extends PoliterModel
         $perm = parent::getPermissions();
         $perm['list'] = 'list' . $class;
         $perm['plan'] = 'plan' . $class;
+        $perm['calendar'] = 'calendar' . $class;
+        $perm['jsoncalendar'] = 'jsoncalendar' . $class;
         $perm['change'] = 'change' . $class;
         $perm['plan-edit'] = 'plan-edit' . $class;
         return $perm;

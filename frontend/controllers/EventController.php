@@ -12,6 +12,7 @@ use yii\db\StaleObjectException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 /**
  * EventController implements the CRUD actions for Event model.
@@ -94,7 +95,9 @@ class EventController extends PoliterController
         $searchModel = new EventSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 50;
-
+        if (isset($_GET['uuid'])) {
+            $dataProvider->query->where(['uuid' => $_GET['uuid']]);
+        }
         $objects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->orderBy('title')->all();
         $objects = ArrayHelper::map($objects, 'uuid', 'title');
 
@@ -325,4 +328,67 @@ class EventController extends PoliterController
         return $this->redirect('../event/plan');
 
     }
+
+    /**
+     * @return string
+     */
+    public function actionCalendar()
+    {
+        return $this->render('calendar');
+    }
+
+    /**
+     * Метод возвращает события календарю, за указанный период.
+     *
+     * @param null $start
+     * @param null $end
+     * @param null $_
+     * @return array
+     */
+    public
+    function actionJsoncalendar($start = NULL, $end = NULL, $_ = NULL)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $tsStart = strtotime($start);
+        $tsEnd = strtotime($end);
+
+        $eventTs = Event::find()
+            ->andWhere([
+                    'and',
+                    ['>=', 'date', date('Y-m-d H:i:s', $tsStart)],
+                    ['<', 'date', date('Y-m-d H:i:s', $tsEnd)],
+                ]
+            )
+            ->andWhere(['deleted' => 0])
+            ->orderBy("_id DESC")
+            ->all();
+
+        $events = [];
+        /** @var Event $event */
+        foreach ($eventTs as $eventT) {
+            $event = new \yii2fullcalendar\models\Event();
+            $event->id = $eventT['_id'];
+            $event->title = '[' . $eventT['object']->getFullTitle() . '] ' . $eventT['title'];
+
+            if ($eventT->dateFact) {
+                $event->start = $eventT->date;
+                $event->end = $eventT->dateFact;
+            } else {
+                $event->start = $eventT->date;
+                $event->end = $eventT->date;
+            }
+
+            if ($eventT->status == 0) {
+                $event->backgroundColor = 'grey';
+            } else {
+                $event->backgroundColor = 'green';
+            }
+            $event->url = '/event/index?uuid=' . $eventT["uuid"];
+            $event->color = '#333333';
+            $events[] = $event;
+        }
+
+        return $events;
+    }
+
 }
