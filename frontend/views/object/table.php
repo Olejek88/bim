@@ -23,7 +23,7 @@ $this->title = Yii::t('app', 'ПолиТЭР::Гипертаблица объе�
                         'name' => 'district',
                         'language' => 'ru',
                         'options' => [
-                            'placeholder' => Yii::t('app', 'Выберите объект')
+                            'placeholder' => Yii::t('app', 'Выберите район')
                         ],
                         'pluginOptions' => [
                             'allowClear' => true
@@ -46,7 +46,7 @@ $this->title = Yii::t('app', 'ПолиТЭР::Гипертаблица объе�
             <th class="kv-align-middle" data-col-seq="0" rowspan="2">Район</th>
             <th class="kv-align-middle" data-col-seq="0" rowspan="2">Тип объекта</th>
             <th class="kv-align-middle" data-col-seq="0" rowspan="2">Класс ЭЭ</th>
-            <th class="kv-align-middle" data-col-seq="0" rowspan="2">Показатель ЭО</th>
+            <!--            <th class="kv-align-middle" data-col-seq="0" rowspan="2">Показатель ЭО</th>-->
             <th class="kv-align-middle" data-col-seq="0" rowspan="2">Учет тепла</th>
             <th class="kv-align-middle" data-col-seq="0" rowspan="2">Учет воды</th>
             <th class="kv-align-middle" data-col-seq="0" rowspan="2">Учет ЭЭ</th>
@@ -82,7 +82,7 @@ $this->title = Yii::t('app', 'ПолиТЭР::Гипертаблица объе�
                 echo '<td class="kv-align-middle">-</td>';
             echo '<td class="text-center kv-align-middle">' . $object['type'] . '</td>';
             echo '<td class="text-center kv-align-middle">' . $object['efficiency'] . '</td>';
-            echo '<td class="text-center kv-align-middle">' . $object['equipment'] . '</td>';
+            //echo '<td class="text-center kv-align-middle">' . $object['equipment'] . '</td>';
 
             echo '<td class="text-center kv-align-middle">' . $object['heat'] . '</td>';
             echo '<td class="text-center kv-align-middle">' . $object['water'] . '</td>';

@@ -120,12 +120,14 @@ class MeasureChannel extends PoliterModel
     {
         /** @var Measure $measure */
         $measure = Measure::find()
+            ->select('measureChannelUuid, date, value')
             ->where(['measureChannelUuid' => $this->uuid])
             ->orderBy('date desc')
+            ->asArray()
             ->limit(1)
             ->one();
         if ($measure) {
-            return number_format($measure->value, 3) . ' [' . date("m/d h:i:s", strtotime($measure->date)) . ']';
+            return number_format($measure['value'], 3) . ' [' . date("m/d h:i:s", strtotime($measure['date'])) . ']';
         }
         return '-';
     }

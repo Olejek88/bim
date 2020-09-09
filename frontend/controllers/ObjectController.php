@@ -444,6 +444,7 @@ class ObjectController extends PoliterController
                                     ]
                                 );
                                 $value = $channel->getLastMeasure() . "&nbsp;" . $links;
+                                //$value = '';
                                 $links = Html::a('<span class="fa fa-database"></span>&nbsp',
                                     ['/parameter/list', 'uuid' => $channel['uuid']],
                                     [

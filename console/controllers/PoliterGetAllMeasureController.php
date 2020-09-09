@@ -25,22 +25,33 @@ class PoliterGetAllMeasureController extends Controller
     public function actionRun()
     {
 //        $this->stdout("Hello?\n $dbName \n", Console::BOLD|Console::FG_RED);
-
-        $mcs = MeasureChannel::find()->where(['deleted' => false])->select(['uuid', 'param_id', 'type'])->asArray()->all();
+        $mcs = MeasureChannel::find()
+            ->where(['deleted' => false])
+            ->andWhere(['>', 'param_id', 0])
+            ->select(['uuid', 'param_id', 'type'])->asArray()->all();
+        $count = count($mcs);
+        $cnt = 1;
+        // временное решение, чтобы не тянуть уже скачанное с нуля
         foreach ($mcs as $mc) {
-            $archives = FlowArchive::find()->where(['ID' => $mc['param_id']])->asArray()->all();
-            foreach ($archives as $archive) {
-                $m = new Measure();
-                $m->uuid = MainFunctions::GUID();
-                $m->measureChannelUuid = $mc['uuid'];
-                $m->date = FlowArchive::getDatetime($archive['TIME']);
-                $m->value = floatval(FlowArchive::getFloatValue($archive['VALUE']));
-                if (!$m->save()) {
-                    // TODO: запротоколировать ошибки записи
+            $measureCount = Measure::find()->where(['measureChannelUuid' => $mc['uuid']])->count();
+            if ($measureCount < 10) {
+                echo date('H:i:s') . ' [' . $cnt . '/' . $count . ' ' . number_format($cnt * 100 / $count, 2) . '%] channel ' . $mc['param_id'] . ' ' . $measureCount . PHP_EOL;
+                $archives = FlowArchive::find()->where(['ID' => $mc['param_id']])->asArray()->all();
+                foreach ($archives as $archive) {
+                    $m = new Measure();
+                    $m->uuid = MainFunctions::GUID();
+                    $m->measureChannelUuid = $mc['uuid'];
+                    $m->date = FlowArchive::getDatetime($archive['TIME']);
+                    $m->value = floatval(FlowArchive::getFloatValue($archive['VALUE']));
+                    if (!$m->save()) {
+                        // TODO: запротоколировать ошибки записи
+                    }
                 }
+            } else {
+                echo date('H:i:s') . ' [' . $cnt . '/' . $count . ' ' . number_format($cnt * 100 / $count, 2) . '%] skip channel ' . $mc['param_id'] . ' ' . $measureCount . PHP_EOL;
             }
+            $cnt++;
         }
-
         return ExitCode::OK;
     }
 }

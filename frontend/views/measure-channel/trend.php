@@ -11,7 +11,7 @@
             $cnt = 0;
             foreach ($values as $value) {
                 echo '<tr><td>' . $value['date'] . '</td>
-                      <td class="text-right">' . $value['value'] . '</td></tr>';
+                      <td class="text-right">' . number_format($value['value'], 3) . '</td></tr>';
                 if ($cnt++ > 8) break;
             }
             ?>
