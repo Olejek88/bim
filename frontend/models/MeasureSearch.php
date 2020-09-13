@@ -18,7 +18,7 @@ class MeasureSearch extends Measure
     {
         return [
             [['_id'], 'integer'],
-            [['uuid', 'measureChannelUuid', 'date', 'value', 'createdAt', 'changedAt'], 'safe'],
+            [['measureChannelId', 'date', 'value', 'createdAt', 'changedAt'], 'safe'],
         ];
     }
 
@@ -56,7 +56,7 @@ class MeasureSearch extends Measure
         $query->andFilterWhere([
             '_id' => $this->_id,
             'date' => $this->date,
-            'measureChannelUuid' => $this->measureChannelUuid,
+            'measureChannelId' => $this->measureChannelId,
             'createdAt' => $this->createdAt,
             'changedAt' => $this->changedAt,
         ]);

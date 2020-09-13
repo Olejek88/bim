@@ -2,7 +2,6 @@
 
 namespace console\workers;
 
-use common\components\MainFunctions;
 use common\models\FlowArchive;
 use common\models\Flows2;
 use common\models\Measure;
@@ -52,29 +51,29 @@ class PoliterService extends Worker
      */
     private function getExtMeasuredValues($date)
     {
-        $mcs = MeasureChannel::find()->where(['deleted' => false])->select(['uuid', 'param_id', 'type'])->asArray()->all();
+        $mcs = MeasureChannel::find()->where(['deleted' => false])->select(['_id', 'param_id', 'type'])->asArray()->all();
 
         // список ID параметров которые будем тянуть из внешней базы
         $extIds = [];
-        $mcUuids = [];
+        $mcIds = [];
         foreach ($mcs as $mc) {
-            $mcUuids[] = $mc['uuid'];
+            $mcIds[] = $mc['_id'];
             $extIds[] = $mc['param_id'];
         }
 
         // вспомогательный запрос
         $subQuery = Measure::find()
-            ->select(['measureChannelUuid', 'max(date) date1'])
-            ->where(['measureChannelUuid' => $mcUuids])
-            ->groupBy(['measureChannelUuid']);
+            ->select(['measureChannelId', 'max(date) date1'])
+            ->where(['measureChannelId' => $mcIds])
+            ->groupBy(['measureChannelId']);
         // выбираем из базы для каждого канала измерений последнее по дате значение
         $measures = Measure::find()
-            ->innerJoin(['m' => $subQuery], 'measure.measureChannelUuid=m.measureChannelUuid and measure.date=m.date1')
+            ->innerJoin(['m' => $subQuery], 'measure.measureChannelId=m.measureChannelId and measure.date=m.date1')
             ->all();
         $res = [];
         foreach ($measures as $measure) {
-            if (empty($res[$measure['measureChannelUuid']])) {
-                $res[$measure['measureChannelUuid']] = $measure;
+            if (empty($res[$measure['measureChannelId']])) {
+                $res[$measure['measureChannelId']] = $measure;
             }
         }
 
@@ -128,9 +127,9 @@ class PoliterService extends Worker
             /** @var Measure $m */
             $m = null;
             $measureDateSrc = null;
-            if (!empty($measures[$mc['uuid']])) {
-                $m = $measures[$mc['uuid']];
-                $measureDateSrc = $measures[$mc['uuid']]['date'];
+            if (!empty($measures[$mc['_id']])) {
+                $m = $measures[$mc['_id']];
+                $measureDateSrc = $measures[$mc['_id']]['date'];
             }
 
             // параметр из внешней базы
@@ -144,28 +143,28 @@ class PoliterService extends Worker
             switch ($mc['type']) {
                 case MeasureType::MEASURE_TYPE_CURRENT:
 //                    echo "MEASURE_TYPE_CURRENT" . PHP_EOL;
-                    self::createMeasure($m, $f2, $mc['uuid']);
+                    self::createMeasure($m, $f2, $mc['_id']);
                     break;
                 case MeasureType::MEASURE_TYPE_HOURS:
 //                    echo "MEASURE_TYPE_HOURS" . PHP_EOL;
                     // проверяем на разность дат по часу
                     $measureDate = date('YmdH', strtotime($measureDateSrc));
                     $extMeasureDate = date('YmdH', strtotime(Flows2::getDatetime($extMeasureDateSrc)));
-                    self::createMeasure($m, $f2, $mc['uuid'], $measureDate == $extMeasureDate);
+                    self::createMeasure($m, $f2, $mc['_id'], $measureDate == $extMeasureDate);
                     break;
                 case MeasureType::MEASURE_TYPE_DAYS:
 //                    echo "MEASURE_TYPE_DAYS" . PHP_EOL;
                     // проверяем на разность дат по дню
                     $measureDate = date('Ymd', strtotime($measureDateSrc));
                     $extMeasureDate = date('Ymd', strtotime(Flows2::getDatetime($extMeasureDateSrc)));
-                    self::createMeasure($m, $f2, $mc['uuid'], $measureDate == $extMeasureDate);
+                    self::createMeasure($m, $f2, $mc['_id'], $measureDate == $extMeasureDate);
                     break;
                 case MeasureType::MEASURE_TYPE_MONTH:
 //                    echo "MEASURE_TYPE_MONTH" . PHP_EOL;
                     // проверяем на разность дат по месяцу
                     $measureDate = date('Ym', strtotime($measureDateSrc));
                     $extMeasureDate = date('Ym', strtotime(Flows2::getDatetime($extMeasureDateSrc)));
-                    self::createMeasure($m, $f2, $mc['uuid'], $measureDate == $extMeasureDate);
+                    self::createMeasure($m, $f2, $mc['_id'], $measureDate == $extMeasureDate);
                     break;
                 default:
 //                    echo "none" . PHP_EOL;
@@ -177,12 +176,12 @@ class PoliterService extends Worker
     /**
      * @param $measure Measure|null
      * @param $flows2 array of Flows2
-     * @param $mcUuid string Measure channel uuid
+     * @param $mcId string Measure channel id
      * @param bool $isSameDate Для текущих значений всегда true, для создания новой записи для другого часа, дня,
      *                          месяца false.
      * @throws Exception
      */
-    private function createMeasure($measure, $flows2, $mcUuid, $isSameDate = true)
+    private function createMeasure($measure, $flows2, $mcId, $isSameDate = true)
     {
         if (!empty($measure) && !empty($flows2)) {
             if ($isSameDate) {
@@ -191,14 +190,12 @@ class PoliterService extends Worker
             } else {
                 // создаём запись с измерением
                 $m = new Measure();
-                $m->uuid = MainFunctions::GUID();
-                $m->measureChannelUuid = $mcUuid;
+                $m->measureChannelId = $mcId;
             }
         } else if (empty($measure) && !empty($flows2)) {
             // создаём запись с измерением
             $m = new Measure();
-            $m->uuid = MainFunctions::GUID();
-            $m->measureChannelUuid = $mcUuid;
+            $m->measureChannelId = $mcId;
         } else {
             // нет записи с измерением, нет данных для создания записи
             return;
@@ -225,23 +222,23 @@ class PoliterService extends Worker
 
         // как глубоко будем проверять пропущенные значения
         $deep = -7;
-        $mcs = MeasureChannel::find()->where(['deleted' => false])->select(['uuid', 'param_id', 'type'])->asArray()->all();
-        $mcs = ArrayHelper::map($mcs, 'uuid', function ($item) {
+        $mcs = MeasureChannel::find()->where(['deleted' => false])->select(['_id', 'param_id', 'type'])->asArray()->all();
+        $mcs = ArrayHelper::map($mcs, '_id', function ($item) {
             return $item;
         });
 
-        $measuresByChannels = ArrayHelper::map($mcs, 'uuid', function ($item) {
+        $measuresByChannels = ArrayHelper::map($mcs, '_id', function ($item) {
             return [];
         });
 
-        $uuids = [];
+        $ids = [];
         foreach ($mcs as $mc) {
-            $uuids[] = $mc['uuid'];
+            $ids[] = $mc['_id'];
         }
 
         $date = '2020-06-11 00:00:00';
         $measures = Measure::find()
-            ->where(['measureChannelUuid' => $uuids])
+            ->where(['measureChannelId' => $ids])
             ->andWhere([
                 'AND',
                 ['>=', 'date', date('Y-m-d', strtotime($date . '' . $deep . ' day'))],
@@ -251,12 +248,12 @@ class PoliterService extends Worker
             ->orderBy(['date' => SORT_ASC])
             ->all();
         foreach ($measures as $measure) {
-            $measuresByChannels[$measure['measureChannelUuid']][$measure['uuid']] = $measure;
+            $measuresByChannels[$measure['measureChannelId']][$measure['_id']] = $measure;
         }
 
         unset($measures);
 
-        foreach ($measuresByChannels as $channelUuid => $channel) {
+        foreach ($measuresByChannels as $channelId => $channel) {
             $absDeep = abs(intval($deep));
             $dateList = [];
             for ($i = 1; $i <= $absDeep; $i++) {
@@ -270,14 +267,13 @@ class PoliterService extends Worker
 
             foreach ($dateList as $lostDate => $value) {
                 $archive = FlowArchive::find()
-                    ->where(['ID' => $mcs[$channelUuid]['param_id'],
+                    ->where(['ID' => $mcs[$channelId]['param_id'],
                         'fromTime' => date('Y-m-d 00:00:00', strtotime($lostDate)),
                         'toTime' => date('Y-m-d 00:00:00', strtotime($lostDate . '+1 day')),
                     ])->one();
                 if ($archive) {
                     $m = new Measure();
-                    $m->uuid = MainFunctions::GUID();
-                    $m->measureChannelUuid = $channelUuid;
+                    $m->measureChannelId = $channelId;
                     $m->date = FlowArchive::getDatetime($archive['TIME']);
                     $m->value = floatval(FlowArchive::getFloatValue($archive['VALUE']));
                     if (!$m->save()) {

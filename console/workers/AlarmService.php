@@ -46,9 +46,9 @@ class AlarmService extends Worker
         $channels = MeasureChannel::find()->all();
         foreach ($channels as $channel) {
             $last = Measure::find()
-                ->where(['measureChannelUuid' => $channel['uuid']])
+                ->where(['measureChannelId' => $channel['_id']])
                 ->orderBy('date desc')
-                ->limit(1)
+//                ->limit(1)
                 ->one();
             if ($last) {
                 if (time() - strtotime($last['date']) > 3600 * 24 * 7) {
@@ -89,9 +89,9 @@ class AlarmService extends Worker
         foreach ($channels as $channel) {
             // вообще оно там одно будет скорее всего
             $last = Measure::find()
-                ->where(['measureChannelUuid' => $channel['uuid']])
+                ->where(['measureChannelId' => $channel['_id']])
                 ->orderBy('date desc')
-                ->limit(1)
+//                ->limit(1)
                 ->one();
             if ($last && $last['value'] == 1) {
                 $alarm = Alarm::find()

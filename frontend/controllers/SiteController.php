@@ -377,12 +377,16 @@ class SiteController extends Controller
         $layer = self::getLayers();
 
         $fullTree = array();
-        $objects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])
-            ->andWhere(['deleted' => 0])->all();
+        $objects = Objects::find()
+            ->with(['parent', 'objectSubType'])
+            ->where(['objectTypeUuid' => ObjectType::OBJECT])
+            ->andWhere(['deleted' => 0])
+            ->asArray()
+            ->all();
         foreach ($objects as $object) {
             $fullTree['children'][] = [
-                'title' => $object->getFullTitle(),
-                'type_title' => $object->objectSubType->title,
+                'title' => Objects::getFullTitleStatic($object),
+                'type_title' => $object['objectSubType']['title'],
                 'key' => $object['_id'],
                 'expanded' => true,
                 'folder' => true
@@ -391,13 +395,16 @@ class SiteController extends Controller
             $channels = MeasureChannel::find()
                 ->where(['objectUuid' => $object['uuid']])
                 ->andWhere(['deleted' => 0])
-                ->andWhere(['or', ['measureTypeUuid' => MeasureType::ENERGY],
-                    ['measureTypeUuid' => MeasureType::POWER],
-                    ['measureTypeUuid' => MeasureType::HEAT_FLOW],
-                    ['measureTypeUuid' => MeasureType::TEMPERATURE],
-                    ['measureTypeUuid' => MeasureType::PRESSURE],
-                    ['measureTypeUuid' => MeasureType::HEAT_IN],
-                    ['measureTypeUuid' => MeasureType::COLD_WATER]])
+                ->andWhere(['measureTypeUuid' => [
+                    MeasureType::ENERGY,
+                    MeasureType::POWER,
+                    MeasureType::HEAT_FLOW,
+                    MeasureType::TEMPERATURE,
+                    MeasureType::PRESSURE,
+                    MeasureType::HEAT_IN,
+                    MeasureType::COLD_WATER]
+                ])
+                ->asArray()
                 ->all();
             foreach ($channels as $channel) {
                 $childIdx = count($fullTree['children']) - 1;
@@ -412,11 +419,11 @@ class SiteController extends Controller
                 $links .= Html::a('<span class="fa fa-th"></span>&nbsp',
                     ['/measure-channel/dashboard', 'uuid' => $channel['uuid']]
                 );
-                $value = $channel->getLastMeasure();
+                $value = MeasureChannel::getLastMeasureStatic($channel);
                 if ($value != '-') {
                     $value = $value . "&nbsp;" . $links;
                     $fullTree['children'][$childIdx]['children'][] = [
-                        'title' => $channel->title,
+                        'title' => $channel['title'],
                         'value' => $value,
                         'folder' => false
                     ];
@@ -436,7 +443,7 @@ class SiteController extends Controller
             $measureChannelDay = MeasureChannel::getChannel($object['uuid'], MeasureType::TEMPERATURE_AIR, MeasureType::MEASURE_TYPE_DAYS);
             if ($measureChannelMonth) {
                 $measures = Measure::find()
-                    ->where(['measureChannelUuid' => $measureChannelMonth['uuid']])
+                    ->where(['measureChannelId' => $measureChannelMonth['_id']])
                     ->orderBy('date DESC')
                     ->limit(24)
                     ->asArray()
@@ -454,7 +461,7 @@ class SiteController extends Controller
 
             if ($measureChannelDay) {
                 $measures = Measure::find()
-                    ->where(['measureChannelUuid' => $measureChannelDay['uuid']])
+                    ->where(['measureChannelId' => $measureChannelDay['_id']])
                     ->orderBy('date DESC')
                     ->limit(60)
                     ->asArray()
@@ -615,23 +622,23 @@ class SiteController extends Controller
         $chan3 = [];
         foreach ($measureChannels as $measureChannel) {
             if ($measureChannel->measureTypeUuid == MeasureType::ENERGY || $measureChannel->measureTypeUuid == MeasureType::VOLTAGE) {
-                $chan1[] = $measureChannel['uuid'];
+                $chan1[] = $measureChannel['_id'];
             }
             if ($measureChannel->measureTypeUuid == MeasureType::HEAT_CONSUMED || $measureChannel->measureTypeUuid == MeasureType::HEAT_IN) {
-                $chan2[] = $measureChannel['uuid'];
+                $chan2[] = $measureChannel['_id'];
             }
             if ($measureChannel->measureTypeUuid == MeasureType::COLD_WATER || $measureChannel->measureTypeUuid == MeasureType::HOT_WATER) {
-                $chan3[] = $measureChannel['uuid'];
+                $chan3[] = $measureChannel['_id'];
             }
         }
         $data_by_source[0]['cnt'] = Measure::find()
-            ->where(['in', 'measureChannelUuid', $chan1])
+            ->where(['in', 'measureChannelId', $chan1])
             ->count();
         $data_by_source[1]['cnt'] = Measure::find()
-            ->where(['in', 'measureChannelUuid', $chan2])
+            ->where(['in', 'measureChannelId', $chan2])
             ->count();
         $data_by_source[2]['cnt'] = Measure::find()
-            ->where(['in', 'measureChannelUuid', $chan3])
+            ->where(['in', 'measureChannelId', $chan3])
             ->count();
         $data_by_source[0]['title'] = 'Электроэнергия';
         $data_by_source[1]['title'] = 'Тепло';
@@ -979,48 +986,87 @@ class SiteController extends Controller
 
         $default_coordinates = new LatLng(['lat' => 55.54, 'lng' => 61.36]);
         $coordinates = $default_coordinates;
+        $tmpChs = MeasureChannel::find()
+            ->where([
+                'measureTypeUuid' => [MeasureType::ENERGY, MeasureType::POWER],
+            ])
+            ->asArray()
+            ->all();
+        $energyChsByObject = [];
+        foreach ($tmpChs as $ch) {
+            $energyChsByObject[$ch['objectUuid']][] = $ch['_id'];
+        }
+
+        $tmpChs = MeasureChannel::find()
+            ->where([
+                'measureTypeUuid' => [MeasureType::HEAT_CONSUMED, MeasureType::HEAT_FLOW],
+            ])
+            ->asArray()
+            ->all();
+        $heatChsByObject = [];
+        foreach ($tmpChs as $ch) {
+            $heatChsByObject[$ch['objectUuid']][] = $ch['_id'];
+        }
+
+        $tmpChn = MeasureChannel::find()->where(['measureTypeUuid' => [MeasureType::COLD_WATER]])->asArray()->all();
+        $waterChsByObjects = [];
+        foreach ($tmpChn as $ch) {
+            $waterChsByObjects[$ch['objectUuid']][] = $ch['_id'];
+        }
+
         /** @var Objects $object */
         foreach ($objectSelect as $object) {
             $position = new LatLng(['lat' => $object["latitude"], 'lng' => $object["longitude"]]);
             $data = '';
-            /** @var Measure $measureEnergy */
-            $measureEnergy = Measure::find()->joinWith('measureChannel')
-                ->where(['or', ['measure_channel.measureTypeUuid' => MeasureType::ENERGY],
-                    ['measure_channel.measureTypeUuid' => MeasureType::POWER]])
-                ->andWhere(['objectUuid' => $object->uuid])
-                ->orderBy('date desc')
-                ->limit(1)
-                ->one();
-            if ($measureEnergy) {
-                $data .= $measureEnergy->measureChannel->title . ' = ' . $measureEnergy->value . '<br/>';
+            if (!empty($energyChsByObject[$object->uuid])) {
+                /** @var Measure $measureEnergy */
+                $measureEnergy = Measure::find()
+                    ->with(['measureChannel'])
+                    ->where(['measureChannelId' => $energyChsByObject[$object->uuid]])
+                    ->orderBy('date desc')
+                    ->limit(1)
+                    ->asArray()
+                    ->one();
+                if ($measureEnergy) {
+                    $data .= $measureEnergy['measureChannel']['title'] . ' = ' . $measureEnergy['value'] . '<br/>';
+                }
             }
-            /** @var Measure $measureHeat */
-            $measureHeat = Measure::find()->joinWith('measureChannel')
-                ->where(['or', ['measure_channel.measureTypeUuid' => MeasureType::HEAT_CONSUMED],
-                    ['measure_channel.measureTypeUuid' => MeasureType::HEAT_FLOW]])
-                ->andWhere(['objectUuid' => $object->uuid])
-                ->orderBy('date desc')
-                ->limit(1)
-                ->one();
-            if ($measureHeat) {
-                $data .= $measureHeat->measureChannel->title . ' = ' . $measureHeat->value . '<br/>';
+
+            if (!empty($heatChsByObject[$object->uuid])) {
+                /** @var Measure $measureHeat */
+                $measureHeat = Measure::find()
+                    ->with(['measureChannel'])
+                    ->where(['measureChannelId' => $heatChsByObject[$object->uuid]])
+                    ->orderBy('date desc')
+                    ->limit(1)
+                    ->asArray()
+                    ->one();
+                if ($measureHeat) {
+                    $data .= $measureHeat['measureChannel']['title'] . ' = ' . $measureHeat['value'] . '<br/>';
+                }
             }
-            /** @var Measure $measureWater */
-            $measureWater = Measure::find()->joinWith('measureChannel')
-                ->where(['measure_channel.measureTypeUuid' => MeasureType::COLD_WATER])
-                ->andWhere(['objectUuid' => $object->uuid])
-                ->orderBy('date desc')
-                ->limit(1)
-                ->one();
-            if ($measureWater) {
-                $data .= $measureWater->measureChannel->title . ' = ' . $measureWater->value . '<br/>';
+
+            if (!empty($waterChsByObjects[$object->uuid])) {
+                /** @var Measure $measureWater */
+                $measureWater = Measure::find()
+                    ->with(['measureChannel'])
+                    ->where(['measureChannelId' => $waterChsByObjects[$object->uuid]])
+                    ->orderBy('date desc')
+                    ->limit(1)
+                    ->asArray()
+                    ->one();
+                if ($measureWater) {
+                    $data .= $measureWater['measureChannel']['title'] . ' = ' . $measureWater['value'] . '<br/>';
+                }
             }
+
             $alarm = Alarm::find()->where(['entityUuid' => $object->uuid])
                 ->andWhere(['status' => Alarm::STATUS_ACTIVE])
                 ->one();
             if ($alarm) {
                 $data .= $alarm->getAlarmLabel() . " " . $alarm["title"] . '<br/>';
             }
+
             $marker = new Marker(['latLng' => $position, 'popupContent' => '<b>'
                 . '<a href="/object/dashboard?uuid=' . $object['uuid'] . '">' . htmlspecialchars($object->getFullTitle()) . '</a></b><br/>'
                 . htmlspecialchars($object->objectSubType->title) . '<br/>'
@@ -1032,10 +1078,12 @@ class SiteController extends Controller
             if ($coordinates->lng == $default_coordinates->lng && $coordinates->lat == $default_coordinates->lat && $object["latitude"] > 0) {
                 $coordinates = new LatLng(['lat' => $object["latitude"], 'lng' => $object["longitude"]]);
             }
+
             $heatGroup->addLayer($marker);
             if ($object->water) {
                 $waterGroup->addLayer($marker);
             }
+
             if ($object->electricity) {
                 $powerGroup->addLayer($marker);
             }
@@ -1050,6 +1098,7 @@ class SiteController extends Controller
                 foreach ($district_coordinates as $coordinate) {
                     $coordinates_latlng[] = new LatLng(['lat' => $coordinate->lat, 'lng' => $coordinate->lng]);
                 }
+
                 $polygon = new Polygon(['latLngs' => $coordinates_latlng, 'popupContent' => '<b>'
                     . htmlspecialchars($district->district->getFullTitle()) . '</b>']);
                 //$polygon->clientOptions = ['color' => 'red'];

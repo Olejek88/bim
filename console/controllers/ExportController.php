@@ -73,27 +73,25 @@ class ExportController extends Controller
             if ($date != '' && $value != '') {
                 $realDate = strftime("%Y%m%d000000", strtotime($date));
                 $data = Measure::find()
-                    ->where(['measureChannelUuid' => $measureChannelDay['uuid']])
+                    ->where(['measureChannelId' => $measureChannelDay['_id']])
                     ->andWhere(['date' => $realDate])
                     ->one();
                 if (!$data) {
                     $data = new Measure();
-                    $data->uuid = MainFunctions::GUID();
                     $data->date = $realDate;
-                    $data->measureChannelUuid = $measureChannelDay['uuid'];
+                    $data->measureChannelId = $measureChannelDay['_id'];
                     $data->value = $value;
                     $data->save();
                 }
                 if ($month != '') {
                     $data = Measure::find()
-                        ->where(['measureChannelUuid' => $measureChannelMonth['uuid']])
+                        ->where(['measureChannelId' => $measureChannelMonth['_id']])
                         ->andWhere(['date' => $realDate])
                         ->one();
                     if (!$data) {
                         $data = new Measure();
-                        $data->uuid = MainFunctions::GUID();
                         $data->date = $realDate;
-                        $data->measureChannelUuid = $measureChannelMonth['uuid'];
+                        $data->measureChannelId = $measureChannelMonth['_id'];
                         $data->value = $month;
                         $data->save();
                     }

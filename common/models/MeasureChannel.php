@@ -120,12 +120,32 @@ class MeasureChannel extends PoliterModel
     {
         /** @var Measure $measure */
         $measure = Measure::find()
-            ->select('measureChannelUuid, date, value')
-            ->where(['measureChannelUuid' => $this->uuid])
+            ->select('measureChannelId, date, value')
+            ->where(['measureChannelId' => $this->_id])
             ->orderBy('date desc')
             ->asArray()
-            ->limit(1)
+//            ->limit(1)
             ->one();
+        if ($measure) {
+            return number_format($measure['value'], 3) . ' [' . date("m/d h:i:s", strtotime($measure['date'])) . ']';
+        }
+        return '-';
+    }
+
+    /**
+     * @return string
+     */
+    public static function getLastMeasureStatic($channel)
+    {
+        /** @var Measure $measure */
+        $measure = Yii::$app->db->createCommand('SELECT m.measureChannelId, date, value FROM measure m
+join (
+select measureChannelId, max(date) as lastDate
+from measure
+WHERE measureChannelId=:chId
+group by measureChannelId
+) tt
+on m.measureChannelId=tt.measureChannelId and m.date=tt.lastDate', [':chId' => $channel['_id']])->queryOne();
         if ($measure) {
             return number_format($measure['value'], 3) . ' [' . date("m/d h:i:s", strtotime($measure['date'])) . ']';
         }

@@ -11,8 +11,7 @@ use yii\db\Expression;
  * This is the model class for table "measure".
  *
  * @property integer $_id
- * @property string $uuid
- * @property string $measureChannelUuid
+ * @property string $measureChannelId
  * @property double $value
  * @property string $date
  * @property string $createdAt
@@ -63,16 +62,19 @@ class Measure extends PoliterModel
         return [
             [
                 [
-                    'uuid',
-                    'measureChannelUuid',
+                    'measureChannelId',
                     'value',
                     'date'
                 ],
                 'required'
             ],
             [['value'], 'number'],
-            [['uuid', 'measureChannelUuid', 'date'], 'string', 'max' => 50],
-            [['oid', 'createdAt', 'changedAt'], 'safe']
+            [['measureChannelId'], 'integer'],
+            [['measureChannelId'],
+                'targetAttribute' => ['measureChannelId' => '_id'],
+                'targetClass' => MeasureChannel::class,
+            ],
+            [['date'], 'string', 'max' => 50],
         ];
     }
 
@@ -87,9 +89,8 @@ class Measure extends PoliterModel
     {
         return [
             '_id' => Yii::t('app', '№'),
-            'uuid' => Yii::t('app', 'Uuid'),
             'measureChannel' => Yii::t('app', 'Канал измерения'),
-            'measureChannelUuid' => Yii::t('app', 'Канал измерения'),
+            'measureChannelId' => Yii::t('app', 'Канал измерения'),
             'value' => Yii::t('app', 'Значение'),
             'date' => Yii::t('app', 'Дата'),
             'createdAt' => Yii::t('app', 'Создан'),
@@ -104,8 +105,9 @@ class Measure extends PoliterModel
      */
     public function fields1()
     {
-        return ['_id', 'uuid',
-            'measureChannelUuid',
+        return [
+            '_id',
+            'measureChannelId',
             'measureChannel' => function ($model) {
                 return $model->measureChannel;
             },
@@ -123,7 +125,7 @@ class Measure extends PoliterModel
      */
     public function getMeasureChannel()
     {
-        return $this->hasOne(MeasureChannel::class, ['uuid' => 'measureChannelUuid']);
+        return $this->hasOne(MeasureChannel::class, ['_id' => 'measureChannelId']);
     }
 
 }

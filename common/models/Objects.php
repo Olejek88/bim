@@ -192,10 +192,7 @@ class Objects extends PoliterModel
      */
     public function getParent()
     {
-        if ($this->parentUuid) {
-            return $this->hasOne(Objects::class, ['uuid' => 'parentUuid']);
-        }
-        return null;
+        return $this->hasOne(Objects::class, ['uuid' => 'parentUuid']);
     }
 
     /**
@@ -260,6 +257,23 @@ class Objects extends PoliterModel
         }
         return $this->title;
         //return 'ул.' . $house->street->title . ', д.' . $house->number . ' - ' . $this->title;
+    }
+
+    public static function getFullTitleStatic($object)
+    {
+        if ($object['objectTypeUuid'] == ObjectType::REGION) {
+            return $object['title'];
+        }
+
+        if ($object['objectTypeUuid'] == ObjectType::OBJECT) {
+            return 'ул.' . $object['parent']['title'] . ', ' . $object['title'];
+        }
+
+        if ($object['objectTypeUuid'] == ObjectType::SUB_DISTRICT) {
+            return $object['title'];
+        }
+
+        return $object['title'];
     }
 
     /**
@@ -344,9 +358,9 @@ class Objects extends PoliterModel
                         if ($type == 3)
                             $measureChannel = MeasureChannel::getChannel($object['uuid'], MeasureType::ENERGY, MeasureType::MEASURE_TYPE_MONTH);
                         if (isset($measureChannel)) {
-                            $heat['avg'] = Measure::find()->where(['measureChannelUuid' => $measureChannel['uuid']])
+                            $heat['avg'] = Measure::find()->where(['measureChannelId' => $measureChannel['_id']])
                                 ->orderBy('date DESC')->limit(24)->average('value');
-                            $heat['summary'] = Measure::find()->where(['measureChannelUuid' => $measureChannel['uuid']])
+                            $heat['summary'] = Measure::find()->where(['measureChannelId' => $measureChannel['_id']])
                                 ->orderBy('date DESC')->limit(24)->sum('value');
                             $avg += $heat['avg'];
                             $sum += $heat['summary'];

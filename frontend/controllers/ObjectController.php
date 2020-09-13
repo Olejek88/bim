@@ -749,17 +749,17 @@ class ObjectController extends PoliterController
                 $coordinates = new LatLng(['lat' => $object["latitude"], 'lng' => $object["longitude"]]);
 
                 $data['month'] = [];
-                $channel_uuid = [];
+                $channel_id = [];
                 $measureChannels = MeasureChannel::find()->where(['objectUuid' => $object['uuid']])
                     ->andWhere(['deleted' => 0])
                     ->andWhere(['type' => MeasureType::MEASURE_TYPE_MONTH])
                     ->all();
                 foreach ($measureChannels as $measureChannel) {
-                    $channel_uuid[] = $measureChannel['uuid'];
+                    $channel_id[] = $measureChannel['_id'];
                 }
                 /** @var Measure[] $last_measures */
                 $last_measures = Measure::find()
-                    ->where(['in', 'measureChannelUuid', $channel_uuid])
+                    ->where(['in', 'measureChannelId', $channel_id])
                     ->orderBy('date desc')->all();
 
                 $last_date = '';
@@ -817,7 +817,7 @@ class ObjectController extends PoliterController
                 }
                 if ($measureChannelMonth) {
                     $temperatures = Measure::find()
-                        ->where(['measureChannelUuid' => $measureChannelMonth['uuid']])
+                        ->where(['measureChannelId' => $measureChannelMonth['_id']])
                         ->orderBy('date DESC')
                         ->asArray()
                         ->all();
@@ -837,7 +837,7 @@ class ObjectController extends PoliterController
                 }
 
                 if ($measureChannelHeat) {
-                    $measures = Measure::find()->where(['measureChannelUuid' => $measureChannelHeat['uuid']])->all();
+                    $measures = Measure::find()->where(['measureChannelId' => $measureChannelHeat['_id']])->all();
                     foreach ($measures as $measure) {
                         $measure_month = intval(date("m", strtotime($measure['date'])));
                         $measure_year = date("Y", strtotime($measure['date']));

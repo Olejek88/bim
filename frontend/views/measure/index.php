@@ -25,7 +25,7 @@ $gridColumns = [
         }
     ],
     [
-        'attribute' => 'measureChannelUuid',
+        'attribute' => 'measureChannelId',
         'vAlign' => 'middle',
         'contentOptions' => [
             'class' => 'table_class'

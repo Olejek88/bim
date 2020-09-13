@@ -33,14 +33,13 @@ class PoliterGetAllMeasureController extends Controller
         $cnt = 1;
         // временное решение, чтобы не тянуть уже скачанное с нуля
         foreach ($mcs as $mc) {
-            $measureCount = Measure::find()->where(['measureChannelUuid' => $mc['uuid']])->count();
+            $measureCount = Measure::find()->where(['measureChannelId' => $mc['_id']])->count();
             if ($measureCount < 10) {
                 echo date('H:i:s') . ' [' . $cnt . '/' . $count . ' ' . number_format($cnt * 100 / $count, 2) . '%] channel ' . $mc['param_id'] . ' ' . $measureCount . PHP_EOL;
                 $archives = FlowArchive::find()->where(['ID' => $mc['param_id']])->asArray()->all();
                 foreach ($archives as $archive) {
                     $m = new Measure();
-                    $m->uuid = MainFunctions::GUID();
-                    $m->measureChannelUuid = $mc['uuid'];
+                    $m->measureChannelId = $mc['_id'];
                     $m->date = FlowArchive::getDatetime($archive['TIME']);
                     $m->value = floatval(FlowArchive::getFloatValue($archive['VALUE']));
                     if (!$m->save()) {

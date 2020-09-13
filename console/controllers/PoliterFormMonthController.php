@@ -106,7 +106,7 @@ class PoliterFormMonthController extends Controller
                     $startDate = sprintf("%04d%02d01000000", $year, $month);
                     $endDate = sprintf("%04d%02d31000000", $year, $month);
                     $sum = Measure::find()
-                        ->where(['measureChannelUuid' => $channelDay['uuid']])
+                        ->where(['measureChannelId' => $channelDay['_id']])
                         ->andWhere(['>=', 'date', $startDate])
                         ->andWhere(['<=', 'date', $endDate])
                         ->sum('value');
@@ -126,21 +126,20 @@ class PoliterFormMonthController extends Controller
     }
 
     /**
-     * @param $measureChannelUuid
+     * @param $measureChannelId
      * @param $date
      * @param $sum
      * @throws Exception
      */
-    function storeCheckMeasure($measureChannelUuid, $date, $sum)
+    function storeCheckMeasure($measureChannelId, $date, $sum)
     {
         $measureMonth = Measure::find()
-            ->where(['measureChannelUuid' => $measureChannelUuid])
+            ->where(['measureChannelId' => $measureChannelId])
             ->andWhere(['date' => $date])
             ->one();
         if (!$measureMonth) {
             $measure = new Measure();
-            $measure->uuid = MainFunctions::GUID();
-            $measure->measureChannelUuid = $measureChannelUuid;
+            $measure->measureChannelId = $measureChannelId;
             $measure->date = $date;
             $measure->value = $sum;
             if ($measure->save()) {
