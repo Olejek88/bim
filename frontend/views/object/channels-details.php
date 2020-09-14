@@ -76,7 +76,7 @@ $channels->query->andWhere(['objectUuid' => $model->uuid]);
                     ],
                     'headerOptions' => ['class' => 'text-center'],
                     'content' => function ($data) {
-                        return $data->getLastMeasure();
+                        return $data->getFormatLastMeasure();
                     }
                 ],
             ];

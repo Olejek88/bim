@@ -443,7 +443,7 @@ class ObjectController extends PoliterController
                                         'data-target' => '#modalChart',
                                     ]
                                 );
-                                $value = $channel->getLastMeasure() . "&nbsp;" . $links;
+                                $value = $channel->getFormatLastMeasure() . "&nbsp;" . $links;
                                 //$value = '';
                                 $links = Html::a('<span class="fa fa-database"></span>&nbsp',
                                     ['/parameter/list', 'uuid' => $channel['uuid']],
@@ -2272,7 +2272,7 @@ class ObjectController extends PoliterController
                                 ->limit(1)
                                 ->one();
                             if ($measureChannel) {
-                                $data[$object_count]['measures'][] = $measureChannel->getLastMeasure();
+                                $data[$object_count]['measures'][] = $measureChannel->getFormatLastMeasure();
                             }
                         }
                     }

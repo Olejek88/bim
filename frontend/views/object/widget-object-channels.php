@@ -1,6 +1,7 @@
 <?php
 /* @var $channels */
 
+use common\models\MeasureChannel;
 use common\models\MeasureType;
 use kartik\grid\GridView;
 
@@ -78,7 +79,7 @@ use kartik\grid\GridView;
                 ],
                 'headerOptions' => ['class' => 'text-center'],
                 'content' => function ($data) {
-                    return $data->getLastMeasure();
+                    return $data->getFormatLastMeasure();
                 }
             ],
         ];

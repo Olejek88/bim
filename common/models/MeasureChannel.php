@@ -29,7 +29,8 @@ use yii\db\Expression;
  * @property MeasureType $measureType
  * @property Objects $object
  * @property-read string $typeName
- * @property-read string $lastMeasure
+ * @property-read string $formatLastMeasure
+ * @property-read array $lastMeasure
  */
 class MeasureChannel extends PoliterModel
 {
@@ -114,42 +115,94 @@ class MeasureChannel extends PoliterModel
     }
 
     /**
-     * @return string
+     * @return array
      */
     public function getLastMeasure()
     {
-        /** @var Measure $measure */
+        /** @var MeasureLast $measure */
+        // вспомогательный запрос
+        $lastMeasureTmp = MeasureLast::find()
+            ->select('measureChannelId, max(date) as date')
+            ->where([
+                'measureChannelId' => $this->_id,
+            ])
+            ->groupBy('measureChannelId');
+        // выбираем из базы для каждого канала измерений последнее по дате значение
         $measure = Measure::find()
-            ->select('measureChannelId, date, value')
-            ->where(['measureChannelId' => $this->_id])
-            ->orderBy('date desc')
+            ->with(['measureChannel'])
+            ->innerJoin(['m' => $lastMeasureTmp], 'measure.measureChannelId=m.measureChannelId and measure.date=m.date')
             ->asArray()
-//            ->limit(1)
-            ->one();
-        if ($measure) {
-            return number_format($measure['value'], 3) . ' [' . date("m/d h:i:s", strtotime($measure['date'])) . ']';
-        }
-        return '-';
+            ->all();
+
+        return $measure;
     }
 
     /**
      * @return string
      */
+    public function getFormatLastMeasure()
+    {
+        $text = '-';
+        $measures = $this->getLastMeasure();
+        if (count($measures) > 0) {
+            $text = '';
+            foreach ($measures as $measure) {
+                if ($text != '') {
+                    $text .= '<br/>';
+                }
+
+                $text .= number_format($measure['value'], 3)
+                    . ' [' . date("m/d h:i:s", strtotime($measure['date'])) . ']';
+            }
+        }
+
+        return $text;
+    }
+
+    /**
+     * @param $channel int|array
+     * @return array
+     */
     public static function getLastMeasureStatic($channel)
     {
-        /** @var Measure $measure */
-        $measure = Yii::$app->db->createCommand('SELECT m.measureChannelId, date, value FROM measure m
-join (
-select measureChannelId, max(date) as lastDate
-from measure
-WHERE measureChannelId=:chId
-group by measureChannelId
-) tt
-on m.measureChannelId=tt.measureChannelId and m.date=tt.lastDate', [':chId' => $channel['_id']])->queryOne();
-        if ($measure) {
-            return number_format($measure['value'], 3) . ' [' . date("m/d h:i:s", strtotime($measure['date'])) . ']';
+        /** @var MeasureLast $measure */
+        // вспомогательный запрос
+        $lastMeasureTmp = MeasureLast::find()
+            ->select('measureChannelId, max(date) as date')
+            ->where([
+                'measureChannelId' => $channel,
+            ])
+            ->groupBy('measureChannelId');
+        // выбираем из базы для каждого канала измерений последнее по дате значение
+        $measure = Measure::find()
+            ->with(['measureChannel'])
+            ->innerJoin(['m' => $lastMeasureTmp], 'measure.measureChannelId=m.measureChannelId and measure.date=m.date')
+            ->asArray()
+            ->all();
+
+        return $measure;
+    }
+
+    /**
+     * @param $channel int|array
+     * @return string
+     */
+    public static function getFormatLastMeasureStatic($channel)
+    {
+        $text = '-';
+        $measures = self::getLastMeasureStatic($channel);
+        if (count($measures)) {
+            foreach ($measures as $measure) {
+                if ($text != '') {
+                    $text .= '<br/>';
+                }
+
+                $text .= number_format($measure['value'], 3)
+                    . ' [' . date("m/d h:i:s", strtotime($measure['date'])) . ']';
+            }
         }
-        return '-';
+
+        return $text;
     }
 
     /**
