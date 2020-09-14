@@ -93,7 +93,7 @@ class PoliterFormMonthController extends Controller
     {
         $channels = MeasureChannel::find()->where(['type' => MeasureType::MEASURE_TYPE_MONTH])->all();
         foreach ($channels as $channel) {
-            $deep = 18;
+            $deep = 35;
             $today = getdate();
             $year = $today['year'];
             $month = $today['mon'];
@@ -109,10 +109,11 @@ class PoliterFormMonthController extends Controller
                         ->where(['measureChannelUuid' => $channelDay['uuid']])
                         ->andWhere(['>=', 'date', $startDate])
                         ->andWhere(['<=', 'date', $endDate])
+                        ->andWhere(['>', 'value', 0])
                         ->sum('value');
                     //echo $deep.' check '.$channel['uuid'].' '.$startDate.'-'.$endDate.' = '.$sum.PHP_EOL;
-                    if ($sum) {
-                        self::storeCheckMeasure($channel['uuid'], $startDate, $sum);
+                    if ($sum && is_numeric($sum)) {
+                        self::storeCheckMeasure($channel['uuid'], $startDate, number_format($sum, 3));
                     }
                     if ($month > 1) {
                         $month--;
@@ -136,6 +137,7 @@ class PoliterFormMonthController extends Controller
         $measureMonth = Measure::find()
             ->where(['measureChannelUuid' => $measureChannelUuid])
             ->andWhere(['date' => $date])
+            ->limit(1)
             ->one();
         if (!$measureMonth) {
             $measure = new Measure();
