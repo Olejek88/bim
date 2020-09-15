@@ -78,7 +78,7 @@ use kartik\grid\GridView;
                 ],
                 'headerOptions' => ['class' => 'text-center'],
                 'content' => function ($data) {
-                    return $data->getLastMeasure();
+                    return $data->getFormatLastMeasure();
                 }
             ],
         ];

@@ -4,6 +4,7 @@ namespace common\models;
 
 use common\components\MainFunctions;
 use dosamigos\leaflet\types\LatLng;
+use Exception;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -328,10 +329,19 @@ class Objects extends PoliterModel
      * 2 - water + main
      * 3 - energy + main
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function getParamsByDistrict($type)
     {
+        $result = [
+            'avg' => 0,
+            'cnt' => 0,
+            'square' => 0,
+            'volume' => 0,
+            'sum' => 0,
+            'ee' => 0,
+        ];
+
         if ($this->objectTypeUuid == ObjectType::SUB_DISTRICT) {
             $coordinates = DistrictCoordinates::find()->where(['districtUuid' => $this->uuid])->one();
             if ($coordinates) {
@@ -378,7 +388,11 @@ class Objects extends PoliterModel
                 $result['sum'] = $sum;
                 $result['ee'] = $ee;
                 return $result;
+            } else {
+                return $result;
             }
+        } else {
+            return $result;
         }
     }
 
@@ -431,7 +445,7 @@ class Objects extends PoliterModel
     /**
      * @param $parameterTypeUuid
      * @param $value
-     * @throws \Exception
+     * @throws Exception
      */
     public function checkCreateParameter($parameterTypeUuid, $value)
     {

@@ -42,6 +42,8 @@ use yii\web\Controller;
 /**
  * Class SiteController
  * @package frontend\controllers
+ *
+ * @property-read mixed $layers
  */
 class SiteController extends Controller
 {
@@ -181,6 +183,7 @@ class SiteController extends Controller
         return $this->render(
             'index',
             [
+                'title' => 'Стартовая страница',
                 'leafLet' => $leaflet,
             ]
         );
@@ -213,7 +216,8 @@ class SiteController extends Controller
                     $coordinates_latlng[] = new LatLng(['lat' => $coordinate->lat, 'lng' => $coordinate->lng]);
                 }
 
-                $tileLink = Html::a(htmlspecialchars($district->district->getFullTitle()), ['/object/table', 'districtUuid' => $district['uuid']]);
+                $tileLink = Html::a(htmlspecialchars($district->district->getFullTitle()),
+                    ['/object/table', 'districtUuid' => $district['uuid']]);
                 $result = $district->district->getParamsByDistrict(1);
                 $polygon = new Polygon(['latLngs' => $coordinates_latlng, 'popupContent' => '<b>'
                     . $tileLink . '</b><br/>'
@@ -363,7 +367,7 @@ class SiteController extends Controller
         $objectsTypeCount = ObjectType::find()->count();
         $objectsSubTypeCount = ObjectSubType::find()->count();
         $channelsCount = MeasureChannel::find()->where(['deleted' => 0])->count();
-        $measuresCount = Measure::find()->count();
+        $measuresCount = 0; // Measure::find()->count(); // реально ни где не выводится, отключил выборку
         $eventsCount = Event::find()->count();
         $eventTypesCount = EventType::find()->count();
         $measureTypesCount = MeasureType::find()->count();
@@ -419,7 +423,7 @@ class SiteController extends Controller
                 $links .= Html::a('<span class="fa fa-th"></span>&nbsp',
                     ['/measure-channel/dashboard', 'uuid' => $channel['uuid']]
                 );
-                $value = MeasureChannel::getLastMeasureStatic($channel);
+                $value = MeasureChannel::getFormatLastMeasureStatic($channel['_id']);
                 if ($value != '-') {
                     $value = $value . "&nbsp;" . $links;
                     $fullTree['children'][$childIdx]['children'][] = [
@@ -591,25 +595,35 @@ class SiteController extends Controller
         foreach ($objects as $object) {
             $channels[$count]['object'] = $object->getFullTitle();
             $channels[$count]['energy'] = MeasureChannel::find()
-                ->where(['objectUuid' => $object->uuid])
-                ->andWhere(['or', ['measureTypeUuid' => MeasureType::ENERGY],
-                    ['measureTypeUuid' => MeasureType::VOLTAGE],
-                    ['measureTypeUuid' => MeasureType::CURRENT],
-                    ['measureTypeUuid' => MeasureType::POWER],
-                    ['measureTypeUuid' => MeasureType::FREQUENCY]])
+                ->where([
+                    'objectUuid' => $object->uuid,
+                    'measureTypeUuid' => [
+                        MeasureType::ENERGY,
+                        MeasureType::VOLTAGE,
+                        MeasureType::CURRENT,
+                        MeasureType::POWER,
+                        MeasureType::FREQUENCY
+                    ],
+                ])
                 ->count();
             $channels[$count]['heat'] = MeasureChannel::find()
-                ->where(['objectUuid' => $object->uuid])
-                ->andWhere(['or', ['measureTypeUuid' => MeasureType::HEAT_CONSUMED],
-                    ['measureTypeUuid' => MeasureType::HEAT_FLOW],
-                    ['measureTypeUuid' => MeasureType::TEMPERATURE],
-                    ['measureTypeUuid' => MeasureType::PRESSURE],
-                    ['measureTypeUuid' => MeasureType::HEAT_IN]])
+                ->where(['objectUuid' => $object->uuid,
+                    'measureTypeUuid' => [
+                        MeasureType::HEAT_CONSUMED,
+                        MeasureType::HEAT_FLOW,
+                        MeasureType::TEMPERATURE,
+                        MeasureType::PRESSURE,
+                        MeasureType::HEAT_IN],
+                ])
                 ->count();
             $channels[$count]['water'] = MeasureChannel::find()
-                ->where(['objectUuid' => $object->uuid])
-                ->andWhere(['or', ['measureTypeUuid' => MeasureType::COLD_WATER],
-                    ['measureTypeUuid' => MeasureType::HOT_WATER]])
+                ->where([
+                    'objectUuid' => $object->uuid,
+                    'measureTypeUuid' => [
+                        MeasureType::COLD_WATER,
+                        MeasureType::HOT_WATER,
+                    ]
+                ])
                 ->count();
             $channels[$count]['all'] = MeasureChannel::find()
                 ->where(['objectUuid' => $object->uuid])
@@ -728,7 +742,10 @@ class SiteController extends Controller
     {
         $exception = Yii::$app->errorHandler->exception;
         if ($exception !== null) {
-            return $this->render("../site/error");
+            return $this->render("../site/error", [
+                'name' => 'Ошибка',
+                'message' => $exception->getMessage(),
+            ]);
         }
         return '';
     }
@@ -1028,42 +1045,24 @@ class SiteController extends Controller
             $data = '';
             if (!empty($energyChsByObject[$object->uuid])) {
                 /** @var Measure $measureEnergy */
-                $measureEnergy = Measure::find()
-                    ->with(['measureChannel'])
-                    ->where(['measureChannelId' => $energyChsByObject[$object->uuid]])
-                    ->orderBy('date desc')
-                    ->limit(1)
-                    ->asArray()
-                    ->one();
-                if ($measureEnergy) {
+                $measureEnergys = MeasureChannel::getLastMeasureStatic($energyChsByObject[$object->uuid]);
+                foreach ($measureEnergys as $measureEnergy) {
                     $data .= $measureEnergy['measureChannel']['title'] . ' = ' . $measureEnergy['value'] . '<br/>';
                 }
             }
 
             if (!empty($heatChsByObject[$object->uuid])) {
                 /** @var Measure $measureHeat */
-                $measureHeat = Measure::find()
-                    ->with(['measureChannel'])
-                    ->where(['measureChannelId' => $heatChsByObject[$object->uuid]])
-                    ->orderBy('date desc')
-                    ->limit(1)
-                    ->asArray()
-                    ->one();
-                if ($measureHeat) {
+                $measureHeats = MeasureChannel::getLastMeasureStatic($heatChsByObject[$object->uuid]);
+                foreach ($measureHeats as $measureHeat) {
                     $data .= $measureHeat['measureChannel']['title'] . ' = ' . $measureHeat['value'] . '<br/>';
                 }
             }
 
             if (!empty($waterChsByObjects[$object->uuid])) {
                 /** @var Measure $measureWater */
-                $measureWater = Measure::find()
-                    ->with(['measureChannel'])
-                    ->where(['measureChannelId' => $waterChsByObjects[$object->uuid]])
-                    ->orderBy('date desc')
-                    ->limit(1)
-                    ->asArray()
-                    ->one();
-                if ($measureWater) {
+                $measureWaters = MeasureChannel::getLastMeasureStatic($energyChsByObject[$object->uuid]);
+                foreach ($measureWaters as $measureWater) {
                     $data .= $measureWater['measureChannel']['title'] . ' = ' . $measureWater['value'] . '<br/>';
                 }
             }
