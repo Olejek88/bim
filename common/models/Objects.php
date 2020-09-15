@@ -235,6 +235,7 @@ class Objects extends PoliterModel
         $perm['dashboard'] = 'dashboard' . $class;
         $perm['districts'] = 'districts' . $class;
         $perm['plan-edit'] = 'plan-edit' . $class;
+        $perm['create-coefficient'] = 'create-coefficient' . $class;
         $perm['table'] = 'table' . $class;
         $perm['month'] = 'month' . $class;
         $perm['days'] = 'days' . $class;
@@ -402,10 +403,10 @@ class Objects extends PoliterModel
     /**
      * @param $uuid
      * @param $date
-     * @param string $default
+     * @param int $default
      * @return string
      */
-    public function getParameter($uuid, $date = null, $default = "n/a")
+    public function getParameter($uuid, $date = null, $default = 0)
     {
         /** @var Parameter $parameter */
         if ($date) {

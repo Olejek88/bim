@@ -64,7 +64,7 @@ use yii\helpers\Html;
             'editableOptions' => function ($data) {
                 $types = array(
                     '1' => Yii::t('app', 'Выполнено'),
-                    '0' => Yii::t('app', 'В работе')
+                    '0' => Yii::t('app', 'Запланировано')
                 );
                 return [
                     'header' => Yii::t('app', 'Статус'),

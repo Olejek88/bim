@@ -1002,7 +1002,7 @@ class ObjectController extends PoliterController
                         [
                             'title' => 'Редактировать',
                             'data-toggle' => 'modal',
-                            'data-target' => '#modalPlan',
+                            'data-target' => '#modalEditParameter',
                         ]);
                 } else {
                     $objects[$count]['plans'][$month]['plan'] = '<span class="span-plan0">-</span>';
@@ -1010,11 +1010,11 @@ class ObjectController extends PoliterController
                 $measureValue = '<span class="span-plan0">-</span>';
                 if ($measureChannelHeat) {
                     $measure = Measure::find()
-                        ->where(['measureChannelUuid' => $measureChannelHeat['uuid']])
+                        ->where(['measureChannelId' => $measureChannelHeat['_id']])
                         ->andWhere(['date' => $mon_date_str2[$month]])
                         ->one();
                     if ($measure) {
-                        $measureValue = "<span class='span-plan1'>" . $measure['value'] . "</span>";
+                        $measureValue = "<span class='span-plan1'>" . number_format($measure['value'], 2, ".", "") . "</span>";
                     }
                 }
                 $objects[$count]['plans'][$month]['fact'] = $measureValue;
@@ -1509,11 +1509,11 @@ class ObjectController extends PoliterController
                         ['title' => 'Редактировать', 'data-toggle' => 'modal', 'data-target' => '#modalEditParameter']);
 
                     $measure = Measure::find()
-                        ->where(['measureChannelUuid' => $measureChannel['uuid']])
+                        ->where(['measureChannelId' => $measureChannel['_id']])
                         ->andWhere(['date' => $mon_date_str2[$month]])
                         ->one();
                     if ($measure) {
-                        $objects[$count]['plans'][$month]['fact'] = "<span class='span-plan1'>" . $measure['value'] . "</span>";
+                        $objects[$count]['plans'][$month]['fact'] = "<span class='span-plan1'>" . number_format($measure['value'], 2, ".", "") . "</span>";
                         if ($baseConsumption) {
                             $targetConsumption = $parameter['value'] * $baseConsumption['value'];
                             if ($targetConsumption > 0) {
@@ -1594,21 +1594,21 @@ class ObjectController extends PoliterController
                 $measureChannelEnergy = MeasureChannel::getChannel($object['uuid'], MeasureType::ENERGY, MeasureType::MEASURE_TYPE_MONTH);
                 if ($measureChannelHeat) {
                     $measures_heat = Measure::find()
-                        ->where(['measureChannelUuid' => $measureChannelHeat['uuid']])
+                        ->where(['measureChannelId' => $measureChannelHeat['_id']])
                         ->orderBy('date DESC')
                         ->limit(24)
                         ->all();
                 }
                 if ($measureChannelWater) {
                     $measures_water = Measure::find()
-                        ->where(['measureChannelUuid' => $measureChannelWater['uuid']])
+                        ->where(['measureChannelId' => $measureChannelWater['_id']])
                         ->orderBy('date DESC')
                         ->limit(24)
                         ->all();
                 }
                 if ($measureChannelEnergy) {
                     $measures_energy = Measure::find()
-                        ->where(['measureChannelUuid' => $measureChannelEnergy['uuid']])
+                        ->where(['measureChannelId' => $measureChannelEnergy['_id']])
                         ->orderBy('date DESC')
                         ->limit(24)
                         ->all();
@@ -1729,7 +1729,7 @@ class ObjectController extends PoliterController
 
                 if ($measureChannelHeat) {
                     $measures_heat = Measure::find()
-                        ->where(['measureChannelUuid' => $measureChannelHeat['uuid']])
+                        ->where(['measureChannelId' => $measureChannelHeat['_id']])
                         ->andWhere(['>=', 'date', $startDate])
                         ->andWhere(['<', 'date', $endDate])
                         ->orderBy('date DESC')
@@ -1737,7 +1737,7 @@ class ObjectController extends PoliterController
                 }
                 if ($measureChannelWater) {
                     $measures_water = Measure::find()
-                        ->where(['measureChannelUuid' => $measureChannelWater['uuid']])
+                        ->where(['measureChannelId' => $measureChannelWater['_id']])
                         ->orderBy('date DESC')
                         ->andWhere(['>=', 'date', $startDate])
                         ->andWhere(['<', 'date', $endDate])
@@ -1745,7 +1745,7 @@ class ObjectController extends PoliterController
                 }
                 if ($measureChannelEnergy) {
                     $measures_energy = Measure::find()
-                        ->where(['measureChannelUuid' => $measureChannelEnergy['uuid']])
+                        ->where(['measureChannelId' => $measureChannelEnergy['_id']])
                         ->orderBy('date DESC')
                         ->andWhere(['>=', 'date', $startDate])
                         ->andWhere(['<', 'date', $endDate])
@@ -1775,36 +1775,36 @@ class ObjectController extends PoliterController
                     $data[$cnt]['energy'] = "-";
                     foreach ($measures_heat as $measure) {
                         if ($measure['date'] == $mon_date_str[$cnt]) {
-                            $data[$cnt]['heat'] = $measure['value'];
+                            $data[$cnt]['heat'] = number_format($measure->value, 3, ".", "");
                             $categories['heat'] .= '\'' . date("Y-m", strtotime($measure->date)) . '\',';
                             if ($zero_heat > 0) {
                                 $values['heat'] .= ",";
                             }
-                            $values['heat'] .= $measure->value;
+                            $values['heat'] .= number_format($measure->value, 2, ".", "");
                             $zero_heat++;
                             break;
                         }
                     }
                     foreach ($measures_water as $measure) {
                         if ($measure['date'] == $mon_date_str[$cnt]) {
-                            $data[$cnt]['water'] = $measure['value'];
+                            $data[$cnt]['water'] = number_format($measure->value, 3, ".", "");
                             $categories['water'] .= '\'' . date("d H:i", strtotime($measure->date)) . '\',';
                             if ($zero_water > 0) {
                                 $values['water'] .= ",";
                             }
-                            $values['water'] .= $measure->value;
+                            $values['water'] .= number_format($measure->value, 2, ".", "");
                             $zero_water++;
                             break;
                         }
                     }
                     foreach ($measures_energy as $measure) {
                         if ($measure['date'] == $mon_date_str[$cnt]) {
-                            $data[$cnt]['energy'] = $measure['value'];
+                            $data[$cnt]['energy'] = number_format($measure->value, 3, ".", "");
                             $categories['energy'] .= '\'' . date("d H:i", strtotime($measure->date)) . '\',';
                             if ($zero_energy > 0) {
                                 $values['energy'] .= ",";
                             }
-                            $values['energy'] .= $measure->value;
+                            $values['energy'] .= number_format($measure->value, 2, ".", "");
                             $zero_energy++;
                             break;
                         }
@@ -1875,7 +1875,7 @@ class ObjectController extends PoliterController
                 $allObjects = $district->getObjectsByDistrict(100);
             }
         } else {
-            $allObjects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->all();
+            $allObjects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->andWhere(['source' => 0])->all();
         }
         $time = localtime(time(), true);
         $year[0] = $time['tm_year'] + 1900;
@@ -1933,7 +1933,7 @@ class ObjectController extends PoliterController
                     ['title' => 'Редактировать', 'data-toggle' => 'modal', 'data-target' => '#modalEditParameter']);
 
                 $measure = Measure::find()
-                    ->where(['measureChannelUuid' => $measureChannelHeat['uuid']])
+                    ->where(['measureChannelId' => $measureChannelHeat['_id']])
                     ->andWhere(['>=', 'date', $date[0]])
                     ->andWhere(['<=', 'date', $date[10]])
                     ->sum('value');
@@ -1943,7 +1943,7 @@ class ObjectController extends PoliterController
                         MainFunctions::getEfficiency($measure, $measureChannelHeat, $objects[$count]['square'], 1);
                 }
                 $measure = Measure::find()
-                    ->where(['measureChannelUuid' => $measureChannelHeat['uuid']])
+                    ->where(['measureChannelId' => $measureChannelHeat['_id']])
                     ->andWhere(['>=', 'date', $date[1]])
                     ->andWhere(['<=', 'date', $date[11]])
                     ->sum('value');
@@ -1953,7 +1953,7 @@ class ObjectController extends PoliterController
                         MainFunctions::getEfficiency($measure, $measureChannelHeat, $objects[$count]['square'], 1);
                 }
                 $measure = Measure::find()
-                    ->where(['measureChannelUuid' => $measureChannelHeat['uuid']])
+                    ->where(['measureChannelId' => $measureChannelHeat['_id']])
                     ->andWhere(['>=', 'date', $date[2]])
                     ->andWhere(['<=', 'date', $date[12]])
                     ->sum('value');
@@ -1990,7 +1990,7 @@ class ObjectController extends PoliterController
                 $allObjects = $district->getObjectsByDistrict(100);
             }
         } else {
-            $allObjects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->all();
+            $allObjects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->andWhere(['source' => 0])->all();
         }
         $time = localtime(time(), true);
         $year[0] = $time['tm_year'] + 1900;
@@ -2056,34 +2056,37 @@ class ObjectController extends PoliterController
                 $average_cnt = 0;
                 $currentYearCons = 0;
                 $measure = Measure::find()
-                    ->where(['measureChannelUuid' => $measureChannelHeat['uuid']])
+                    ->where(['measureChannelId' => $measureChannelHeat['_id']])
                     ->andWhere(['>=', 'date', $date[0]])
                     ->andWhere(['<=', 'date', $date[10]])
+                    ->andWhere(['>', 'value', 0])
                     ->sum('value');
                 if ($measure) {
-                    $objects[$count]['consumption'][0] = number_format($measure, 2);
+                    $objects[$count]['consumption'][0] = $measure;
                     $currentYearCons = 1;
                 } else {
                     $objects[$count]['consumption'][0] = 0;
                 }
                 $measure = Measure::find()
-                    ->where(['measureChannelUuid' => $measureChannelHeat['uuid']])
+                    ->where(['measureChannelId' => $measureChannelHeat['_id']])
                     ->andWhere(['>=', 'date', $date[1]])
                     ->andWhere(['<=', 'date', $date[11]])
+                    ->andWhere(['>', 'value', 0])
                     ->sum('value');
                 if ($measure) {
-                    $objects[$count]['consumption'][1] = number_format($measure, 2);
+                    $objects[$count]['consumption'][1] = $measure;
                     $average_cnt++;
                 } else {
                     $objects[$count]['consumption'][1] = 0;
                 }
                 $measure = Measure::find()
-                    ->where(['measureChannelUuid' => $measureChannelHeat['uuid']])
+                    ->where(['measureChannelId' => $measureChannelHeat['_id']])
                     ->andWhere(['>=', 'date', $date[2]])
                     ->andWhere(['<=', 'date', $date[12]])
+                    ->andWhere(['>', 'value', 0])
                     ->sum('value');
                 if ($measure) {
-                    $objects[$count]['consumption'][2] = number_format($measure, 2);
+                    $objects[$count]['consumption'][2] = $measure;
                     $average_cnt++;
                 } else {
                     $objects[$count]['consumption'][2] = 0;
@@ -2114,7 +2117,7 @@ class ObjectController extends PoliterController
                         $kntRest = $sumParametersRest / $sumParameters;
                     }
                     $average = 0;
-                    if ($currentYearCons) {
+                    if ($currentYearCons && $kntRest < 1) {
                         // обратный коэффициент прогноза до конца года
                         $average = $objects[$count]['consumption'][0] * (1 / (1 - $kntRest));
                         $average_cnt++;
@@ -2175,6 +2178,9 @@ class ObjectController extends PoliterController
                     $objects[$count]['events'][2] = number_format($eventsImpact[2], 4) . ' (' . Html::a($eventsCount[2],
                             ['/event/list', 'objectUuid' => $object['uuid'], 'dateStart' => $date[4], 'dateEnd' => $date[14]],
                             ['title' => 'События', 'data-toggle' => 'modal', 'data-target' => '#modalEvents']) . ')';
+                    $objects[$count]['consumption'][0] = number_format($objects[$count]['consumption'][0], 2, ".", "");
+                    $objects[$count]['consumption'][1] = number_format($objects[$count]['consumption'][1], 2, ".", "");
+                    $objects[$count]['consumption'][2] = number_format($objects[$count]['consumption'][2], 2, ".", "");
                 }
             }
             $count++;
@@ -2408,5 +2414,16 @@ class ObjectController extends PoliterController
             ['categories' => $categories,
                 'values' => $bar]
         );
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function actionCreateCoefficient()
+    {
+        $allObjects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->all();
+        foreach ($allObjects as $object) {
+            ObjectController::createConsumptionCoefficients($object['uuid']);
+        }
     }
 }

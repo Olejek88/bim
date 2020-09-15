@@ -63,7 +63,7 @@ $gridColumns = [
         },
         'filterType' => GridView::FILTER_SELECT2,
         'header' => Yii::t('app', 'Тип'),
-        'filter' => $objects,
+        'filter' => $types,
         'filterWidgetOptions' => [
             'pluginOptions' => ['allowClear' => true],
         ],
@@ -195,13 +195,16 @@ $gridColumns = [
         'contentOptions' => [
             'class' => 'table_class'
         ],
-        'editableOptions' => [
-            'size' => 'lg'
-        ],
         'headerOptions' => ['class' => 'text-center'],
         'content' => function ($data) {
             return substr($data['description'], 0, 200);
-        }
+        },
+        'editableOptions' => function ($data) {
+            return [
+                'placement' => PopoverX::ALIGN_BOTTOM_LEFT,
+                'size' => 'lg'
+            ];
+        },
     ],
 ];
 

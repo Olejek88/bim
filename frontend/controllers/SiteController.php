@@ -559,10 +559,18 @@ class SiteController extends Controller
         $zero = 0;
         $max_date = date('t');
         $categories_days = "";
+        $year = $today['year'];
+        $mon = $today['mon'];
+        if ($mon > 1) {
+            $mon--;
+        } else {
+            $mon = 12;
+            $year--;
+        }
         for ($day = 1; $day <= $max_date; $day++) {
             $categories_days .= $day . ',';
-            $start = sprintf("%d%02d%02d000000", $today['year'], $today['mon'], $day);
-            $end = sprintf("%d%02d%02d235959", $today['year'], $today['mon'], $day);
+            $start = sprintf("%d%02d%02d000000", $year, $mon, $day);
+            $end = sprintf("%d%02d%02d235959", $year, $mon, $day);
             $values = Measure::find()
                 ->where('date>=' . $start)
                 ->andWhere('date<=' . $end)
@@ -621,13 +629,13 @@ class SiteController extends Controller
         $chan2 = [];
         $chan3 = [];
         foreach ($measureChannels as $measureChannel) {
-            if ($measureChannel->measureTypeUuid == MeasureType::ENERGY || $measureChannel->measureTypeUuid == MeasureType::VOLTAGE) {
+            if ($measureChannel->measureTypeUuid == MeasureType::ENERGY || $measureChannel->measureTypeUuid == MeasureType::VOLTAGE || $measureChannel->measureTypeUuid == MeasureType::POWER) {
                 $chan1[] = $measureChannel['_id'];
             }
-            if ($measureChannel->measureTypeUuid == MeasureType::HEAT_CONSUMED || $measureChannel->measureTypeUuid == MeasureType::HEAT_IN) {
+            if ($measureChannel->measureTypeUuid == MeasureType::HEAT_CONSUMED || $measureChannel->measureTypeUuid == MeasureType::HEAT_IN || $measureChannel->measureTypeUuid == MeasureType::HEAT_OUT) {
                 $chan2[] = $measureChannel['_id'];
             }
-            if ($measureChannel->measureTypeUuid == MeasureType::COLD_WATER || $measureChannel->measureTypeUuid == MeasureType::HOT_WATER) {
+            if ($measureChannel->measureTypeUuid == MeasureType::COLD_WATER || $measureChannel->measureTypeUuid == MeasureType::HOT_WATER || $measureChannel->measureTypeUuid == MeasureType::TEMPERATURE_HOT_WATER) {
                 $chan3[] = $measureChannel['_id'];
             }
         }

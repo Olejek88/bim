@@ -28,22 +28,25 @@ $this->registerJsFile('/js/HighCharts/modules/exporting.js');
                 <?= $this->render('widget-stats-bar', ['id' => '2', 'categories' => $categories_days, 'values' => $values_days, 'title' => 'Количество данных по дням']); ?>
             </div>
         </div>
+        <div class="row">
+            <div class="col-md-12">
+                <?= $this->render('widget-stats-pie', ['id' => '1', 'data' => $data_by_source, 'title' => 'По ресурсам']); ?>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <?= $this->render('widget-stats-pie', ['id' => '2', 'data' => $data_by_type, 'title' => 'По типам']); ?>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <?= $this->render('widget-stats-main', ['stats' => $stats]); ?>
+            </div>
+        </div>
     </div>
     <!-- /.col -->
     <div class="col-md-5">
         <?= $this->render('widget-stats-channels', ['channels' => $channels]); ?>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-5">
-        <?= $this->render('widget-stats-pie', ['id' => '1', 'data' => $data_by_source, 'title' => 'По ресурсам']); ?>
-    </div>
-    <div class="col-md-5">
-        <?= $this->render('widget-stats-pie', ['id' => '2', 'data' => $data_by_type, 'title' => 'По типам']); ?>
-    </div>
-    <div class="col-md-2">
-        <?= $this->render('widget-stats-main', ['stats' => $stats]); ?>
     </div>
 </div>
 

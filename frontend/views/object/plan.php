@@ -6,7 +6,7 @@
 
 $this->title = Yii::t('app', 'ПолиТЭР::Календарь целей');
 
-$this->registerJs('$("#modalPlan").on("hidden.bs.modal",
+$this->registerJs('$("#modalEditParameter").on("hidden.bs.modal",
 function () {
     $(this).removeData();
      window.location.replace("plan");
@@ -54,7 +54,7 @@ function () {
     </table>
 </div>
 
-<div class="modal remote fade" id="modalPlan">
+<div class="modal remote fade" id="modalEditParameter">
     <div class="modal-dialog" style="width: 950px">
         <div class="modal-content loader-lg" style="margin: 10px; padding: 10px">
         </div>
