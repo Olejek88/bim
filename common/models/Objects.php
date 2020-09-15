@@ -481,15 +481,15 @@ class Objects extends PoliterModel
         if ($measureChannel) {
             /** @var Measure $measure */
             $measure = Measure::find()
-                ->where(['measureChannelUuid' => $measureChannel['uuid']])
+                ->where(['measureChannelId' => $measureChannel['_id']])
                 ->orderBy('date desc')
                 ->limit(1)
                 ->one();
             if ($measure) {
                 if ($includeDate)
-                    return number_format($measure->value, 3) . ' [' . $measure->date . ']';
+                    return number_format($measure->value, 3, ".", "") . ' [' . date("d/m/y H:i", strtotime($measure->date)) . ']';
                 else
-                    return number_format($measure->value, 3);
+                    return number_format($measure->value, 3, ".", "");
             }
         }
         return "-";

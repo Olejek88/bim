@@ -443,7 +443,7 @@ class ObjectController extends PoliterController
                                         'data-target' => '#modalChart',
                                     ]
                                 );
-                                $value = $channel->getFormatLastMeasure() . "&nbsp;" . $links;
+                                $value = MeasureChannel::getFormatLastMeasureStatic($channel['_id']) . "&nbsp;" . $links;
                                 //$value = '';
                                 $links = Html::a('<span class="fa fa-database"></span>&nbsp',
                                     ['/parameter/list', 'uuid' => $channel['uuid']],
@@ -1134,28 +1134,31 @@ class ObjectController extends PoliterController
                 $objects[$count]['plans'][$month]['fact_electricity'] = '<span class="span-plan0">-</span>';
                 if ($measureChannelHeat) {
                     $measure = Measure::find()
-                        ->where(['measureChannelUuid' => $measureChannelHeat['uuid']])
+                        ->where(['measureChannelId' => $measureChannelHeat['_id']])
                         ->andWhere(['date' => $mon_date_str2[$month]])
+                        ->limit(1)
                         ->one();
-                    if ($measure) {
+                    if ($measure && $measure['value'] > 0) {
                         $objects[$count]['plans'][$month]['fact_heat'] = "<span class='span-plan1'>" . $measure['value'] . "</span>";
                     }
                 }
                 if ($measureChannelWater) {
                     $measure = Measure::find()
-                        ->where(['measureChannelUuid' => $measureChannelWater['uuid']])
+                        ->where(['measureChannelId' => $measureChannelWater['_id']])
                         ->andWhere(['date' => $mon_date_str2[$month]])
+                        ->limit(1)
                         ->one();
-                    if ($measure) {
+                    if ($measure && $measure['value'] > 0) {
                         $objects[$count]['plans'][$month]['fact_water'] = "<span class='span-plan1'>" . $measure['value'] . "</span>";
                     }
                 }
                 if ($measureChannelEnergy) {
                     $measure = Measure::find()
-                        ->where(['measureChannelUuid' => $measureChannelEnergy['uuid']])
+                        ->where(['measureChannelId' => $measureChannelEnergy['_id']])
                         ->andWhere(['date' => $mon_date_str2[$month]])
+                        ->limit(1)
                         ->one();
-                    if ($measure) {
+                    if ($measure && $measure['value'] > 0) {
                         $objects[$count]['plans'][$month]['fact_electricity'] = "<span class='span-plan1'>" . $measure['value'] . "</span>";
                     }
                 }
@@ -1374,7 +1377,7 @@ class ObjectController extends PoliterController
                 $measureValue = '<span class="span-plan0">-</span>';
                 if ($measureChannelHeat) {
                     $measure = Measure::find()
-                        ->where(['measureChannelUuid' => $measureChannelHeat['uuid']])
+                        ->where(['measureChannelId' => $measureChannelHeat['_id']])
                         ->andWhere(['date' => $mon_date_str2[$month]])
                         ->one();
                     if ($measure) {
@@ -2304,10 +2307,10 @@ class ObjectController extends PoliterController
     }
 
     /**
-     * @param $measureChannelUuid
+     * @param $measureChannelId
      * @return string|null
      */
-    public function actionTemperature($measureChannelUuid)
+    public function actionTemperature($measureChannelId)
     {
         $time = localtime(time(), true);
         $year[0] = $time['tm_year'] + 1900;
@@ -2334,7 +2337,7 @@ class ObjectController extends PoliterController
         if (!$measureChannelMonth) return null;
 
         $temperatures = Measure::find()
-            ->where(['measureChannelUuid' => $measureChannelMonth['uuid']])
+            ->where(['measureChannelId' => $measureChannelMonth['_id']])
             ->orderBy('date DESC')
             ->asArray()
             ->all();
@@ -2352,7 +2355,7 @@ class ObjectController extends PoliterController
             }
         }
 
-        $measures = Measure::find()->where(['measureChannelUuid' => $measureChannelUuid])->all();
+        $measures = Measure::find()->where(['measureChannelId' => $measureChannelId])->all();
         foreach ($measures as $measure) {
             $measure_month = intval(date("m", strtotime($measure['date'])));
             $measure_year = date("Y", strtotime($measure['date']));

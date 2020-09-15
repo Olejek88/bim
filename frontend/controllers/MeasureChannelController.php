@@ -123,14 +123,14 @@ class MeasureChannelController extends Controller
             if ($measureChannel) {
                 $name = $measureChannel->title;
                 $values = Measure::find()
-                    ->where(['measureChannelUuid' => $measureChannelUuid])
-                    ->orderBy('date')
+                    ->where(['measureChannelId' => $measureChannel['_id']])
+                    ->orderBy('date desc')
                     ->limit(100)
                     ->all();
                 return $this->renderAjax('trend', [
                     'model' => $measureChannel,
                     'name' => $name,
-                    'values' => $values
+                    'values' => array_reverse($values)
                 ]);
             }
         }
@@ -247,7 +247,7 @@ class MeasureChannelController extends Controller
             if ($measureChannel) {
                 $name = $measureChannel->title;
                 $measures = Measure::find()
-                    ->where(['measureChannelUuid' => $measureChannelUuid])
+                    ->where(['measureChannelId' => $measureChannel['_id']])
                     ->orderBy('date')
                     ->limit(30)
                     ->all();

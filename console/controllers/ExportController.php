@@ -2,7 +2,6 @@
 
 namespace console\controllers;
 
-use common\components\MainFunctions;
 use common\models\Measure;
 use common\models\MeasureChannel;
 use common\models\MeasureType;

@@ -196,9 +196,8 @@ class MeasureChannel extends PoliterModel
                 if ($text != '') {
                     $text .= '<br/>';
                 }
-
-                $text .= number_format($measure['value'], 3)
-                    . ' [' . date("m/d h:i:s", strtotime($measure['date'])) . ']';
+                $text .= number_format($measure['value'], 3, ".", "")
+                    . ' [' . date("m/d h:i", strtotime($measure['date'])) . ']';
             }
         }
 

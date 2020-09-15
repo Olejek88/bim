@@ -3,6 +3,7 @@
 /* @var $model Objects */
 /* @var $channels */
 
+use common\models\MeasureChannel;
 use common\models\MeasureType;
 use common\models\Objects;
 use frontend\models\MeasureChannelSearch;
@@ -76,7 +77,7 @@ $channels->query->andWhere(['objectUuid' => $model->uuid]);
                     ],
                     'headerOptions' => ['class' => 'text-center'],
                     'content' => function ($data) {
-                        return $data->getFormatLastMeasure();
+                        return MeasureChannel::getFormatLastMeasureStatic($data['_id']);
                     }
                 ],
             ];

@@ -9,7 +9,7 @@
         <table class="table table-bordered table-condensed table-hover small kv-table">
             <?php
             $cnt = 0;
-            foreach ($values as $value) {
+            foreach (array_reverse($values) as $value) {
                 echo '<tr><td>' . $value['date'] . '</td>
                       <td class="text-right">' . number_format($value['value'], 3) . '</td></tr>';
                 if ($cnt++ > 8) break;
@@ -49,7 +49,6 @@
             ]
         },
         yAxis: {
-            min: 0,
             title: {
                 text: '<?php echo $name ?>'
             }
@@ -59,7 +58,7 @@
             $first = 0;
             $bar = "name: '" . $name . "',";
             $bar .= "data: [";
-            foreach ($values as $value) {
+            foreach (array_reverse($values) as $value) {
                 if ($first > 0)
                     $bar .= "," . PHP_EOL;
                 $bar .= $value->value;
