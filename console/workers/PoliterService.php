@@ -2,6 +2,7 @@
 
 namespace console\workers;
 
+use common\components\MainFunctions;
 use common\models\FlowArchive;
 use common\models\Flows2;
 use common\models\Measure;
@@ -39,6 +40,9 @@ class PoliterService extends Worker
         // пытаемся получить измерения не полученные ранее
         // TODO: дёргать их так же часто как текущие не нужно, нужно реализовать ограничение
         self::getExtLostMeasure();
+
+        // обновляем таблицу с последними измеренными значениями
+        MainFunctions::updateMeasureLast();
 
         $this->log('[' . self::LOG_ID . '] stop worker');
         ServiceRegister::addServiceRegister(ServiceRegister::SERVICE_IMPORT, ServiceRegister::TYPE_INFO,

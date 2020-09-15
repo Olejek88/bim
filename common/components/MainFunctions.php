@@ -4,12 +4,16 @@ namespace common\components;
 
 use common\models\ActionRegister;
 use common\models\MeasureChannel;
+use common\models\MeasureLast;
 use common\models\Parameter;
 use common\models\ParameterType;
 use common\models\User;
 use dosamigos\leaflet\types\LatLng;
+use RecursiveArrayIterator;
+use RecursiveIteratorIterator;
 use Yii;
 use yii\db\ActiveRecord;
+use yii\db\Exception;
 
 /**
  * Class MainFunctions
@@ -187,5 +191,47 @@ class MainFunctions
         if ($efficiency < 1.5)
             return '<div class="colorLabel" style="background-color: #a83800">[F]' . $efficiency . '</div>';
         return '<div class="colorLabel" style="background-color: #c82829">[G]' . $efficiency . '</div>';
+    }
+
+    /**
+     * Удаляет устаревшие значения из таблицы measure_last, оставляя только по одному последнему значению
+     * для каждого канала измерения.
+     *
+     * @throws Exception
+     */
+    public static function updateMeasureLast()
+    {
+        $db = Yii::$app->db;
+        $db->createCommand('
+    REPLACE INTO measure_last (_id, measureChannelId, value, date, createdAt, changedAt) (
+        SELECT _id, m.measureChannelId, value, m.date, createdAt, changedAt FROM `measure` m
+        JOIN (
+            SELECT measureChannelId, max(date) AS date
+            FROM `measure`
+            GROUP BY measureChannelId
+        ) tt ON m.measureChannelId=tt.measureChannelId AND m.date=tt.date
+    )
+')->execute();
+
+        // выбираем устаревшие данные
+        $tmpIds = $db->createCommand('
+    SELECT t1._id FROM measure_last t1
+    JOIN measure_last t2 ON t1._id=t2._id AND t2._id NOT IN (
+        SELECT _id from measure_last t1
+        JOIN (
+            SELECT measureChannelId, MAX(date) date
+            FROM measure_last
+            GROUP BY measureChannelId
+        ) t2 on t1.measureChannelId=t2.measureChannelId and t1.date=t2.date
+    )        
+')->queryAll();
+
+        $oldIds = [];
+        $it = new RecursiveIteratorIterator(new RecursiveArrayIterator($tmpIds));
+        foreach ($it as $v) {
+            $oldIds[] = $v;
+        }
+        // удаляем устаревшие данные
+        MeasureLast::deleteAll(['_id' => $oldIds]);
     }
 }
