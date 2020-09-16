@@ -65,6 +65,9 @@ class PoliterService extends Worker
             }
         }
 
+        // обновляем таблицу с последними измеренными значениями
+        MainFunctions::updateMeasureLast();
+
         $this->log('[' . self::LOG_ID . '] stop worker');
         ServiceRegister::addServiceRegister(ServiceRegister::SERVICE_IMPORT, ServiceRegister::TYPE_INFO,
             null, 'сервис закончил свою работу');
