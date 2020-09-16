@@ -57,7 +57,11 @@ class m200820_092446_add_air_temperature extends Migration
             $measureChannel->param_id = "0";
             $measureChannel->type = $type;
             $measureChannel->status = 1;
-            $measureChannel->save();
+            if ($measureChannel->save()) {
+                $measureChannel->param_id = $measureChannel->path . $measureChannel->_id;
+                $measureChannel->save();
+            }
+
             echo json_encode($measureChannel->errors) . PHP_EOL;
         } else {
             echo 'no city objects found';

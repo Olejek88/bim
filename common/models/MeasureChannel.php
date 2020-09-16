@@ -298,7 +298,10 @@ class MeasureChannel extends PoliterModel
             $measureChannel->param_id = 0;
             $measureChannel->type = $type;
             $measureChannel->status = 1;
-            $measureChannel->save();
+            if ($measureChannel->save()) {
+                $measureChannel->param_id = $measureChannel->path . $measureChannel->_id;
+                $measureChannel->save();
+            }
         }
         return null;
     }

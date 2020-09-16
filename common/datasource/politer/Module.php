@@ -219,10 +219,8 @@ class Module extends \yii\base\Module implements IDataSource
         // проверяем каналы с частотой в день
         self::getLostByDays(MeasureType::MEASURE_TYPE_DAYS, $date, 'Y-m-d 00:00:00', $deep);
 
-        // TODO: уточнить у Олега что именно здесь выбираем !!!
-        // тип MEASURE_TYPE_MONTH? нужен метод getLostByMonth?
         // проверяем каналы с частотой сумма
-//        self::getLostByDays(MeasureType::MEASURE_TYPE_TOTAL, $date, 'Y-m-d 00:00:00', $deep);
+        self::getLostByDays(MeasureType::MEASURE_TYPE_TOTAL, $date, 'Y-m-d 00:00:00', $deep);
     }
 
     /**

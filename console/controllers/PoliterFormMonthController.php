@@ -8,6 +8,7 @@ use common\models\MeasureChannel;
 use common\models\MeasureType;
 use common\models\Objects;
 use Exception;
+use Yii;
 use yii\console\Controller;
 use yii\console\ExitCode;
 
@@ -77,8 +78,9 @@ class PoliterFormMonthController extends Controller
             $measureChannel->type = MeasureType::MEASURE_TYPE_MONTH;
             $measureChannel->path = "internal";
             $measureChannel->original_name = "";
-            $measureChannel->param_id = $measureChannelDay['_id'] . "";
+            $measureChannel->param_id = $measureChannel->path . Yii::$app->security->generateRandomString(16);
             if ($measureChannel->save()) {
+                $measureChannel->param_id = $measureChannel->path . $measureChannel->_id;
                 echo 'create new channel ' . $measureChannel->title . PHP_EOL;
             } else {
                 echo 'error create new channel ' . json_encode($measureChannel->errors) . PHP_EOL;
