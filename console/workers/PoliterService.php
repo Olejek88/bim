@@ -2,8 +2,10 @@
 
 namespace console\workers;
 
+use common\components\MainFunctions;
 use common\datasource\DataSourceTrait;
 use common\datasource\IDataSource;
+use common\models\ServiceRegister;
 use Exception;
 use inpassor\daemon\Worker;
 use Yii;
