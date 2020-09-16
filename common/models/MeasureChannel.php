@@ -3,6 +3,7 @@
 namespace common\models;
 
 use common\components\MainFunctions;
+use Exception;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -69,7 +70,7 @@ class MeasureChannel extends PoliterModel
     public function rules()
     {
         return [
-            [['uuid', 'title', 'objectUuid', 'measureTypeUuid'], 'required'],
+            [['uuid', 'title', 'objectUuid', 'measureTypeUuid', 'data_source'], 'required'],
             [['createdAt', 'changedAt'], 'safe'],
             [['uuid', 'objectUuid', 'measureTypeUuid'], 'string', 'max' => 50],
             [['param_id'], 'string', 'max' => 255],
@@ -280,10 +281,11 @@ class MeasureChannel extends PoliterModel
 
     /**
      * @param $type
+     * @param $dataSource
      * @return Parameter|null
-     * @throws \Exception
+     * @throws Exception
      */
-    public function createNewChannel($type)
+    public function createNewChannel($type, $dataSource)
     {
         $object = Objects::find()->where(['objectTypeUuid' => ObjectType::CITY])->andWhere(['deleted' => 0])->limit(1)->one();
         if ($object) {
@@ -298,6 +300,7 @@ class MeasureChannel extends PoliterModel
             $measureChannel->param_id = 0;
             $measureChannel->type = $type;
             $measureChannel->status = 1;
+            $measureChannel->data_source = $dataSource;
             if ($measureChannel->save()) {
                 $measureChannel->param_id = $measureChannel->path . $measureChannel->_id;
                 $measureChannel->save();

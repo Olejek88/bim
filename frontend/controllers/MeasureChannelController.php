@@ -2,6 +2,8 @@
 
 namespace frontend\controllers;
 
+use common\datasource\DataSourceTrait;
+use common\datasource\IDataSource;
 use common\models\Measure;
 use common\models\MeasureChannel;
 use common\models\MeasureType;
@@ -12,6 +14,7 @@ use Exception;
 use frontend\models\MeasureChannelSearch;
 use Throwable;
 use Yii;
+use yii\base\Module;
 use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -97,13 +100,31 @@ class MeasureChannelController extends Controller
         $objects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->orderBy('title DESC')->all();
         $types = MeasureType::find()->orderBy('title DESC')->all();
         $objects = ArrayHelper::map($objects, 'uuid', function ($data) {
-            return $data->getFullName();
+            /** @var Objects $data */
+            return $data->getFullTitle();
         });
         $types = ArrayHelper::map($types, 'uuid', 'title');
+        // получаем список источников
+        $dataSources = [];
+        $modules = Yii::$app->getModules();
+        foreach ($modules as $prefix => $module) {
+            /** @var $module IDataSource|DataSourceTrait|Module */
+            if (is_array($module) && !empty($module['class']) && str_contains($module['class'], 'common\datasource\\')) {
+                $module = Yii::$app->getModule($prefix);
+            } else if (is_object($module) && str_contains($module::className(), 'common\datasource\\')) {
+            } else {
+                continue;
+            }
+
+            $dataSources[$module->id] = $module->description;
+        }
+
         return $this->renderAjax('_add_sensor_channel', [
             'model' => $measureChannel,
             'types' => $types,
-            'objects' => $objects
+            'object_uuid' => null,
+            'objects' => $objects,
+            'dataSources' => $dataSources,
         ]);
     }
 
@@ -159,6 +180,7 @@ class MeasureChannelController extends Controller
                 return json_encode(['message' => $message]);
             }
         }
+
         return $this->render('_add_form', [
             'model' => $model
         ]);

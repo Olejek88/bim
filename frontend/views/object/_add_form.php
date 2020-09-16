@@ -56,7 +56,7 @@ use yii\helpers\Html;
     echo $form->field($object, 'title')->textInput(['maxlength' => true]);
     echo $form->field($object, 'deleted')->hiddenInput(['value' => 0])->label(false);
 
-    if (isset($object_uuid) && $object_uuid) {
+    if (!empty($object_uuid)) {
         echo $form->field($object, 'parentUuid')->hiddenInput(['value' => $object_uuid])->label(false);
     } else {
         if ($object['uuid']) {

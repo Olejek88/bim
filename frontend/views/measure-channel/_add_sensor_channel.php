@@ -3,11 +3,11 @@
 /* @var $objects */
 /* @var $object_uuid */
 /* @var $measureChannels */
+/* @var $dataSources */
 
 /* @var $types */
 
 use common\components\MainFunctions;
-use common\models\Device;
 use kartik\select2\Select2;
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
@@ -35,7 +35,7 @@ use yii\helpers\Html;
 
     <?php
     echo $form->field($model, 'title')->textInput(['maxlength' => true]);
-    if (isset($object_uuid)) {
+    if (!empty($object_uuid)) {
         echo $form->field($model, 'objectUuid')->hiddenInput(['value' => $object_uuid])->label(false);
     } else {
         if ($model['uuid']) {
@@ -71,6 +71,13 @@ use yii\helpers\Html;
     echo $form->field($model, 'path')->textInput(['maxlength' => true]);
     echo $form->field($model, 'original_name')->textInput(['maxlength' => true]);
     echo $form->field($model, 'param_id')->textInput(['maxlength' => true]);
+    echo $form->field($model, 'data_source')->widget(Select2::class,
+        [
+            'data' => $dataSources,
+            'options' => ['placeholder' => Yii::t('app', 'Выберите источник ...')],
+            'pluginOptions' => [
+            ],
+        ]);
     ?>
 </div>
 <div class="modal-footer">

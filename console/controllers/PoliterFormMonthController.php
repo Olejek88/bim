@@ -69,7 +69,7 @@ class PoliterFormMonthController extends Controller
             ->andWhere(['measureTypeUuid' => $measureTypeUuid])
             ->one();
         //echo 'check channel '.$measureTypeUuid.' '.json_encode($measureChannel).' '.json_encode($measureChannelDay).PHP_EOL;
-        if (!$measureChannel && $measureChannelDay) {
+        if ($measureChannel == null && $measureChannelDay != null) {
             $measureChannel = new MeasureChannel();
             $measureChannel->uuid = MainFunctions::GUID();
             $measureChannel->title = $title;
@@ -79,9 +79,14 @@ class PoliterFormMonthController extends Controller
             $measureChannel->path = "internal";
             $measureChannel->original_name = "";
             $measureChannel->param_id = $measureChannel->path . Yii::$app->security->generateRandomString(16);
+            $measureChannel->data_source = $measureChannelDay->data_source;
             if ($measureChannel->save()) {
                 $measureChannel->param_id = $measureChannel->path . $measureChannel->_id;
-                echo 'create new channel ' . $measureChannel->title . PHP_EOL;
+                if ($measureChannel->save()) {
+                    echo 'create new channel ' . $measureChannel->title . PHP_EOL;
+                } else {
+                    echo 'error create new channel ' . json_encode($measureChannel->errors) . PHP_EOL;
+                }
             } else {
                 echo 'error create new channel ' . json_encode($measureChannel->errors) . PHP_EOL;
             }

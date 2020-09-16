@@ -3,6 +3,8 @@
 namespace frontend\controllers;
 
 use common\components\MainFunctions;
+use common\datasource\DataSourceTrait;
+use common\datasource\IDataSource;
 use common\models\DistrictCoordinates;
 use common\models\Event;
 use common\models\Measure;
@@ -27,6 +29,7 @@ use frontend\models\ObjectsSearch;
 use frontend\models\ParameterSearch;
 use Yii;
 use yii\base\InvalidConfigException;
+use yii\base\Module;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
@@ -512,12 +515,27 @@ class ObjectController extends PoliterController
                     $measureChannel = new MeasureChannel();
                     $types = MeasureType::find()->orderBy('title DESC')->all();
                     $types = ArrayHelper::map($types, 'uuid', 'title');
+                    // получаем список источников
+                    $dataSources = [];
+                    $modules = Yii::$app->getModules();
+                    foreach ($modules as $prefix => $module) {
+                        /** @var $module IDataSource|DataSourceTrait|Module */
+                        if (is_array($module) && !empty($module['class']) && str_contains($module['class'], 'common\datasource\\')) {
+                            $module = Yii::$app->getModule($prefix);
+                        } else if (is_object($module) && str_contains($module::className(), 'common\datasource\\')) {
+                        } else {
+                            continue;
+                        }
+
+                        $dataSources[$module->id] = $module->description;
+                    }
 
                     return $this->renderAjax('../measure-channel/_add_sensor_channel', [
                         'model' => $measureChannel,
                         'types' => $types,
                         'object_uuid' => $object_uuid,
-                        'objects' => null
+                        'objects' => null,
+                        'dataSources' => $dataSources,
                     ]);
                 }
             }
@@ -560,11 +578,27 @@ class ObjectController extends PoliterController
             if ($type == 'channel' && $measureChannel) {
                 $types = MeasureType::find()->orderBy('title DESC')->all();
                 $types = ArrayHelper::map($types, 'uuid', 'title');
+                // получаем список источников
+                $dataSources = [];
+                $modules = Yii::$app->getModules();
+                foreach ($modules as $prefix => $module) {
+                    /** @var $module IDataSource|DataSourceTrait|Module */
+                    if (is_array($module) && !empty($module['class']) && str_contains($module['class'], 'common\datasource\\')) {
+                        $module = Yii::$app->getModule($prefix);
+                    } else if (is_object($module) && str_contains($module::className(), 'common\datasource\\')) {
+                    } else {
+                        continue;
+                    }
+
+                    $dataSources[$module->id] = $module->description;
+                }
+
                 return $this->renderAjax('../measure-channel/_add_sensor_channel', [
                     'model' => $measureChannel,
                     'types' => $types,
                     'object_uuid' => $object_uuid,
-                    'objects' => null
+                    'objects' => null,
+                    'dataSources' => $dataSources,
                 ]);
             }
 
@@ -576,7 +610,8 @@ class ObjectController extends PoliterController
                     'objects' => $objects,
                     'objectSubTypes' => $objectSubTypes,
                     'objectTypes' => $objectTypes,
-                    'object_type' => $object_type
+                    'object_type' => $object_type,
+                    'object_uuid' => null,
                 ]);
             }
         }
@@ -636,7 +671,7 @@ class ObjectController extends PoliterController
     /**
      * Creates a new Object custom District model.
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function actionSaveDistrict()
     {
@@ -916,7 +951,7 @@ class ObjectController extends PoliterController
 
     /**
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public
     function actionPlanEdit()
@@ -1180,7 +1215,7 @@ class ObjectController extends PoliterController
      * Проверяем наличие параметров коэффициентов для объекта, и если их нет - создаем их
      *
      * @param $objectUuid
-     * @throws \Exception
+     * @throws Exception
      */
     public static
     function createConsumptionCoefficients($objectUuid)
@@ -1552,7 +1587,7 @@ class ObjectController extends PoliterController
 
     /**
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public
     function actionParameterEdit()
@@ -1839,7 +1874,7 @@ class ObjectController extends PoliterController
     /**
      * Метод не факт что будет нужен, так как все меняется регулярно
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public
     function checkObjectDistricts()
