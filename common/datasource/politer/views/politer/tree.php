@@ -23,7 +23,7 @@ function (key, opt) {
         folder: node.folder
     });
     $.ajax({
-        url: "/flows/link-obj-form",
+        url: "link-obj-form",
         type: "get",
         success: function (data) {
             $("#modalLinkObjContent").html(data);

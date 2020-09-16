@@ -65,7 +65,7 @@ use yii\web\View;
             $.ajax({
                 type: "post",
                 data: data,
-                url: "/flows/link-obj-form",
+                url: "link-obj-form",
                 success: function () {
                     $("#modalLinkObj").modal('hide');
                 },

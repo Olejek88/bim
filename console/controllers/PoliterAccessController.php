@@ -84,10 +84,9 @@ class PoliterAccessController extends Controller
 
         // разрешения предоставляемые моделями которые не наследуют common\models\PoliterModel
         $excludeModels = [
-            'common\models\Flow',
-            'common\models\FlowArchive',
-            'common\models\Flows',
-            'common\models\Flows2',
+            'common\datasource\politer\models\PoliterController',
+            'common\datasource\vega\models\VegaController',
+            'common\models\DataSource',
         ];
 
         foreach ($excludeModels as $class) {

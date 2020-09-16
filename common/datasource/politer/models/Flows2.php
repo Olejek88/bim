@@ -1,6 +1,6 @@
 <?php
 
-namespace common\models;
+namespace common\datasource\politer\models;
 
 use Yii;
 use yii\base\InvalidConfigException;
@@ -34,7 +34,7 @@ class Flows2 extends ActiveRecord
      */
     public static function getDb()
     {
-        return Yii::$app->get('oracle');
+        return Yii::$app->get('politerDb');
     }
 
     public static function getTableSchema()

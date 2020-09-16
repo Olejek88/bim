@@ -50,7 +50,7 @@ class PoliterController extends Controller
                 $modelClass = $this->modelClass;
                 /* @var PoliterModel $model */
                 $model = new $modelClass;
-                $modelPermissions = $model->permissions;
+                $modelPermissions = $model->getPermissions();
                 $permiss = null; //Проверка на массив/строку для описания прав
                 if (isset($modelPermissions[$action->id])) {
                     if (is_array($modelPermissions[$action->id])) {

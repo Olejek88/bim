@@ -4,190 +4,190 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-  "content-hash": "821f3536eac294365b2e71de335eb041",
+    "content-hash": "9d45097db1fb0d25d6b03817864fac49",
     "packages": [
         {
-          "name": "2amigos/yii2-leaflet-extension",
-          "version": "1.1.0",
-          "source": {
-            "type": "git",
-            "url": "https://github.com/2amigos/yii2-leaflet-extension.git",
-            "reference": "ddeded2fc0b9268c4ca72c8f8049aaf32cb9f013"
-          },
-          "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/2amigos/yii2-leaflet-extension/zipball/ddeded2fc0b9268c4ca72c8f8049aaf32cb9f013",
-            "reference": "ddeded2fc0b9268c4ca72c8f8049aaf32cb9f013",
-            "shasum": ""
-          },
-          "require": {
-            "bower-asset/leaflet": "^1.0",
-            "yiisoft/yii2": "^2.0"
-          },
-          "require-dev": {
-            "phpunit/phpunit": "4.*"
-          },
-          "type": "yii2-extension",
-          "extra": {
-            "branch-alias": {
-              "dev-master": "1.0-dev"
+            "name": "2amigos/yii2-leaflet-extension",
+            "version": "1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/2amigos/yii2-leaflet-extension.git",
+                "reference": "ddeded2fc0b9268c4ca72c8f8049aaf32cb9f013"
             },
-            "asset-installer-paths": {
-              "bower-asset-library": "vendor/bower"
-            }
-          },
-          "autoload": {
-            "psr-4": {
-              "dosamigos\\leaflet\\": "src"
-            }
-          },
-          "notification-url": "https://packagist.org/downloads/",
-          "license": [
-            "BSD-3-Clause"
-          ],
-          "authors": [
-            {
-              "name": "2amigOS! Consulting Group",
-              "email": "hola@2amigos.us",
-              "homepage": "http://2amigos.us",
-              "role": "Developer"
-            }
-          ],
-          "description": "LeafLet Mobile-Friendly Interactive Maps Extension Library for Yii2.",
-          "homepage": "http://yiiwheels.com/extension/leaflet-extension-library",
-          "keywords": [
-            "2amigos",
-            "extension",
-            "leaflet",
-            "maps",
-            "widget",
-            "yii",
-            "yii2"
-          ],
-          "time": "2017-03-26T18:39:13+00:00"
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/2amigos/yii2-leaflet-extension/zipball/ddeded2fc0b9268c4ca72c8f8049aaf32cb9f013",
+                "reference": "ddeded2fc0b9268c4ca72c8f8049aaf32cb9f013",
+                "shasum": ""
+            },
+            "require": {
+                "bower-asset/leaflet": "^1.0",
+                "yiisoft/yii2": "^2.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.*"
+            },
+            "type": "yii2-extension",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                },
+                "asset-installer-paths": {
+                    "bower-asset-library": "vendor/bower"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "dosamigos\\leaflet\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "2amigOS! Consulting Group",
+                    "email": "hola@2amigos.us",
+                    "homepage": "http://2amigos.us",
+                    "role": "Developer"
+                }
+            ],
+            "description": "LeafLet Mobile-Friendly Interactive Maps Extension Library for Yii2.",
+            "homepage": "http://yiiwheels.com/extension/leaflet-extension-library",
+            "keywords": [
+                "2amigos",
+                "extension",
+                "leaflet",
+                "maps",
+                "widget",
+                "yii",
+                "yii2"
+            ],
+            "time": "2017-03-26T18:39:13+00:00"
         },
-      {
-        "name": "2amigos/yii2-leaflet-geocoder-plugin",
-        "version": "1.0.3",
-        "source": {
-          "type": "git",
-          "url": "https://github.com/2amigos/yii2-leaflet-geocoder-plugin.git",
-          "reference": "19918f94eb6760b9e02b5333311a630b1a33f8ef"
+        {
+            "name": "2amigos/yii2-leaflet-geocoder-plugin",
+            "version": "1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/2amigos/yii2-leaflet-geocoder-plugin.git",
+                "reference": "19918f94eb6760b9e02b5333311a630b1a33f8ef"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/2amigos/yii2-leaflet-geocoder-plugin/zipball/19918f94eb6760b9e02b5333311a630b1a33f8ef",
+                "reference": "19918f94eb6760b9e02b5333311a630b1a33f8ef",
+                "shasum": ""
+            },
+            "require": {
+                "2amigos/yii2-leaflet-extension": "1.*"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.*"
+            },
+            "type": "yii2-extension",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                },
+                "asset-installer-paths": {
+                    "bower-asset-library": "vendor/bower"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "dosamigos\\leaflet\\plugins\\geocoder\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "2amigOS! Consulting Group",
+                    "email": "hola@2amigos.us",
+                    "homepage": "http://2amigos.us",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Yii2 LeafLet Plugin to provide support for address lookup with dropdown list of results to Leaflet.",
+            "homepage": "http://yiiwheels.com/extension/leaflet-geocoder-plugin",
+            "keywords": [
+                "2amigos",
+                "extension",
+                "leaflet",
+                "maps",
+                "plugin",
+                "widget",
+                "yii",
+                "yii 2",
+                "yii2"
+            ],
+            "time": "2019-04-06T16:13:43+00:00"
         },
-        "dist": {
-          "type": "zip",
-          "url": "https://api.github.com/repos/2amigos/yii2-leaflet-geocoder-plugin/zipball/19918f94eb6760b9e02b5333311a630b1a33f8ef",
-          "reference": "19918f94eb6760b9e02b5333311a630b1a33f8ef",
-          "shasum": ""
+        {
+            "name": "2amigos/yii2-leaflet-markercluster-plugin",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/2amigos/yii2-leaflet-markercluster-plugin.git",
+                "reference": "500aa4a25de7806fac7021fc361e6f810da64f23"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/2amigos/yii2-leaflet-markercluster-plugin/zipball/500aa4a25de7806fac7021fc361e6f810da64f23",
+                "reference": "500aa4a25de7806fac7021fc361e6f810da64f23",
+                "shasum": ""
+            },
+            "require": {
+                "2amigos/yii2-leaflet-extension": "~1.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.*"
+            },
+            "type": "yii2-extension",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                },
+                "asset-installer-paths": {
+                    "bower-asset-library": "vendor/bower"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "dosamigos\\leaflet\\plugins\\markercluster\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "2amigOS! Consulting Group",
+                    "email": "hola@2amigos.us",
+                    "homepage": "http://2amigos.us",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Yii2 LeafLet Plugin to provide beautiful, sophisticated, high performance marker clustering solution with smooth animations and lots of great features.",
+            "keywords": [
+                "2amigos",
+                "extension",
+                "leaflet",
+                "maps",
+                "plugin",
+                "widget",
+                "yii",
+                "yii 2",
+                "yii2"
+            ],
+            "time": "2015-03-31T11:45:57+00:00"
         },
-        "require": {
-          "2amigos/yii2-leaflet-extension": "1.*"
-        },
-        "require-dev": {
-          "phpunit/phpunit": "4.*"
-        },
-        "type": "yii2-extension",
-        "extra": {
-          "branch-alias": {
-            "dev-master": "1.0-dev"
-          },
-          "asset-installer-paths": {
-            "bower-asset-library": "vendor/bower"
-          }
-        },
-        "autoload": {
-          "psr-4": {
-            "dosamigos\\leaflet\\plugins\\geocoder\\": "src"
-          }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-          "BSD-3-Clause"
-        ],
-        "authors": [
-          {
-            "name": "2amigOS! Consulting Group",
-            "email": "hola@2amigos.us",
-            "homepage": "http://2amigos.us",
-            "role": "Developer"
-          }
-        ],
-        "description": "Yii2 LeafLet Plugin to provide support for address lookup with dropdown list of results to Leaflet.",
-        "homepage": "http://yiiwheels.com/extension/leaflet-geocoder-plugin",
-        "keywords": [
-          "2amigos",
-          "extension",
-          "leaflet",
-          "maps",
-          "plugin",
-          "widget",
-          "yii",
-          "yii 2",
-          "yii2"
-        ],
-        "time": "2019-04-06T16:13:43+00:00"
-      },
-      {
-        "name": "2amigos/yii2-leaflet-markercluster-plugin",
-        "version": "1.0.0",
-        "source": {
-          "type": "git",
-          "url": "https://github.com/2amigos/yii2-leaflet-markercluster-plugin.git",
-          "reference": "500aa4a25de7806fac7021fc361e6f810da64f23"
-        },
-        "dist": {
-          "type": "zip",
-          "url": "https://api.github.com/repos/2amigos/yii2-leaflet-markercluster-plugin/zipball/500aa4a25de7806fac7021fc361e6f810da64f23",
-          "reference": "500aa4a25de7806fac7021fc361e6f810da64f23",
-          "shasum": ""
-        },
-        "require": {
-          "2amigos/yii2-leaflet-extension": "~1.0"
-        },
-        "require-dev": {
-          "phpunit/phpunit": "4.*"
-        },
-        "type": "yii2-extension",
-        "extra": {
-          "branch-alias": {
-            "dev-master": "1.0-dev"
-          },
-          "asset-installer-paths": {
-            "bower-asset-library": "vendor/bower"
-          }
-        },
-        "autoload": {
-          "psr-4": {
-            "dosamigos\\leaflet\\plugins\\markercluster\\": "src"
-          }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-          "BSD-3-Clause"
-        ],
-        "authors": [
-          {
-            "name": "2amigOS! Consulting Group",
-            "email": "hola@2amigos.us",
-            "homepage": "http://2amigos.us",
-            "role": "Developer"
-          }
-        ],
-        "description": "Yii2 LeafLet Plugin to provide beautiful, sophisticated, high performance marker clustering solution with smooth animations and lots of great features.",
-        "keywords": [
-          "2amigos",
-          "extension",
-          "leaflet",
-          "maps",
-          "plugin",
-          "widget",
-          "yii",
-          "yii 2",
-          "yii2"
-        ],
-        "time": "2015-03-31T11:45:57+00:00"
-      },
-      {
+        {
             "name": "almasaeed2010/adminlte",
             "version": "v2.4.18",
             "source": {
@@ -235,14 +235,13 @@
             "version": "v3.4.1",
             "source": {
                 "type": "git",
-              "url": "https://github.com/twbs/bootstrap.git",
+                "url": "git@github.com:twbs/bootstrap.git",
                 "reference": "68b0d231a13201eb14acd3dc84e51543d16e5f7e"
             },
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/twbs/bootstrap/zipball/68b0d231a13201eb14acd3dc84e51543d16e5f7e",
-              "reference": "68b0d231a13201eb14acd3dc84e51543d16e5f7e",
-              "shasum": null
+                "reference": "68b0d231a13201eb14acd3dc84e51543d16e5f7e"
             },
             "require": {
                 "bower-asset/jquery": ">=1.9.1,<4.0"
@@ -263,8 +262,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/mar10/fancytree/zipball/23f3a24c768baa75f13ab1983e4ed898ed617961",
-              "reference": "23f3a24c768baa75f13ab1983e4ed898ed617961",
-              "shasum": null
+                "reference": "23f3a24c768baa75f13ab1983e4ed898ed617961"
             },
             "require": {
                 "bower-asset/jquery": ">=1.7",
@@ -276,53 +274,6 @@
             ]
         },
         {
-          "name": "bower-asset/fullcalendar",
-          "version": "v3.9.0",
-          "source": {
-            "type": "git",
-            "url": "git@github.com:fullcalendar/fullcalendar.git",
-            "reference": "3ddb3c8d1461c6b841aed3487ba07d8ba338adb6"
-          },
-          "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/fullcalendar/fullcalendar/zipball/3ddb3c8d1461c6b841aed3487ba07d8ba338adb6",
-            "reference": "3ddb3c8d1461c6b841aed3487ba07d8ba338adb6",
-            "shasum": null
-          },
-          "require": {
-            "bower-asset/jquery": ">=2,<4.0",
-            "bower-asset/moment": ">=2.20.1,<3.0.0"
-          },
-          "type": "bower-asset",
-          "license": [
-            "MIT"
-          ]
-        },
-      {
-        "name": "bower-asset/fullcalendar-scheduler",
-        "version": "v1.10.1",
-        "source": {
-          "type": "git",
-          "url": "git@github.com:fullcalendar/fullcalendar-scheduler.git",
-          "reference": "49a73555d10381e58deab4b74a16947a7511bf40"
-        },
-        "dist": {
-          "type": "zip",
-          "url": "https://api.github.com/repos/fullcalendar/fullcalendar-scheduler/zipball/49a73555d10381e58deab4b74a16947a7511bf40",
-          "reference": "49a73555d10381e58deab4b74a16947a7511bf40",
-          "shasum": null
-        },
-        "require": {
-          "bower-asset/fullcalendar": "~3.9.0",
-          "bower-asset/jquery": ">=2,<4.0",
-          "bower-asset/moment": ">=2.20.1,<3.0.0"
-        },
-        "type": "bower-asset",
-        "license": [
-          "SEE LICENSE IN LICENSE.md"
-        ]
-      },
-      {
             "name": "bower-asset/inputmask",
             "version": "3.3.11",
             "source": {
@@ -333,8 +284,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/RobinHerbots/Inputmask/zipball/5e670ad62f50c738388d4dcec78d2888505ad77b",
-              "reference": "5e670ad62f50c738388d4dcec78d2888505ad77b",
-              "shasum": null
+                "reference": "5e670ad62f50c738388d4dcec78d2888505ad77b"
             },
             "require": {
                 "bower-asset/jquery": ">=1.7"
@@ -349,14 +299,13 @@
             "version": "3.4.1",
             "source": {
                 "type": "git",
-              "url": "git@github.com:jquery/jquery-dist.git",
+                "url": "git@github.com:jquery/jquery-dist.git",
                 "reference": "15bc73803f76bc53b654b9fdbbbc096f56d7c03d"
             },
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/jquery/jquery-dist/zipball/15bc73803f76bc53b654b9fdbbbc096f56d7c03d",
-              "reference": "15bc73803f76bc53b654b9fdbbbc096f56d7c03d",
-              "shasum": null
+                "reference": "15bc73803f76bc53b654b9fdbbbc096f56d7c03d"
             },
             "type": "bower-asset",
             "license": [
@@ -368,14 +317,13 @@
             "version": "1.12.1",
             "source": {
                 "type": "git",
-              "url": "git@github.com:components/jqueryui.git",
+                "url": "git@github.com:components/jqueryui.git",
                 "reference": "44ecf3794cc56b65954cc19737234a3119d036cc"
             },
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/components/jqueryui/zipball/44ecf3794cc56b65954cc19737234a3119d036cc",
-              "reference": "44ecf3794cc56b65954cc19737234a3119d036cc",
-              "shasum": null
+                "reference": "44ecf3794cc56b65954cc19737234a3119d036cc"
             },
             "require": {
                 "bower-asset/jquery": ">=1.6"
@@ -386,53 +334,32 @@
             ]
         },
         {
-          "name": "bower-asset/leaflet",
-          "version": "v1.6.0",
-          "source": {
-            "type": "git",
-            "url": "git@github.com:Leaflet/Leaflet.git",
-            "reference": "0c81bdf904d864fd12a286e3d1979f47aba17991"
-          },
-          "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/Leaflet/Leaflet/zipball/0c81bdf904d864fd12a286e3d1979f47aba17991",
-            "reference": "0c81bdf904d864fd12a286e3d1979f47aba17991",
-            "shasum": null
-          },
-          "type": "bower-asset"
+            "name": "bower-asset/leaflet",
+            "version": "v1.6.0",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:Leaflet/Leaflet.git",
+                "reference": "0c81bdf904d864fd12a286e3d1979f47aba17991"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Leaflet/Leaflet/zipball/0c81bdf904d864fd12a286e3d1979f47aba17991",
+                "reference": "0c81bdf904d864fd12a286e3d1979f47aba17991"
+            },
+            "type": "bower-asset"
         },
-      {
-        "name": "bower-asset/moment",
-        "version": "2.27.0",
-        "source": {
-          "type": "git",
-          "url": "git@github.com:moment/moment.git",
-          "reference": "3e1a95b5ef0a505fec567c5b2290fd80e1da18f9"
-        },
-        "dist": {
-          "type": "zip",
-          "url": "https://api.github.com/repos/moment/moment/zipball/3e1a95b5ef0a505fec567c5b2290fd80e1da18f9",
-          "reference": "3e1a95b5ef0a505fec567c5b2290fd80e1da18f9",
-          "shasum": null
-        },
-        "type": "bower-asset",
-        "license": [
-          "MIT"
-        ]
-      },
-      {
+        {
             "name": "bower-asset/punycode",
             "version": "v1.3.2",
             "source": {
                 "type": "git",
-              "url": "git@github.com:bestiejs/punycode.js.git",
+                "url": "git@github.com:bestiejs/punycode.js.git",
                 "reference": "38c8d3131a82567bfef18da09f7f4db68c84f8a3"
             },
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/bestiejs/punycode.js/zipball/38c8d3131a82567bfef18da09f7f4db68c84f8a3",
-              "reference": "38c8d3131a82567bfef18da09f7f4db68c84f8a3",
-              "shasum": null
+                "reference": "38c8d3131a82567bfef18da09f7f4db68c84f8a3"
             },
             "type": "bower-asset"
         },
@@ -447,8 +374,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/yiisoft/jquery-pjax/zipball/aef7b953107264f00234902a3880eb50dafc48be",
-              "reference": "aef7b953107264f00234902a3880eb50dafc48be",
-              "shasum": null
+                "reference": "aef7b953107264f00234902a3880eb50dafc48be"
             },
             "require": {
                 "bower-asset/jquery": ">=1.8"
@@ -743,16 +669,16 @@
         },
         {
             "name": "ezyang/htmlpurifier",
-          "version": "v4.13.0",
+            "version": "v4.13.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ezyang/htmlpurifier.git",
-              "reference": "08e27c97e4c6ed02f37c5b2b20488046c8d90d75"
+                "reference": "08e27c97e4c6ed02f37c5b2b20488046c8d90d75"
             },
             "dist": {
                 "type": "zip",
-              "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/08e27c97e4c6ed02f37c5b2b20488046c8d90d75",
-              "reference": "08e27c97e4c6ed02f37c5b2b20488046c8d90d75",
+                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/08e27c97e4c6ed02f37c5b2b20488046c8d90d75",
+                "reference": "08e27c97e4c6ed02f37c5b2b20488046c8d90d75",
                 "shasum": ""
             },
             "require": {
@@ -769,8 +695,8 @@
                 "files": [
                     "library/HTMLPurifier.composer.php"
                 ],
-              "exclude-from-classmap": [
-                "/library/HTMLPurifier/Language/"
+                "exclude-from-classmap": [
+                    "/library/HTMLPurifier/Language/"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -789,7 +715,7 @@
             "keywords": [
                 "html"
             ],
-          "time": "2020-06-29T00:56:53+00:00"
+            "time": "2020-06-29T00:56:53+00:00"
         },
         {
             "name": "fortawesome/font-awesome",
@@ -840,249 +766,249 @@
             "time": "2016-10-24T15:52:54+00:00"
         },
         {
-          "name": "guzzlehttp/guzzle",
-          "version": "7.0.1",
-          "source": {
-            "type": "git",
-            "url": "https://github.com/guzzle/guzzle.git",
-            "reference": "2d9d3c186a6637a43193e66b097c50e4451eaab2"
-          },
-          "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/guzzle/guzzle/zipball/2d9d3c186a6637a43193e66b097c50e4451eaab2",
-            "reference": "2d9d3c186a6637a43193e66b097c50e4451eaab2",
-            "shasum": ""
-          },
-          "require": {
-            "ext-json": "*",
-            "guzzlehttp/promises": "^1.0",
-            "guzzlehttp/psr7": "^1.6.1",
-            "php": "^7.2.5",
-            "psr/http-client": "^1.0"
-          },
-          "provide": {
-            "psr/http-client-implementation": "1.0"
-          },
-          "require-dev": {
-            "ergebnis/composer-normalize": "^2.0",
-            "ext-curl": "*",
-            "php-http/client-integration-tests": "dev-phpunit8",
-            "phpunit/phpunit": "^8.5.5",
-            "psr/log": "^1.1"
-          },
-          "suggest": {
-            "ext-curl": "Required for CURL handler support",
-            "ext-intl": "Required for Internationalized Domain Name (IDN) support",
-            "psr/log": "Required for using the Log middleware"
-          },
-          "type": "library",
-          "extra": {
-            "branch-alias": {
-              "dev-master": "7.0-dev"
-            }
-          },
-          "autoload": {
-            "psr-4": {
-              "GuzzleHttp\\": "src/"
+            "name": "guzzlehttp/guzzle",
+            "version": "7.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/guzzle/guzzle.git",
+                "reference": "2d9d3c186a6637a43193e66b097c50e4451eaab2"
             },
-            "files": [
-              "src/functions_include.php"
-            ]
-          },
-          "notification-url": "https://packagist.org/downloads/",
-          "license": [
-            "MIT"
-          ],
-          "authors": [
-            {
-              "name": "Michael Dowling",
-              "email": "mtdowling@gmail.com",
-              "homepage": "https://github.com/mtdowling"
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/2d9d3c186a6637a43193e66b097c50e4451eaab2",
+                "reference": "2d9d3c186a6637a43193e66b097c50e4451eaab2",
+                "shasum": ""
             },
-            {
-              "name": "Márk Sági-Kazár",
-              "email": "mark.sagikazar@gmail.com",
-              "homepage": "https://sagikazarmark.hu"
-            }
-          ],
-          "description": "Guzzle is a PHP HTTP client library",
-          "homepage": "http://guzzlephp.org/",
-          "keywords": [
-            "client",
-            "curl",
-            "framework",
-            "http",
-            "http client",
-            "psr-18",
-            "psr-7",
-            "rest",
-            "web service"
-          ],
-          "time": "2020-06-27T10:33:25+00:00"
+            "require": {
+                "ext-json": "*",
+                "guzzlehttp/promises": "^1.0",
+                "guzzlehttp/psr7": "^1.6.1",
+                "php": "^7.2.5",
+                "psr/http-client": "^1.0"
+            },
+            "provide": {
+                "psr/http-client-implementation": "1.0"
+            },
+            "require-dev": {
+                "ergebnis/composer-normalize": "^2.0",
+                "ext-curl": "*",
+                "php-http/client-integration-tests": "dev-phpunit8",
+                "phpunit/phpunit": "^8.5.5",
+                "psr/log": "^1.1"
+            },
+            "suggest": {
+                "ext-curl": "Required for CURL handler support",
+                "ext-intl": "Required for Internationalized Domain Name (IDN) support",
+                "psr/log": "Required for using the Log middleware"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "7.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "GuzzleHttp\\": "src/"
+                },
+                "files": [
+                    "src/functions_include.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Dowling",
+                    "email": "mtdowling@gmail.com",
+                    "homepage": "https://github.com/mtdowling"
+                },
+                {
+                    "name": "Márk Sági-Kazár",
+                    "email": "mark.sagikazar@gmail.com",
+                    "homepage": "https://sagikazarmark.hu"
+                }
+            ],
+            "description": "Guzzle is a PHP HTTP client library",
+            "homepage": "http://guzzlephp.org/",
+            "keywords": [
+                "client",
+                "curl",
+                "framework",
+                "http",
+                "http client",
+                "psr-18",
+                "psr-7",
+                "rest",
+                "web service"
+            ],
+            "time": "2020-06-27T10:33:25+00:00"
         },
-      {
-        "name": "guzzlehttp/promises",
-        "version": "v1.3.1",
-        "source": {
-          "type": "git",
-          "url": "https://github.com/guzzle/promises.git",
-          "reference": "a59da6cf61d80060647ff4d3eb2c03a2bc694646"
+        {
+            "name": "guzzlehttp/promises",
+            "version": "v1.3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/guzzle/promises.git",
+                "reference": "a59da6cf61d80060647ff4d3eb2c03a2bc694646"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/guzzle/promises/zipball/a59da6cf61d80060647ff4d3eb2c03a2bc694646",
+                "reference": "a59da6cf61d80060647ff4d3eb2c03a2bc694646",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.4-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "GuzzleHttp\\Promise\\": "src/"
+                },
+                "files": [
+                    "src/functions_include.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Dowling",
+                    "email": "mtdowling@gmail.com",
+                    "homepage": "https://github.com/mtdowling"
+                }
+            ],
+            "description": "Guzzle promises library",
+            "keywords": [
+                "promise"
+            ],
+            "time": "2016-12-20T10:07:11+00:00"
         },
-        "dist": {
-          "type": "zip",
-          "url": "https://api.github.com/repos/guzzle/promises/zipball/a59da6cf61d80060647ff4d3eb2c03a2bc694646",
-          "reference": "a59da6cf61d80060647ff4d3eb2c03a2bc694646",
-          "shasum": ""
+        {
+            "name": "guzzlehttp/psr7",
+            "version": "1.6.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/guzzle/psr7.git",
+                "reference": "239400de7a173fe9901b9ac7c06497751f00727a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/239400de7a173fe9901b9ac7c06497751f00727a",
+                "reference": "239400de7a173fe9901b9ac7c06497751f00727a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0",
+                "psr/http-message": "~1.0",
+                "ralouphie/getallheaders": "^2.0.5 || ^3.0.0"
+            },
+            "provide": {
+                "psr/http-message-implementation": "1.0"
+            },
+            "require-dev": {
+                "ext-zlib": "*",
+                "phpunit/phpunit": "~4.8.36 || ^5.7.27 || ^6.5.8"
+            },
+            "suggest": {
+                "zendframework/zend-httphandlerrunner": "Emit PSR-7 responses"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.6-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "GuzzleHttp\\Psr7\\": "src/"
+                },
+                "files": [
+                    "src/functions_include.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Dowling",
+                    "email": "mtdowling@gmail.com",
+                    "homepage": "https://github.com/mtdowling"
+                },
+                {
+                    "name": "Tobias Schultze",
+                    "homepage": "https://github.com/Tobion"
+                }
+            ],
+            "description": "PSR-7 message implementation that also provides common utility methods",
+            "keywords": [
+                "http",
+                "message",
+                "psr-7",
+                "request",
+                "response",
+                "stream",
+                "uri",
+                "url"
+            ],
+            "time": "2019-07-01T23:21:34+00:00"
         },
-        "require": {
-          "php": ">=5.5.0"
+        {
+            "name": "inpassor/yii2-daemon",
+            "version": "0.3.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Inpassor/yii2-daemon.git",
+                "reference": "a8efd68efa48e74295ff359938120ac12e1fb1bf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Inpassor/yii2-daemon/zipball/a8efd68efa48e74295ff359938120ac12e1fb1bf",
+                "reference": "a8efd68efa48e74295ff359938120ac12e1fb1bf",
+                "shasum": ""
+            },
+            "require": {
+                "yiisoft/yii2": "*"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "inpassor\\daemon\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Inpassor",
+                    "email": "inpassor@yandex.com"
+                }
+            ],
+            "description": "The simple daemon extension for the Yii 2 framework",
+            "keywords": [
+                "daemon",
+                "yii2"
+            ],
+            "time": "2018-11-19T12:10:19+00:00"
         },
-        "require-dev": {
-          "phpunit/phpunit": "^4.0"
-        },
-        "type": "library",
-        "extra": {
-          "branch-alias": {
-            "dev-master": "1.4-dev"
-          }
-        },
-        "autoload": {
-          "psr-4": {
-            "GuzzleHttp\\Promise\\": "src/"
-          },
-          "files": [
-            "src/functions_include.php"
-          ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-          "MIT"
-        ],
-        "authors": [
-          {
-            "name": "Michael Dowling",
-            "email": "mtdowling@gmail.com",
-            "homepage": "https://github.com/mtdowling"
-          }
-        ],
-        "description": "Guzzle promises library",
-        "keywords": [
-          "promise"
-        ],
-        "time": "2016-12-20T10:07:11+00:00"
-      },
-      {
-        "name": "guzzlehttp/psr7",
-        "version": "1.6.1",
-        "source": {
-          "type": "git",
-          "url": "https://github.com/guzzle/psr7.git",
-          "reference": "239400de7a173fe9901b9ac7c06497751f00727a"
-        },
-        "dist": {
-          "type": "zip",
-          "url": "https://api.github.com/repos/guzzle/psr7/zipball/239400de7a173fe9901b9ac7c06497751f00727a",
-          "reference": "239400de7a173fe9901b9ac7c06497751f00727a",
-          "shasum": ""
-        },
-        "require": {
-          "php": ">=5.4.0",
-          "psr/http-message": "~1.0",
-          "ralouphie/getallheaders": "^2.0.5 || ^3.0.0"
-        },
-        "provide": {
-          "psr/http-message-implementation": "1.0"
-        },
-        "require-dev": {
-          "ext-zlib": "*",
-          "phpunit/phpunit": "~4.8.36 || ^5.7.27 || ^6.5.8"
-        },
-        "suggest": {
-          "zendframework/zend-httphandlerrunner": "Emit PSR-7 responses"
-        },
-        "type": "library",
-        "extra": {
-          "branch-alias": {
-            "dev-master": "1.6-dev"
-          }
-        },
-        "autoload": {
-          "psr-4": {
-            "GuzzleHttp\\Psr7\\": "src/"
-          },
-          "files": [
-            "src/functions_include.php"
-          ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-          "MIT"
-        ],
-        "authors": [
-          {
-            "name": "Michael Dowling",
-            "email": "mtdowling@gmail.com",
-            "homepage": "https://github.com/mtdowling"
-          },
-          {
-            "name": "Tobias Schultze",
-            "homepage": "https://github.com/Tobion"
-          }
-        ],
-        "description": "PSR-7 message implementation that also provides common utility methods",
-        "keywords": [
-          "http",
-          "message",
-          "psr-7",
-          "request",
-          "response",
-          "stream",
-          "uri",
-          "url"
-        ],
-        "time": "2019-07-01T23:21:34+00:00"
-      },
-      {
-        "name": "inpassor/yii2-daemon",
-        "version": "0.3.4",
-        "source": {
-          "type": "git",
-          "url": "https://github.com/Inpassor/yii2-daemon.git",
-          "reference": "a8efd68efa48e74295ff359938120ac12e1fb1bf"
-        },
-        "dist": {
-          "type": "zip",
-          "url": "https://api.github.com/repos/Inpassor/yii2-daemon/zipball/a8efd68efa48e74295ff359938120ac12e1fb1bf",
-          "reference": "a8efd68efa48e74295ff359938120ac12e1fb1bf",
-          "shasum": ""
-        },
-        "require": {
-          "yiisoft/yii2": "*"
-        },
-        "type": "yii2-extension",
-        "autoload": {
-          "psr-4": {
-            "inpassor\\daemon\\": ""
-          }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-          "MIT"
-        ],
-        "authors": [
-          {
-            "name": "Inpassor",
-            "email": "inpassor@yandex.com"
-          }
-        ],
-        "description": "The simple daemon extension for the Yii 2 framework",
-        "keywords": [
-          "daemon",
-          "yii2"
-        ],
-        "time": "2018-11-19T12:10:19+00:00"
-      },
-      {
+        {
             "name": "kartik-v/bootstrap-fileinput",
             "version": "v5.1.1",
             "source": {
@@ -1132,6 +1058,12 @@
                 "preview",
                 "progress",
                 "upload"
+            ],
+            "funding": [
+                {
+                    "url": "https://opencollective.com/bootstrap-fileinput",
+                    "type": "open_collective"
+                }
             ],
             "time": "2020-06-20T13:39:59+00:00"
         },
@@ -1185,102 +1117,102 @@
             "time": "2018-09-14T05:15:26+00:00"
         },
         {
-          "name": "kartik-v/dependent-dropdown",
-          "version": "v1.4.9",
-          "source": {
-            "type": "git",
-            "url": "https://github.com/kartik-v/dependent-dropdown.git",
-            "reference": "54a8806002ee21b744508a2edb95ed01d35c6cf9"
-          },
-          "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/kartik-v/dependent-dropdown/zipball/54a8806002ee21b744508a2edb95ed01d35c6cf9",
-            "reference": "54a8806002ee21b744508a2edb95ed01d35c6cf9",
-            "shasum": ""
-          },
-          "type": "library",
-          "extra": {
-            "branch-alias": {
-              "dev-master": "1.4.x-dev"
-            }
-          },
-          "autoload": {
-            "psr-4": {
-              "kartik\\plugins\\depdrop\\": ""
-            }
-          },
-          "notification-url": "https://packagist.org/downloads/",
-          "license": [
-            "BSD-3-Clause"
-          ],
-          "authors": [
-            {
-              "name": "Kartik Visweswaran",
-              "email": "kartikv2@gmail.com",
-              "homepage": "http://www.krajee.com/"
-            }
-          ],
-          "description": "A multi level dependent dropdown JQuery plugin that allows nested dependencies.",
-          "homepage": "https://github.com/kartik-v/dependent-dropdown",
-          "keywords": [
-            "dependent",
-            "dropdown",
-            "jquery",
-            "option",
-            "select"
-          ],
-          "time": "2019-03-09T10:53:11+00:00"
+            "name": "kartik-v/dependent-dropdown",
+            "version": "v1.4.9",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kartik-v/dependent-dropdown.git",
+                "reference": "54a8806002ee21b744508a2edb95ed01d35c6cf9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kartik-v/dependent-dropdown/zipball/54a8806002ee21b744508a2edb95ed01d35c6cf9",
+                "reference": "54a8806002ee21b744508a2edb95ed01d35c6cf9",
+                "shasum": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.4.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "kartik\\plugins\\depdrop\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Kartik Visweswaran",
+                    "email": "kartikv2@gmail.com",
+                    "homepage": "http://www.krajee.com/"
+                }
+            ],
+            "description": "A multi level dependent dropdown JQuery plugin that allows nested dependencies.",
+            "homepage": "https://github.com/kartik-v/dependent-dropdown",
+            "keywords": [
+                "dependent",
+                "dropdown",
+                "jquery",
+                "option",
+                "select"
+            ],
+            "time": "2019-03-09T10:53:11+00:00"
         },
-      {
-        "name": "kartik-v/php-date-formatter",
-        "version": "v1.3.6",
-        "source": {
-          "type": "git",
-          "url": "https://github.com/kartik-v/php-date-formatter.git",
-          "reference": "514a53660b0d69439236fd3cbc3f41512adb00a0"
+        {
+            "name": "kartik-v/php-date-formatter",
+            "version": "v1.3.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kartik-v/php-date-formatter.git",
+                "reference": "514a53660b0d69439236fd3cbc3f41512adb00a0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kartik-v/php-date-formatter/zipball/514a53660b0d69439236fd3cbc3f41512adb00a0",
+                "reference": "514a53660b0d69439236fd3cbc3f41512adb00a0",
+                "shasum": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.3.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "kartik\\plugins\\dateformatter\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Kartik Visweswaran",
+                    "email": "kartikv2@gmail.com",
+                    "homepage": "http://www.krajee.com/"
+                }
+            ],
+            "description": "A Javascript datetime formatting and manipulation library using PHP date-time formats.",
+            "homepage": "https://github.com/kartik-v/php-date-formatter",
+            "keywords": [
+                "date",
+                "datetime",
+                "formatter",
+                "javascript",
+                "php",
+                "php-date-formatter.js",
+                "time"
+            ],
+            "time": "2020-04-14T10:16:32+00:00"
         },
-        "dist": {
-          "type": "zip",
-          "url": "https://api.github.com/repos/kartik-v/php-date-formatter/zipball/514a53660b0d69439236fd3cbc3f41512adb00a0",
-          "reference": "514a53660b0d69439236fd3cbc3f41512adb00a0",
-          "shasum": ""
-        },
-        "type": "library",
-        "extra": {
-          "branch-alias": {
-            "dev-master": "1.3.x-dev"
-          }
-        },
-        "autoload": {
-          "psr-4": {
-            "kartik\\plugins\\dateformatter\\": ""
-          }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-          "BSD-3-Clause"
-        ],
-        "authors": [
-          {
-            "name": "Kartik Visweswaran",
-            "email": "kartikv2@gmail.com",
-            "homepage": "http://www.krajee.com/"
-          }
-        ],
-        "description": "A Javascript datetime formatting and manipulation library using PHP date-time formats.",
-        "homepage": "https://github.com/kartik-v/php-date-formatter",
-        "keywords": [
-          "date",
-          "datetime",
-          "formatter",
-          "javascript",
-          "php",
-          "php-date-formatter.js",
-          "time"
-        ],
-        "time": "2020-04-14T10:16:32+00:00"
-      },
-      {
+        {
             "name": "kartik-v/yii2-bootstrap4-dropdown",
             "version": "v1.0.1",
             "source": {
@@ -1389,58 +1321,58 @@
             "time": "2018-03-15T08:22:53+00:00"
         },
         {
-          "name": "kartik-v/yii2-datecontrol",
-          "version": "v1.9.7",
-          "source": {
-            "type": "git",
-            "url": "https://github.com/kartik-v/yii2-datecontrol.git",
-            "reference": "e095702e8bcd325a09f6a6e6b21f0b529b6965b9"
-          },
-          "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/kartik-v/yii2-datecontrol/zipball/e095702e8bcd325a09f6a6e6b21f0b529b6965b9",
-            "reference": "e095702e8bcd325a09f6a6e6b21f0b529b6965b9",
-            "shasum": ""
-          },
-          "require": {
-            "kartik-v/php-date-formatter": ">1.3",
-            "kartik-v/yii2-krajee-base": ">=1.9"
-          },
-          "type": "yii2-extension",
-          "extra": {
-            "branch-alias": {
-              "dev-master": "1.9.x-dev"
-            }
-          },
-          "autoload": {
-            "psr-4": {
-              "kartik\\datecontrol\\": "src"
-            }
-          },
-          "notification-url": "https://packagist.org/downloads/",
-          "license": [
-            "BSD-3-Clause"
-          ],
-          "authors": [
-            {
-              "name": "Kartik Visweswaran",
-              "email": "kartikv2@gmail.com",
-              "homepage": "http://www.krajee.com/"
-            }
-          ],
-          "description": "Date control module allowing separation of formats for View and Model for Yii Framework 2.0",
-          "homepage": "https://github.com/kartik-v/yii2-datecontrol",
-          "keywords": [
-            "control",
-            "date",
-            "extension",
-            "format",
-            "yii",
-            "yii2"
-          ],
-          "time": "2018-09-23T07:29:23+00:00"
+            "name": "kartik-v/yii2-datecontrol",
+            "version": "v1.9.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kartik-v/yii2-datecontrol.git",
+                "reference": "e095702e8bcd325a09f6a6e6b21f0b529b6965b9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kartik-v/yii2-datecontrol/zipball/e095702e8bcd325a09f6a6e6b21f0b529b6965b9",
+                "reference": "e095702e8bcd325a09f6a6e6b21f0b529b6965b9",
+                "shasum": ""
+            },
+            "require": {
+                "kartik-v/php-date-formatter": ">1.3",
+                "kartik-v/yii2-krajee-base": ">=1.9"
+            },
+            "type": "yii2-extension",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.9.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "kartik\\datecontrol\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Kartik Visweswaran",
+                    "email": "kartikv2@gmail.com",
+                    "homepage": "http://www.krajee.com/"
+                }
+            ],
+            "description": "Date control module allowing separation of formats for View and Model for Yii Framework 2.0",
+            "homepage": "https://github.com/kartik-v/yii2-datecontrol",
+            "keywords": [
+                "control",
+                "date",
+                "extension",
+                "format",
+                "yii",
+                "yii2"
+            ],
+            "time": "2018-09-23T07:29:23+00:00"
         },
-      {
+        {
             "name": "kartik-v/yii2-dialog",
             "version": "v1.0.5",
             "source": {
@@ -1670,12 +1602,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/kartik-v/yii2-grid.git",
-              "reference": "3199b406f796ab761d6466d62fe132c965b1605a"
+                "reference": "3199b406f796ab761d6466d62fe132c965b1605a"
             },
             "dist": {
                 "type": "zip",
-              "url": "https://api.github.com/repos/kartik-v/yii2-grid/zipball/3199b406f796ab761d6466d62fe132c965b1605a",
-              "reference": "3199b406f796ab761d6466d62fe132c965b1605a",
+                "url": "https://api.github.com/repos/kartik-v/yii2-grid/zipball/3199b406f796ab761d6466d62fe132c965b1605a",
+                "reference": "3199b406f796ab761d6466d62fe132c965b1605a",
                 "shasum": ""
             },
             "require": {
@@ -1715,7 +1647,13 @@
                 "widget",
                 "yii2"
             ],
-          "time": "2020-07-08T07:12:17+00:00"
+            "funding": [
+                {
+                    "url": "https://opencollective.com/yii2-grid",
+                    "type": "open_collective"
+                }
+            ],
+            "time": "2020-07-08T07:12:17+00:00"
         },
         {
             "name": "kartik-v/yii2-krajee-base",
@@ -1818,6 +1756,12 @@
                 "pdf",
                 "utf8",
                 "yii2"
+            ],
+            "funding": [
+                {
+                    "url": "https://opencollective.com/yii2-mpdf",
+                    "type": "open_collective"
+                }
             ],
             "time": "2020-04-14T08:55:18+00:00"
         },
@@ -2033,60 +1977,60 @@
             "time": "2018-10-09T11:34:49+00:00"
         },
         {
-          "name": "kartik-v/yii2-widget-depdrop",
-          "version": "v1.0.6",
-          "source": {
-            "type": "git",
-            "url": "https://github.com/kartik-v/yii2-widget-depdrop.git",
-            "reference": "ea347e3793fbd8273cc9bd1eb94c4b32bb55d318"
-          },
-          "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/kartik-v/yii2-widget-depdrop/zipball/ea347e3793fbd8273cc9bd1eb94c4b32bb55d318",
-            "reference": "ea347e3793fbd8273cc9bd1eb94c4b32bb55d318",
-            "shasum": ""
-          },
-          "require": {
-            "kartik-v/dependent-dropdown": "~1.4",
-            "kartik-v/yii2-krajee-base": ">=2.0.0"
-          },
-          "type": "yii2-extension",
-          "extra": {
-            "branch-alias": {
-              "dev-master": "1.0.x-dev"
-            }
-          },
-          "autoload": {
-            "psr-4": {
-              "kartik\\depdrop\\": "src"
-            }
-          },
-          "notification-url": "https://packagist.org/downloads/",
-          "license": [
-            "BSD-3-Clause"
-          ],
-          "authors": [
-            {
-              "name": "Kartik Visweswaran",
-              "email": "kartikv2@gmail.com",
-              "homepage": "http://www.krajee.com/"
-            }
-          ],
-          "description": "Widget that enables setting up dependent dropdowns with nested dependencies (sub repo split from yii2-widgets)",
-          "homepage": "https://github.com/kartik-v/yii2-widget-depdrop",
-          "keywords": [
-            "dependent",
-            "dropdown",
-            "extension",
-            "form",
-            "jquery",
-            "plugin",
-            "widget",
-            "yii2"
-          ],
-          "time": "2019-04-19T07:02:48+00:00"
+            "name": "kartik-v/yii2-widget-depdrop",
+            "version": "v1.0.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kartik-v/yii2-widget-depdrop.git",
+                "reference": "ea347e3793fbd8273cc9bd1eb94c4b32bb55d318"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kartik-v/yii2-widget-depdrop/zipball/ea347e3793fbd8273cc9bd1eb94c4b32bb55d318",
+                "reference": "ea347e3793fbd8273cc9bd1eb94c4b32bb55d318",
+                "shasum": ""
+            },
+            "require": {
+                "kartik-v/dependent-dropdown": "~1.4",
+                "kartik-v/yii2-krajee-base": ">=2.0.0"
+            },
+            "type": "yii2-extension",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "kartik\\depdrop\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Kartik Visweswaran",
+                    "email": "kartikv2@gmail.com",
+                    "homepage": "http://www.krajee.com/"
+                }
+            ],
+            "description": "Widget that enables setting up dependent dropdowns with nested dependencies (sub repo split from yii2-widgets)",
+            "homepage": "https://github.com/kartik-v/yii2-widget-depdrop",
+            "keywords": [
+                "dependent",
+                "dropdown",
+                "extension",
+                "form",
+                "jquery",
+                "plugin",
+                "widget",
+                "yii2"
+            ],
+            "time": "2019-04-19T07:02:48+00:00"
         },
-      {
+        {
             "name": "kartik-v/yii2-widget-fileinput",
             "version": "v1.0.9",
             "source": {
@@ -2196,44 +2140,44 @@
             "time": "2019-11-15T16:16:16+00:00"
         },
         {
-          "name": "koputo/yii2-leaflet-subgroup-plugin",
-          "version": "dev-master",
-          "source": {
-            "type": "git",
-            "url": "https://github.com/demonwork/yii-leaflet-subgroup-plugin.git",
-            "reference": "6af84dc0d98d6a81b2a00d003e9a1b8d8d6dcb0a"
-          },
-          "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/demonwork/yii-leaflet-subgroup-plugin/zipball/6af84dc0d98d6a81b2a00d003e9a1b8d8d6dcb0a",
-            "reference": "6af84dc0d98d6a81b2a00d003e9a1b8d8d6dcb0a",
-            "shasum": ""
-          },
-          "require": {
-            "2amigos/yii2-leaflet-extension": "~1.0",
-            "2amigos/yii2-leaflet-markercluster-plugin": "~1.0",
-            "php": ">=7.1.0"
-          },
-          "type": "library",
-          "autoload": {
-            "classmap": [
-              "src"
-            ]
-          },
-          "notification-url": "https://packagist.org/downloads/",
-          "license": [
-            "proprietary"
-          ],
-          "authors": [
-            {
-              "name": "Dmitriy Logachev",
-              "email": "demonwork@yandex.ru"
-            }
-          ],
-          "description": "Subgroup cluster",
-          "time": "2020-05-29T16:45:43+00:00"
+            "name": "koputo/yii2-leaflet-subgroup-plugin",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/demonwork/yii-leaflet-subgroup-plugin.git",
+                "reference": "6af84dc0d98d6a81b2a00d003e9a1b8d8d6dcb0a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/demonwork/yii-leaflet-subgroup-plugin/zipball/6af84dc0d98d6a81b2a00d003e9a1b8d8d6dcb0a",
+                "reference": "6af84dc0d98d6a81b2a00d003e9a1b8d8d6dcb0a",
+                "shasum": ""
+            },
+            "require": {
+                "2amigos/yii2-leaflet-extension": "~1.0",
+                "2amigos/yii2-leaflet-markercluster-plugin": "~1.0",
+                "php": ">=7.1.0"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "proprietary"
+            ],
+            "authors": [
+                {
+                    "name": "Dmitriy Logachev",
+                    "email": "demonwork@yandex.ru"
+                }
+            ],
+            "description": "Subgroup cluster",
+            "time": "2020-05-29T16:45:43+00:00"
         },
-      {
+        {
             "name": "maennchen/zipstream-php",
             "version": "2.1.0",
             "source": {
@@ -2291,6 +2235,12 @@
             "keywords": [
                 "stream",
                 "zip"
+            ],
+            "funding": [
+                {
+                    "url": "https://opencollective.com/zipstream",
+                    "type": "open_collective"
+                }
             ],
             "time": "2020-05-30T13:11:16+00:00"
         },
@@ -2525,67 +2475,73 @@
                 "php",
                 "utf-8"
             ],
+            "funding": [
+                {
+                    "url": "https://www.paypal.me/mpdf",
+                    "type": "custom"
+                }
+            ],
             "time": "2020-05-25T09:08:39+00:00"
         },
         {
-          "name": "msvdev/yii2-widget-mappicker",
-          "version": "1.0.1",
-          "source": {
-            "type": "git",
-            "url": "https://github.com/mihaylichenko/yii2-widget-mappicker.git",
-            "reference": "6416ca771079f1448a447d30593a72d25a8e5ff2"
-          },
-          "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/mihaylichenko/yii2-widget-mappicker/zipball/6416ca771079f1448a447d30593a72d25a8e5ff2",
-            "reference": "6416ca771079f1448a447d30593a72d25a8e5ff2",
-            "shasum": ""
-          },
-          "require": {
-            "yiisoft/yii2": ">=2.0.4"
-          },
-          "type": "yii2-extension",
-          "autoload": {
-            "psr-4": {
-              "msvdev\\widgets\\mappicker\\": ""
-            }
-          },
-          "notification-url": "https://packagist.org/downloads/",
-          "license": [
-            "MIT"
-          ],
-          "authors": [
-            {
-              "name": "Sergey Mykhaylichenko",
-              "email": "senya_m@bk.ru",
-              "homepage": "https://github.com/mihaylichenko/"
-            }
-          ],
-          "description": "Yii2 map widget allows you to simplify the entry of geographic coordinates for your form. Support google and yandex maps services.",
-          "homepage": "https://github.com/mihaylichenko/yii2-widget-mappicker",
-          "keywords": [
-            "extension",
-            "googlemap",
-            "map",
-            "plugin",
-            "widget",
-            "yandexmap",
-            "yii2"
-          ],
-          "time": "2018-04-05T08:24:39+00:00"
-        },
-      {
-            "name": "myclabs/deep-copy",
-        "version": "1.10.1",
+            "name": "msvdev/yii2-widget-mappicker",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/myclabs/DeepCopy.git",
-              "reference": "969b211f9a51aa1f6c01d1d2aef56d3bd91598e5"
+                "url": "https://github.com/mihaylichenko/yii2-widget-mappicker.git",
+                "reference": "6416ca771079f1448a447d30593a72d25a8e5ff2"
             },
             "dist": {
                 "type": "zip",
-              "url": "https://api.github.com/repos/myclabs/DeepCopy/zipball/969b211f9a51aa1f6c01d1d2aef56d3bd91598e5",
-              "reference": "969b211f9a51aa1f6c01d1d2aef56d3bd91598e5",
+                "url": "https://api.github.com/repos/mihaylichenko/yii2-widget-mappicker/zipball/6416ca771079f1448a447d30593a72d25a8e5ff2",
+                "reference": "6416ca771079f1448a447d30593a72d25a8e5ff2",
+                "shasum": ""
+            },
+            "require": {
+                "yiisoft/yii2": ">=2.0.4"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "msvdev\\widgets\\mappicker\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sergey Mykhaylichenko",
+                    "email": "senya_m@bk.ru",
+                    "homepage": "https://github.com/mihaylichenko/"
+                }
+            ],
+            "description": "Yii2 map widget allows you to simplify the entry of geographic coordinates for your form. Support google and yandex maps services.",
+            "homepage": "https://github.com/mihaylichenko/yii2-widget-mappicker",
+            "keywords": [
+                "extension",
+                "googlemap",
+                "map",
+                "plugin",
+                "widget",
+                "yandexmap",
+                "yii2"
+            ],
+            "time": "2018-04-05T08:24:39+00:00"
+        },
+        {
+            "name": "myclabs/deep-copy",
+            "version": "1.10.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/myclabs/DeepCopy.git",
+                "reference": "969b211f9a51aa1f6c01d1d2aef56d3bd91598e5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/myclabs/DeepCopy/zipball/969b211f9a51aa1f6c01d1d2aef56d3bd91598e5",
+                "reference": "969b211f9a51aa1f6c01d1d2aef56d3bd91598e5",
                 "shasum": ""
             },
             "require": {
@@ -2620,7 +2576,13 @@
                 "object",
                 "object graph"
             ],
-        "time": "2020-06-29T13:22:24+00:00"
+            "funding": [
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/myclabs/deep-copy",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2020-06-29T13:22:24+00:00"
         },
         {
             "name": "myclabs/php-enum",
@@ -2759,67 +2721,17 @@
             "time": "2018-07-02T15:55:56+00:00"
         },
         {
-          "name": "philippfrenzel/yii2fullcalendar",
-          "version": "3.9.0",
-          "source": {
-            "type": "git",
-            "url": "https://github.com/philippfrenzel/yii2fullcalendar.git",
-            "reference": "0b56a80486fa01b874dda5072ffb9b2cf06210ed"
-          },
-          "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/philippfrenzel/yii2fullcalendar/zipball/0b56a80486fa01b874dda5072ffb9b2cf06210ed",
-            "reference": "0b56a80486fa01b874dda5072ffb9b2cf06210ed",
-            "shasum": ""
-          },
-          "require": {
-            "bower-asset/fullcalendar": "^3.9.0@stable",
-            "bower-asset/fullcalendar-scheduler": "^1.9.2@stable",
-            "yiisoft/yii2": "*",
-            "yiisoft/yii2-jui": "*"
-          },
-          "require-dev": {
-            "codeception/codeception": "*"
-          },
-          "type": "yii2-extension",
-          "autoload": {
-            "psr-4": {
-              "yii2fullcalendar\\": ""
-            }
-          },
-          "notification-url": "https://packagist.org/downloads/",
-          "license": [
-            "MIT"
-          ],
-          "authors": [
-            {
-              "name": "Philipp Frenzel",
-              "email": "philipp@frenzel.net",
-              "homepage": "http://www.frenzel.net/",
-              "role": "Developer"
-            }
-          ],
-          "description": "Yii2 fullcalendar Widgets",
-          "homepage": "http://www.frenzel.net/",
-          "keywords": [
-            "fullcalendar",
-            "widget",
-            "yii2"
-          ],
-          "time": "2018-05-04T09:06:24+00:00"
-        },
-      {
             "name": "phpoffice/phpspreadsheet",
-        "version": "1.14.0",
+            "version": "1.14.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPOffice/PhpSpreadsheet.git",
-              "reference": "73fe58fdc9f3977619bec6b26e867eb2ac059dcd"
+                "reference": "73fe58fdc9f3977619bec6b26e867eb2ac059dcd"
             },
             "dist": {
                 "type": "zip",
-              "url": "https://api.github.com/repos/PHPOffice/PhpSpreadsheet/zipball/73fe58fdc9f3977619bec6b26e867eb2ac059dcd",
-              "reference": "73fe58fdc9f3977619bec6b26e867eb2ac059dcd",
+                "url": "https://api.github.com/repos/PHPOffice/PhpSpreadsheet/zipball/73fe58fdc9f3977619bec6b26e867eb2ac059dcd",
+                "reference": "73fe58fdc9f3977619bec6b26e867eb2ac059dcd",
                 "shasum": ""
             },
             "require": {
@@ -2836,8 +2748,8 @@
                 "ext-xmlwriter": "*",
                 "ext-zip": "*",
                 "ext-zlib": "*",
-              "guzzlehttp/guzzle": "^7.0",
-              "maennchen/zipstream-php": "^2.1",
+                "guzzlehttp/guzzle": "^7.0",
+                "maennchen/zipstream-php": "^2.1",
                 "markbaker/complex": "^1.4",
                 "markbaker/matrix": "^1.2",
                 "php": "^7.2",
@@ -2901,56 +2813,56 @@
                 "xls",
                 "xlsx"
             ],
-        "time": "2020-06-29T01:51:21+00:00"
+            "time": "2020-06-29T01:51:21+00:00"
         },
-      {
-        "name": "psr/http-client",
-        "version": "1.0.1",
-        "source": {
-          "type": "git",
-          "url": "https://github.com/php-fig/http-client.git",
-          "reference": "2dfb5f6c5eff0e91e20e913f8c5452ed95b86621"
-        },
-        "dist": {
-          "type": "zip",
-          "url": "https://api.github.com/repos/php-fig/http-client/zipball/2dfb5f6c5eff0e91e20e913f8c5452ed95b86621",
-          "reference": "2dfb5f6c5eff0e91e20e913f8c5452ed95b86621",
-          "shasum": ""
-        },
-        "require": {
-          "php": "^7.0 || ^8.0",
-          "psr/http-message": "^1.0"
-        },
-        "type": "library",
-        "extra": {
-          "branch-alias": {
-            "dev-master": "1.0.x-dev"
-          }
-        },
-        "autoload": {
-          "psr-4": {
-            "Psr\\Http\\Client\\": "src/"
-          }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-          "MIT"
-        ],
-        "authors": [
-          {
-            "name": "PHP-FIG",
-            "homepage": "http://www.php-fig.org/"
-          }
-        ],
-        "description": "Common interface for HTTP clients",
-        "homepage": "https://github.com/php-fig/http-client",
-        "keywords": [
-          "http",
-          "http-client",
-          "psr",
-          "psr-18"
-        ],
-        "time": "2020-06-29T06:28:15+00:00"
+        {
+            "name": "psr/http-client",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/http-client.git",
+                "reference": "2dfb5f6c5eff0e91e20e913f8c5452ed95b86621"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/http-client/zipball/2dfb5f6c5eff0e91e20e913f8c5452ed95b86621",
+                "reference": "2dfb5f6c5eff0e91e20e913f8c5452ed95b86621",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.0 || ^8.0",
+                "psr/http-message": "^1.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Http\\Client\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for HTTP clients",
+            "homepage": "https://github.com/php-fig/http-client",
+            "keywords": [
+                "http",
+                "http-client",
+                "psr",
+                "psr-18"
+            ],
+            "time": "2020-06-29T06:28:15+00:00"
         },
         {
             "name": "psr/http-message",
@@ -3098,46 +3010,46 @@
             "time": "2017-10-23T01:57:42+00:00"
         },
         {
-          "name": "ralouphie/getallheaders",
-          "version": "3.0.3",
-          "source": {
-            "type": "git",
-            "url": "https://github.com/ralouphie/getallheaders.git",
-            "reference": "120b605dfeb996808c31b6477290a714d356e822"
-          },
-          "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/ralouphie/getallheaders/zipball/120b605dfeb996808c31b6477290a714d356e822",
-            "reference": "120b605dfeb996808c31b6477290a714d356e822",
-            "shasum": ""
-          },
-          "require": {
-            "php": ">=5.6"
-          },
-          "require-dev": {
-            "php-coveralls/php-coveralls": "^2.1",
-            "phpunit/phpunit": "^5 || ^6.5"
-          },
-          "type": "library",
-          "autoload": {
-            "files": [
-              "src/getallheaders.php"
-            ]
-          },
-          "notification-url": "https://packagist.org/downloads/",
-          "license": [
-            "MIT"
-          ],
-          "authors": [
-            {
-              "name": "Ralph Khattar",
-              "email": "ralph.khattar@gmail.com"
-            }
-          ],
-          "description": "A polyfill for getallheaders.",
-          "time": "2019-03-08T08:55:37+00:00"
+            "name": "ralouphie/getallheaders",
+            "version": "3.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ralouphie/getallheaders.git",
+                "reference": "120b605dfeb996808c31b6477290a714d356e822"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ralouphie/getallheaders/zipball/120b605dfeb996808c31b6477290a714d356e822",
+                "reference": "120b605dfeb996808c31b6477290a714d356e822",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6"
+            },
+            "require-dev": {
+                "php-coveralls/php-coveralls": "^2.1",
+                "phpunit/phpunit": "^5 || ^6.5"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/getallheaders.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ralph Khattar",
+                    "email": "ralph.khattar@gmail.com"
+                }
+            ],
+            "description": "A polyfill for getallheaders.",
+            "time": "2019-03-08T08:55:37+00:00"
         },
-      {
+        {
             "name": "rmrevin/yii2-fontawesome",
             "version": "2.17.1",
             "source": {
@@ -3286,6 +3198,12 @@
                 "fpdi",
                 "pdf"
             ],
+            "funding": [
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/setasign/fpdi",
+                    "type": "tidelift"
+                }
+            ],
             "time": "2020-04-28T12:40:35+00:00"
         },
         {
@@ -3411,6 +3329,20 @@
                 "portable",
                 "shim"
             ],
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
             "time": "2020-06-06T08:46:27+00:00"
         },
         {
@@ -3477,6 +3409,20 @@
                 "portable",
                 "shim"
             ],
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
             "time": "2020-06-06T08:46:27+00:00"
         },
         {
@@ -3539,6 +3485,20 @@
                 "polyfill",
                 "portable",
                 "shim"
+            ],
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
             ],
             "time": "2020-06-06T08:46:27+00:00"
         },
@@ -3683,6 +3643,48 @@
             ],
             "description": "PDO userspace driver proxying calls to PHP OCI8 driver",
             "time": "2019-05-09T02:45:31+00:00"
+        },
+        {
+            "name": "yii2-websocket-client/yii2-websocket-client",
+            "version": "1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Yanhuoyiran/yii-websocket.git",
+                "reference": "c772b13baaad9339363c1cdf1aead75f2261e432"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Yanhuoyiran/yii-websocket/zipball/c772b13baaad9339363c1cdf1aead75f2261e432",
+                "reference": "c772b13baaad9339363c1cdf1aead75f2261e432",
+                "shasum": ""
+            },
+            "require": {
+                "yiisoft/yii2": "~2.0.0"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "SPF\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-4-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "jeonjihyun",
+                    "email": "jeonjihyun@live.com"
+                }
+            ],
+            "description": "yii2-websocket-client",
+            "keywords": [
+                "extension",
+                "websocket",
+                "websocket-client",
+                "yii2"
+            ],
+            "time": "2019-09-24T06:29:57+00:00"
         },
         {
             "name": "yiisoft/yii2",
@@ -3899,6 +3901,20 @@
                 "composer",
                 "extension installer",
                 "yii2"
+            ],
+            "funding": [
+                {
+                    "url": "https://github.com/yiisoft",
+                    "type": "github"
+                },
+                {
+                    "url": "https://opencollective.com/yiisoft",
+                    "type": "open_collective"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/yiisoft/yii2-composer",
+                    "type": "tidelift"
+                }
             ],
             "time": "2020-06-24T00:04:01+00:00"
         },
@@ -4141,6 +4157,12 @@
                 "acceptance testing",
                 "functional testing",
                 "unit testing"
+            ],
+            "funding": [
+                {
+                    "url": "https://opencollective.com/codeception",
+                    "type": "open_collective"
+                }
             ],
             "time": "2020-06-07T16:31:51+00:00"
         },
@@ -5361,6 +5383,16 @@
                 "testing",
                 "xunit"
             ],
+            "funding": [
+                {
+                    "url": "https://phpunit.de/donate.html",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/sebastianbergmann",
+                    "type": "github"
+                }
+            ],
             "time": "2020-06-22T07:06:58+00:00"
         },
         {
@@ -6207,6 +6239,20 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
             "time": "2020-06-15T12:59:21+00:00"
         },
         {
@@ -6260,6 +6306,20 @@
             ],
             "description": "Symfony CssSelector Component",
             "homepage": "https://symfony.com",
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
             "time": "2020-05-20T17:43:50+00:00"
         },
         {
@@ -6367,6 +6427,20 @@
             ],
             "description": "Symfony DomCrawler Component",
             "homepage": "https://symfony.com",
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
             "time": "2020-05-23T00:03:06+00:00"
         },
         {
@@ -6439,6 +6513,20 @@
             ],
             "description": "Symfony EventDispatcher Component",
             "homepage": "https://symfony.com",
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
             "time": "2020-05-20T17:43:50+00:00"
         },
         {
@@ -6546,6 +6634,20 @@
             ],
             "description": "Symfony Finder Component",
             "homepage": "https://symfony.com",
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
             "time": "2020-05-20T17:43:50+00:00"
         },
         {
@@ -6607,6 +6709,20 @@
                 "ctype",
                 "polyfill",
                 "portable"
+            ],
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
             ],
             "time": "2020-06-06T08:46:27+00:00"
         },
@@ -6671,6 +6787,20 @@
                 "polyfill",
                 "portable",
                 "shim"
+            ],
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
             ],
             "time": "2020-06-06T08:46:27+00:00"
         },
@@ -6739,6 +6869,20 @@
                 "portable",
                 "shim"
             ],
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
             "time": "2020-06-14T14:40:37+00:00"
         },
         {
@@ -6800,6 +6944,20 @@
                 "polyfill",
                 "portable",
                 "shim"
+            ],
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
             ],
             "time": "2020-06-06T08:46:27+00:00"
         },
@@ -6866,6 +7024,20 @@
                 "polyfill",
                 "portable",
                 "shim"
+            ],
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
             ],
             "time": "2020-06-06T08:46:27+00:00"
         },
@@ -6996,6 +7168,20 @@
                 "utf-8",
                 "utf8"
             ],
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
             "time": "2020-06-11T12:16:36+00:00"
         },
         {
@@ -7059,6 +7245,20 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
             "time": "2020-05-20T17:43:50+00:00"
         },
         {
@@ -7310,16 +7510,17 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-      "kartik-v/yii2-grid": 20,
-      "koputo/yii2-leaflet-subgroup-plugin": 20
+        "kartik-v/yii2-grid": 20,
+        "koputo/yii2-leaflet-subgroup-plugin": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
         "php": ">=5.6.0",
         "ext-oci8": "*",
-      "ext-pdo": "*",
-      "ext-json": "*"
+        "ext-pdo": "*",
+        "ext-json": "*"
     },
-  "platform-dev": []
+    "platform-dev": [],
+    "plugin-api-version": "1.1.0"
 }
