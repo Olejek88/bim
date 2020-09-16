@@ -4,7 +4,6 @@
 namespace common\datasource\politer;
 
 
-use common\components\MainFunctions;
 use common\datasource\DataSourceTrait;
 use common\datasource\IDataSource;
 use common\datasource\politer\models\FlowArchive;
@@ -12,6 +11,7 @@ use common\datasource\politer\models\Flows2;
 use common\models\Measure;
 use common\models\MeasureChannel;
 use common\models\MeasureType;
+use common\models\ServiceRegister;
 use Exception;
 use inpassor\daemon\Worker;
 use Yii;
@@ -56,29 +56,29 @@ class Module extends \yii\base\Module implements IDataSource
         Yii::$app->set('politerDb', $this->oracle);
 
         $mcs = MeasureChannel::find()->where(['deleted' => false, 'data_source' => $this->id])
-            ->select(['uuid', 'param_id', 'type'])->asArray()->all();
+            ->select(['_id', 'param_id', 'type'])->asArray()->all();
 
         // список ID параметров которые будем тянуть из внешней базы
         $extIds = [];
-        $mcUuids = [];
+        $mcIds = [];
         foreach ($mcs as $mc) {
-            $mcUuids[] = $mc['uuid'];
+            $mcIds[] = $mc['_id'];
             $extIds[] = $mc['param_id'];
         }
 
         // вспомогательный запрос
         $subQuery = Measure::find()
-            ->select(['measureChannelUuid', 'max(date) date1'])
-            ->where(['measureChannelUuid' => $mcUuids])
-            ->groupBy(['measureChannelUuid']);
+            ->select(['measureChannelId', 'max(date) date1'])
+            ->where(['measureChannelId' => $mcIds])
+            ->groupBy(['measureChannelId']);
         // выбираем из базы для каждого канала измерений последнее по дате значение
         $measures = Measure::find()
-            ->innerJoin(['m' => $subQuery], 'measure.measureChannelUuid=m.measureChannelUuid and measure.date=m.date1')
+            ->innerJoin(['m' => $subQuery], 'measure.measureChannelId=m.measureChannelId and measure.date=m.date1')
             ->all();
         $res = [];
         foreach ($measures as $measure) {
-            if (empty($res[$measure['measureChannelUuid']])) {
-                $res[$measure['measureChannelUuid']] = $measure;
+            if (empty($res[$measure['measureChannelId']])) {
+                $res[$measure['measureChannelId']] = $measure;
             }
         }
 
@@ -97,14 +97,19 @@ class Module extends \yii\base\Module implements IDataSource
         $flows2 = ArrayHelper::map($flows2, 'ID', function ($item) {
             return $item;
         });
+        if (count($flows2) == 0) {
+            ServiceRegister::addServiceRegister(ServiceRegister::SERVICE_IMPORT, ServiceRegister::TYPE_INFO,
+                null, 'нет данных для импорта');
+        }
+
 
         foreach ($mcs as $mc) {
             /** @var Measure $m */
             $m = null;
             $measureDateSrc = null;
-            if (!empty($measures[$mc['uuid']])) {
-                $m = $measures[$mc['uuid']];
-                $measureDateSrc = $measures[$mc['uuid']]['date'];
+            if (!empty($measures[$mc['_id']])) {
+                $m = $measures[$mc['_id']];
+                $measureDateSrc = $measures[$mc['_id']]['date'];
             }
 
             // параметр из внешней базы
@@ -118,28 +123,28 @@ class Module extends \yii\base\Module implements IDataSource
             switch ($mc['type']) {
                 case MeasureType::MEASURE_TYPE_CURRENT:
 //                    echo "MEASURE_TYPE_CURRENT" . PHP_EOL;
-                    self::createMeasure($m, $f2, $mc['uuid']);
+                    self::createMeasure($m, $f2, $mc['_id']);
                     break;
                 case MeasureType::MEASURE_TYPE_HOURS:
 //                    echo "MEASURE_TYPE_HOURS" . PHP_EOL;
                     // проверяем на разность дат по часу
                     $measureDate = date('YmdH', strtotime($measureDateSrc));
                     $extMeasureDate = date('YmdH', strtotime(Flows2::getDatetime($extMeasureDateSrc)));
-                    self::createMeasure($m, $f2, $mc['uuid'], $measureDate == $extMeasureDate);
+                    self::createMeasure($m, $f2, $mc['_id'], $measureDate == $extMeasureDate);
                     break;
                 case MeasureType::MEASURE_TYPE_DAYS:
 //                    echo "MEASURE_TYPE_DAYS" . PHP_EOL;
                     // проверяем на разность дат по дню
                     $measureDate = date('Ymd', strtotime($measureDateSrc));
                     $extMeasureDate = date('Ymd', strtotime(Flows2::getDatetime($extMeasureDateSrc)));
-                    self::createMeasure($m, $f2, $mc['uuid'], $measureDate == $extMeasureDate);
+                    self::createMeasure($m, $f2, $mc['_id'], $measureDate == $extMeasureDate);
                     break;
-                case MeasureType::MEASURE_TYPE_TOTAL:
-//                    echo "MEASURE_TYPE_TOTAL" . PHP_EOL;
-                    // проверяем на разность дат по дню
-                    $measureDate = date('Ymd', strtotime($measureDateSrc));
-                    $extMeasureDate = date('Ymd', strtotime(Flows2::getDatetime($extMeasureDateSrc)));
-                    self::createMeasure($m, $f2, $mc['uuid'], $measureDate == $extMeasureDate);
+                case MeasureType::MEASURE_TYPE_MONTH:
+//                    echo "MEASURE_TYPE_MONTH" . PHP_EOL;
+                    // проверяем на разность дат по месяцу
+                    $measureDate = date('Ym', strtotime($measureDateSrc));
+                    $extMeasureDate = date('Ym', strtotime(Flows2::getDatetime($extMeasureDateSrc)));
+                    self::createMeasure($m, $f2, $mc['_id'], $measureDate == $extMeasureDate);
                     break;
                 default:
 //                    echo "none" . PHP_EOL;
@@ -150,13 +155,13 @@ class Module extends \yii\base\Module implements IDataSource
 
     /**
      * @param $measure Measure|null
-     * @param $flows2 Flows2
-     * @param $mcUuid string Measure channel uuid
+     * @param $flows2 array of Flows2
+     * @param $mcId string Measure channel id
      * @param bool $isSameDate Для текущих значений всегда true, для создания новой записи для другого часа, дня,
      *                          месяца false.
      * @throws Exception
      */
-    private function createMeasure($measure, $flows2, $mcUuid, $isSameDate = true)
+    private function createMeasure($measure, $flows2, $mcId, $isSameDate = true)
     {
         if (!empty($measure) && !empty($flows2)) {
             if ($isSameDate) {
@@ -165,14 +170,12 @@ class Module extends \yii\base\Module implements IDataSource
             } else {
                 // создаём запись с измерением
                 $m = new Measure();
-                $m->uuid = MainFunctions::GUID();
-                $m->measureChannelUuid = $mcUuid;
+                $m->measureChannelId = $mcId;
             }
         } else if (empty($measure) && !empty($flows2)) {
             // создаём запись с измерением
             $m = new Measure();
-            $m->uuid = MainFunctions::GUID();
-            $m->measureChannelUuid = $mcUuid;
+            $m->measureChannelId = $mcId;
         } else {
             // нет записи с измерением, нет данных для создания записи
             return;
@@ -189,6 +192,9 @@ class Module extends \yii\base\Module implements IDataSource
             }
 
             self::log($message);
+
+            ServiceRegister::addServiceRegister(ServiceRegister::SERVICE_IMPORT, ServiceRegister::TYPE_ERROR,
+                null, 'ошибка: ' . json_encode($m->errors));
         }
     }
 
@@ -213,8 +219,10 @@ class Module extends \yii\base\Module implements IDataSource
         // проверяем каналы с частотой в день
         self::getLostByDays(MeasureType::MEASURE_TYPE_DAYS, $date, 'Y-m-d 00:00:00', $deep);
 
+        // TODO: уточнить у Олега что именно здесь выбираем !!!
+        // тип MEASURE_TYPE_MONTH? нужен метод getLostByMonth?
         // проверяем каналы с частотой сумма
-        self::getLostByDays(MeasureType::MEASURE_TYPE_TOTAL, $date, 'Y-m-d 00:00:00', $deep);
+//        self::getLostByDays(MeasureType::MEASURE_TYPE_TOTAL, $date, 'Y-m-d 00:00:00', $deep);
     }
 
     /**
@@ -229,13 +237,13 @@ class Module extends \yii\base\Module implements IDataSource
         $mcs = self::getMeasureChannels($type);
 
         // пустые списки измерений по каналам
-        $measuresByChannels = ArrayHelper::map($mcs, 'uuid', function ($item) {
+        $measuresByChannels = ArrayHelper::map($mcs, '_id', function ($item) {
             return [];
         });
 
         $measures = self::getMeasures($type, $date, $dateFormat, $deep);
         foreach ($measures as $measure) {
-            $measuresByChannels[$measure['measureChannelUuid']][$measure['uuid']] = $measure;
+            $measuresByChannels[$measure['measureChannelId']][$measure['_id']] = $measure;
         }
 
         $measures = &$measuresByChannels;
@@ -249,8 +257,8 @@ class Module extends \yii\base\Module implements IDataSource
     private function getMeasureChannels($type)
     {
         $mcs = MeasureChannel::find()->where(['deleted' => false, 'type' => $type, 'data_source' => $this->id])
-            ->select(['uuid', 'param_id', 'type'])->asArray()->all();
-        $mcs = ArrayHelper::map($mcs, 'uuid', function ($item) {
+            ->select(['_id', 'param_id', 'type'])->asArray()->all();
+        $mcs = ArrayHelper::map($mcs, '_id', function ($item) {
             return $item;
         });
         return $mcs;
@@ -267,8 +275,8 @@ class Module extends \yii\base\Module implements IDataSource
     {
         $sq = MeasureChannel::find()
             ->where(['deleted' => false, 'type' => $type, 'data_source' => $this->id])
-            ->select(['uuid']);
-        return Measure::find()->where(['measureChannelUuid' => $sq])
+            ->select(['_id']);
+        return Measure::find()->where(['measureChannelId' => $sq])
             ->andWhere([
                 'AND',
                 ['>=', 'date', date($dateFormat, strtotime($date . '' . $deep . ' day'))],
@@ -289,7 +297,7 @@ class Module extends \yii\base\Module implements IDataSource
      */
     private function getLostMeasuresByHours(&$measures, $date, &$mcs, $deep = -7)
     {
-        foreach ($measures as $channelUuid => $channel) {
+        foreach ($measures as $channelId => $channel) {
             $absDeep = abs(intval($deep)) * 24;
             $dateList = [];
             for ($i = 1; $i <= $absDeep; $i++) {
@@ -302,15 +310,15 @@ class Module extends \yii\base\Module implements IDataSource
             }
 
             foreach ($dateList as $lostDate => $value) {
+                /** @var FlowArchive $archive */
                 $archive = FlowArchive::find()
-                    ->where(['ID' => $mcs[$channelUuid]['param_id'],
+                    ->where(['ID' => $mcs[$channelId]['param_id'],
                         'fromTime' => date('Y-m-d H:00:00', strtotime($lostDate)),
                         'toTime' => date('Y-m-d H:00:00', strtotime($lostDate . '+1 hour')),
                     ])->one();
                 if ($archive) {
                     $m = new Measure();
-                    $m->uuid = MainFunctions::GUID();
-                    $m->measureChannelUuid = $channelUuid;
+                    $m->measureChannelId = $channelId;
                     $m->date = $archive->TIME;
                     $m->value = $archive->VALUE;
                     if (!$m->save()) {
@@ -320,6 +328,9 @@ class Module extends \yii\base\Module implements IDataSource
                         }
 
                         self::log($message);
+
+                        ServiceRegister::addServiceRegister(ServiceRegister::SERVICE_IMPORT, ServiceRegister::TYPE_ERROR,
+                            null, 'ошибка: ' . json_encode($m->errors));
                     }
                 }
             }
@@ -338,13 +349,13 @@ class Module extends \yii\base\Module implements IDataSource
         $mcs = self::getMeasureChannels($type);
 
         // пустые списки измерений по каналам
-        $measuresByChannels = ArrayHelper::map($mcs, 'uuid', function ($item) {
+        $measuresByChannels = ArrayHelper::map($mcs, '_id', function ($item) {
             return [];
         });
 
         $measures = self::getMeasures($type, $date, $dateFormat, $deep);
         foreach ($measures as $measure) {
-            $measuresByChannels[$measure['measureChannelUuid']][$measure['uuid']] = $measure;
+            $measuresByChannels[$measure['measureChannelId']][$measure['_id']] = $measure;
         }
 
         $measures = &$measuresByChannels;
@@ -361,7 +372,7 @@ class Module extends \yii\base\Module implements IDataSource
      */
     private function getLostMeasuresByDays(&$measures, $date, &$mcs, $deep = -7)
     {
-        foreach ($measures as $channelUuid => $channel) {
+        foreach ($measures as $channelId => $channel) {
             $absDeep = abs(intval($deep));
             $dateList = [];
             for ($i = 1; $i <= $absDeep; $i++) {
@@ -374,15 +385,15 @@ class Module extends \yii\base\Module implements IDataSource
             }
 
             foreach ($dateList as $lostDate => $value) {
+                /** @var FlowArchive $archive */
                 $archive = FlowArchive::find()
-                    ->where(['ID' => $mcs[$channelUuid]['param_id'],
+                    ->where(['ID' => $mcs[$channelId]['param_id'],
                         'fromTime' => date('Y-m-d 00:00:00', strtotime($lostDate)),
                         'toTime' => date('Y-m-d 00:00:00', strtotime($lostDate . '+1 day')),
                     ])->one();
                 if ($archive) {
                     $m = new Measure();
-                    $m->uuid = MainFunctions::GUID();
-                    $m->measureChannelUuid = $channelUuid;
+                    $m->measureChannelId = $channelId;
                     $m->date = $archive->TIME;
                     $m->value = $archive->VALUE;
                     if (!$m->save()) {
@@ -392,6 +403,9 @@ class Module extends \yii\base\Module implements IDataSource
                         }
 
                         self::log($message);
+
+                        ServiceRegister::addServiceRegister(ServiceRegister::SERVICE_IMPORT, ServiceRegister::TYPE_ERROR,
+                            null, 'ошибка: ' . json_encode($m->errors));
                     }
                 }
             }
