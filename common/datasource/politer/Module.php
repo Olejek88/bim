@@ -56,6 +56,7 @@ class Module extends \yii\base\Module implements IDataSource
         Yii::$app->set('politerDb', $this->oracle);
 
         $mcs = MeasureChannel::find()->where(['deleted' => false, 'data_source' => $this->id])
+            ->andWhere(['not in', 'path', ['internal', 'external']])
             ->select(['_id', 'param_id', 'type'])->asArray()->all();
 
         // список ID параметров которые будем тянуть из внешней базы
@@ -139,11 +140,11 @@ class Module extends \yii\base\Module implements IDataSource
                     $extMeasureDate = date('Ymd', strtotime(Flows2::getDatetime($extMeasureDateSrc)));
                     self::createMeasure($m, $f2, $mc['_id'], $measureDate == $extMeasureDate);
                     break;
-                case MeasureType::MEASURE_TYPE_MONTH:
-//                    echo "MEASURE_TYPE_MONTH" . PHP_EOL;
-                    // проверяем на разность дат по месяцу
-                    $measureDate = date('Ym', strtotime($measureDateSrc));
-                    $extMeasureDate = date('Ym', strtotime(Flows2::getDatetime($extMeasureDateSrc)));
+                case MeasureType::MEASURE_TYPE_TOTAL:
+//                    echo "MEASURE_TYPE_TOTAL" . PHP_EOL;
+                    // проверяем на разность дат по дню
+                    $measureDate = date('Ymd', strtotime($measureDateSrc));
+                    $extMeasureDate = date('Ymd', strtotime(Flows2::getDatetime($extMeasureDateSrc)));
                     self::createMeasure($m, $f2, $mc['_id'], $measureDate == $extMeasureDate);
                     break;
                 default:
@@ -255,6 +256,7 @@ class Module extends \yii\base\Module implements IDataSource
     private function getMeasureChannels($type)
     {
         $mcs = MeasureChannel::find()->where(['deleted' => false, 'type' => $type, 'data_source' => $this->id])
+            ->andWhere(['not in', 'path', ['internal', 'external']])
             ->select(['_id', 'param_id', 'type'])->asArray()->all();
         $mcs = ArrayHelper::map($mcs, '_id', function ($item) {
             return $item;
@@ -273,6 +275,7 @@ class Module extends \yii\base\Module implements IDataSource
     {
         $sq = MeasureChannel::find()
             ->where(['deleted' => false, 'type' => $type, 'data_source' => $this->id])
+            ->andWhere(['not in', 'path', ['internal', 'external']])
             ->select(['_id']);
         return Measure::find()->where(['measureChannelId' => $sq])
             ->andWhere([
