@@ -85,7 +85,7 @@ class Module extends \yii\base\Module implements IDataSource
         $measures = &$res;
 
         // выбираем данные за указанную(текущую) дату
-        $oracleDateFormat = 'YYYY.MM.DD HH24:MI:SS';
+        $oracleDateFormat = 'YYYY-MM-DD HH24:MI:SS';
         $flows2 = Flows2::find()
             ->where(['ID' => $extIds])
             ->andWhere("TIME >= TO_TIMESTAMP(:startTime, '$oracleDateFormat')", [':startTime' => $date])
