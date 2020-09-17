@@ -1,6 +1,7 @@
 <?php
 
 /* @var $this View */
+/* @var $types */
 
 /* @var $objects Objects[] */
 
@@ -38,6 +39,25 @@ use yii\web\View;
 //            'allowClear' => true,
         ],
     ]);
+    echo Select2::widget(
+        [
+            'data' => $types,
+            'name' => 'measureTypeUuid',
+            'options' => ['placeholder' => Yii::t('app', 'Выберите тип измерения ...')],
+            'pluginOptions' => [
+                'allowClear' => true
+            ],
+        ]);
+
+    echo Select2::widget(
+        [
+            'data' => ['0' => 'Текущие', '1' => 'Часовой', '2' => 'Дневной', '4' => 'По месяцам', '7' => 'На дату'],
+            'name' => 'type',
+            'options' => ['placeholder' => Yii::t('app', 'Выберите тип ...')],
+            'pluginOptions' => [
+                'allowClear' => true
+            ],
+        ]);
 
     echo Html::textInput("errors", "", ['readonly' => 'readonly', 'style' => 'width:100%; color: red;', 'id' => 'errors', 'name' => 'errors'])
 

@@ -157,6 +157,16 @@ class PoliterController extends \frontend\controllers\PoliterController
                 $errors[] = 'Не верный путь канала измерения';
             }
 
+            $measureTypeUuid = $request->getBodyParam('measureTypeUuid');
+            if (empty($measureTypeUuid)) {
+                $errors[] = 'Не верный тип измерения';
+            }
+
+            $type = $request->getBodyParam('type');
+            if ($type == '' || !in_array(intval($type), [0, 1, 2, 4, 7])) {
+                $errors[] = 'Не верный тип';
+            }
+
             if (!empty($errors)) {
                 $errors = implode(', ', $errors);
                 Yii::$app->response->statusCode = HttpCode::NOT_ACCEPTABLE;
@@ -179,12 +189,12 @@ class PoliterController extends \frontend\controllers\PoliterController
                 $measureChannel->uuid = MainFunctions::GUID();
                 $measureChannel->title = $flow->NAME;
                 $measureChannel->objectUuid = $objectsUuid;
-                $measureChannel->measureTypeUuid = MeasureType::COMMON;
+                $measureChannel->measureTypeUuid = $measureTypeUuid;
                 $measureChannel->deleted = 0;
                 $measureChannel->path = $flow->PATH;
                 $measureChannel->original_name = $flow->NAME;
                 $measureChannel->param_id = '' . $flow->ID;
-                $measureChannel->type = 0; // в документации типы есть, но реально они не возвращаются
+                $measureChannel->type = $type; // в документации типы есть, но реально они не возвращаются, пользователь выбирает руками
                 $measureChannel->data_source = $this->module->id;
                 if (!$measureChannel->save()) {
                     foreach ($measureChannel->errors as $key => $error) {
@@ -202,8 +212,11 @@ class PoliterController extends \frontend\controllers\PoliterController
         } else if ($request->isAjax) {
             $objects = Objects::findAll(['objectTypeUuid' => ObjectType::OBJECT]);
             $objects = ArrayHelper::map($objects, 'uuid', 'title');
+            $types = MeasureType::find()->orderBy('title DESC')->all();
+            $types = ArrayHelper::map($types, 'uuid', 'title');
             return $this->renderAjax('_link_obj_form', [
                 'objects' => $objects,
+                'types' => $types,
             ]);
         } else {
             return '';
