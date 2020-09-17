@@ -6,7 +6,9 @@ use common\models\Event;
 use common\models\EventType;
 use common\models\Objects;
 use common\models\ObjectType;
+use Exception;
 use frontend\models\EventSearch;
+use Throwable;
 use Yii;
 use yii\db\StaleObjectException;
 use yii\helpers\ArrayHelper;
@@ -29,8 +31,8 @@ class EventController extends PoliterController
      *
      * @return mixed
      * @throws NotFoundHttpException
-     * @throws \Exception
-     * @throws \Throwable
+     * @throws Exception
+     * @throws Throwable
      * @throws StaleObjectException
      */
     public function actionDelete($id)
@@ -287,7 +289,7 @@ class EventController extends PoliterController
 
     /**
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public
     function actionPlanEdit()

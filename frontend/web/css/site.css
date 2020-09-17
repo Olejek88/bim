@@ -131,7 +131,7 @@ a.desc:after {
 
 .wrapper-login-panel {
     width: 400px;
-    margin: 0px auto;
+    margin: 0 auto;
     padding: 10px;
 }
 
@@ -332,7 +332,7 @@ a.desc:after {
 }
 
 .timeline-badge > .glyphicon {
-    margin-right: 0px;
+    margin-right: 0;
     color: #fff
 }
 
@@ -426,7 +426,7 @@ a.desc:after {
  * @type {[type]}
  */
 .box-padding {
-    margin: 0px auto;
+    margin: 0 auto;
     padding-top: 20px;
     width: 700px;
     height: 20%;

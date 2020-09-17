@@ -4,6 +4,7 @@ namespace frontend\controllers;
 
 use common\models\BalancePoint;
 use frontend\models\BalancePointSearch;
+use Throwable;
 use Yii;
 use yii\db\StaleObjectException;
 use yii\web\NotFoundHttpException;
@@ -78,7 +79,7 @@ class BalancePointController extends PoliterController
      *
      * @return mixed
      * @throws NotFoundHttpException
-     * @throws \Throwable
+     * @throws Throwable
      * @throws StaleObjectException
      */
     public function actionDelete($id)

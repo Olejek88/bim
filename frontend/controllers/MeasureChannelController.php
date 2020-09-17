@@ -155,6 +155,7 @@ class MeasureChannelController extends Controller
                 ]);
             }
         }
+        return null;
     }
 
     /**
@@ -181,37 +182,9 @@ class MeasureChannelController extends Controller
             }
         }
 
-        return $this->render('_add_form', [
+        return $this->render('_add_sensor_channel', [
             'model' => $model
         ]);
-    }
-
-    /**
-     * Updates an existing MeasureChannel model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     *
-     * @param integer $id Id
-     *
-     * @return mixed
-     * @throws NotFoundHttpException
-     */
-    public function actionUpdate($id)
-    {
-        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
-            return $this->redirect('/site/index');
-        }
-
-        $model = $this->findModel($id);
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->_id]);
-        } else {
-            return $this->render(
-                'update',
-                [
-                    'model' => $model,
-                ]
-            );
-        }
     }
 
     /**

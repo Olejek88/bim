@@ -4,6 +4,7 @@ namespace frontend\controllers;
 
 use common\models\MeasureType;
 use frontend\models\MeasureSearchType;
+use Throwable;
 use Yii;
 use yii\web\NotFoundHttpException;
 
@@ -42,35 +43,12 @@ class MeasureTypeController extends PoliterController
     }
 
     /**
-     * Creates a new MeasureType model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionCreate()
-    {
-        $model = new MeasureType();
-        $searchModel = new MeasureSearchType();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        $dataProvider->pagination->pageSize = 10;
-        $dataProvider->setSort(['defaultOrder' => ['_id' => SORT_DESC]]);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->_id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-                'dataProvider' => $dataProvider
-            ]);
-        }
-    }
-
-    /**
      * Deletes an existing MeasureType model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function actionDelete($id)
     {

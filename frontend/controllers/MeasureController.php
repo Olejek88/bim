@@ -4,7 +4,9 @@ namespace frontend\controllers;
 
 use common\models\Measure;
 use common\models\MeasureChannel;
+use Exception;
 use frontend\models\MeasureSearch;
+use Throwable;
 use Yii;
 use yii\db\StaleObjectException;
 use yii\helpers\ArrayHelper;
@@ -25,8 +27,8 @@ class MeasureController extends PoliterController
      *
      * @return mixed
      * @throws NotFoundHttpException
-     * @throws \Exception
-     * @throws \Throwable
+     * @throws Exception
+     * @throws Throwable
      * @throws StaleObjectException
      */
     public function actionDelete($id)

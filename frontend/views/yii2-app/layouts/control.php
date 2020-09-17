@@ -38,6 +38,14 @@ foreach ($settings as $setting) {
                 }
                 ?>
             </ul>
+            <ul class="control-sidebar-menu">
+                <li><a href="/action-register">
+                        <i class="menu-icon fa fa-list bg-green"></i>
+                        <div class="menu-info">
+                            <h4 class="control-sidebar-subheading">Журнал действий пользователей</h4>
+                        </div>
+                    </a></li>
+            </ul>
 
         </div>
         <div class="tab-pane" id="control-sidebar-stats-tab"><?php echo Yii::t('app', 'Настройки') ?></div>

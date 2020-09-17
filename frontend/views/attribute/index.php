@@ -70,7 +70,7 @@ $gridColumns = [
         'mergeHeader' => true,
         'headerOptions' => ['class' => 'text-center'],
         'content' => function ($data) {
-            return $data->getEntityTitle();
+            return $data->getEntityName();
         }
     ]
 ];

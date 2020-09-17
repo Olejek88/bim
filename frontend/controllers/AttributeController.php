@@ -10,6 +10,7 @@ use common\models\Objects;
 use common\models\ObjectType;
 use Exception;
 use frontend\models\AttributeSearch;
+use Throwable;
 use Yii;
 use yii\bootstrap\ActiveForm;
 use yii\db\StaleObjectException;
@@ -51,8 +52,8 @@ class AttributeController extends PoliterController
      *
      * @return mixed
      * @throws NotFoundHttpException
-     * @throws \Exception
-     * @throws \Throwable
+     * @throws Exception
+     * @throws Throwable
      * @throws StaleObjectException
      */
     public function actionDelete($id)

@@ -4,7 +4,9 @@ namespace frontend\controllers;
 
 use common\models\EventType;
 use common\models\ParameterType;
+use Exception;
 use frontend\models\EventSearchType;
+use Throwable;
 use Yii;
 use yii\db\StaleObjectException;
 use yii\helpers\ArrayHelper;
@@ -58,42 +60,18 @@ class EventTypeController extends PoliterController
     }
 
     /**
-     * Creates a new EventType model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionCreate()
-    {
-        $model = new EventType();
-        $searchModel = new EventSearchType();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        $dataProvider->pagination->pageSize = 10;
-        $dataProvider->setSort(['defaultOrder' => ['_id' => SORT_DESC]]);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->_id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-                'dataProvider' => $dataProvider
-            ]);
-        }
-    }
-
-    /**
      * Deletes an existing EventType model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException
-     * @throws \Exception
-     * @throws \Throwable
+     * @throws Exception
+     * @throws Throwable
      * @throws StaleObjectException
      */
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();
-
         return $this->redirect(['index']);
     }
 

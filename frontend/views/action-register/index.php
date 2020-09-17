@@ -25,6 +25,7 @@ $gridColumns = [
         'attribute' => 'userId',
         'vAlign' => 'middle',
         'hAlign' => 'center',
+        'mergeHeader' => true,
         'contentOptions' => [
             'class' => 'table_class'
         ],
@@ -78,7 +79,7 @@ $gridColumns = [
         'mergeHeader' => true,
         'headerOptions' => ['class' => 'text-center'],
         'content' => function ($data) {
-            return $data->getEntityTitle();
+            return $data->getEntityName();
         }
     ]
 ];
