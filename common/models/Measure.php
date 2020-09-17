@@ -71,6 +71,7 @@ class Measure extends PoliterModel
             [['value'], 'number'],
             [['measureChannelId'], 'integer'],
             [['measureChannelId'],
+                'exist',
                 'targetAttribute' => ['measureChannelId' => '_id'],
                 'targetClass' => MeasureChannel::class,
             ],
