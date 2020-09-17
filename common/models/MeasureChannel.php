@@ -192,7 +192,7 @@ class MeasureChannel extends PoliterModel
      */
     public static function getFormatLastMeasureStatic($channel)
     {
-        $text = '-';
+        $text = '';
         $measures = self::getLastMeasureStatic($channel);
         if (count($measures)) {
             foreach ($measures as $measure) {
