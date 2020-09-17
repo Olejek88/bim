@@ -140,11 +140,11 @@ class Module extends \yii\base\Module implements IDataSource
                     $extMeasureDate = date('Ymd', strtotime(Flows2::getDatetime($extMeasureDateSrc)));
                     self::createMeasure($m, $f2, $mc['_id'], $measureDate == $extMeasureDate);
                     break;
-                case MeasureType::MEASURE_TYPE_MONTH:
-//                    echo "MEASURE_TYPE_MONTH" . PHP_EOL;
-                    // проверяем на разность дат по месяцу
-                    $measureDate = date('Ym', strtotime($measureDateSrc));
-                    $extMeasureDate = date('Ym', strtotime(Flows2::getDatetime($extMeasureDateSrc)));
+                case MeasureType::MEASURE_TYPE_TOTAL:
+//                    echo "MEASURE_TYPE_TOTAL" . PHP_EOL;
+                    // проверяем на разность дат по дню
+                    $measureDate = date('Ymd', strtotime($measureDateSrc));
+                    $extMeasureDate = date('Ymd', strtotime(Flows2::getDatetime($extMeasureDateSrc)));
                     self::createMeasure($m, $f2, $mc['_id'], $measureDate == $extMeasureDate);
                     break;
                 default:
