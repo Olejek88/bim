@@ -308,6 +308,7 @@ class ObjectController extends PoliterController
                             ->where(['objectTypeUuid' => ObjectType::OBJECT])
                             ->andWhere(['parentUuid' => $street['uuid']])
                             ->andWhere(['deleted' => 0])
+                            ->orderBy('source')
                             ->all();
                         foreach ($objects as $object) {
                             $childIdx4 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children']) - 1;
@@ -924,7 +925,7 @@ class ObjectController extends PoliterController
             $month_count++;
         }
         $count = 0;
-        $allObjects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->all();
+        $allObjects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->andWhere(['source' => 0])->andWhere(['deleted' => 0])->all();
         foreach ($allObjects as $object) {
             $measureChannelHeat = MeasureChannel::find()
                 ->where(['objectUuid' => $object['uuid']])
@@ -1025,7 +1026,7 @@ class ObjectController extends PoliterController
                 $allObjects = $district->getObjectsByDistrict(100);
             }
         } else {
-            $allObjects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->all();
+            $allObjects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->andWhere(['source' => 0])->andWhere(['deleted' => 0])->all();
         }
         foreach ($allObjects as $object) {
             $measureChannelHeat = MeasureChannel::getChannel($object['uuid'], MeasureType::HEAT_CONSUMED, MeasureType::MEASURE_TYPE_MONTH);
@@ -1304,7 +1305,7 @@ class ObjectController extends PoliterController
             $month_count++;
         }
         $count = 0;
-        $allObjects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->all();
+        $allObjects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->andWhere(['source' => 0])->andWhere(['deleted' => 0])->all();
         foreach ($allObjects as $object) {
             /** @var MeasureChannel $measureChannel */
             $measureChannel = null;
@@ -1749,7 +1750,7 @@ class ObjectController extends PoliterController
                 $allObjects = $district->getObjectsByDistrict(100);
             }
         } else {
-            $allObjects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->andWhere(['source' => 0])->all();
+            $allObjects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->andWhere(['source' => 0])->andWhere(['deleted' => 0])->all();
         }
         $time = localtime(time(), true);
         $year[0] = $time['tm_year'] + 1900;
@@ -1864,7 +1865,7 @@ class ObjectController extends PoliterController
                 $allObjects = $district->getObjectsByDistrict(100);
             }
         } else {
-            $allObjects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->andWhere(['source' => 0])->all();
+            $allObjects = Objects::find()->where(['objectTypeUuid' => ObjectType::OBJECT])->andWhere(['source' => 0])->andWhere(['deleted' => 0])->all();
         }
         $time = localtime(time(), true);
         $year[0] = $time['tm_year'] + 1900;

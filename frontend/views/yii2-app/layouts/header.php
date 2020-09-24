@@ -24,12 +24,14 @@ $userImage = $currentUser->getImageUrl();
 
 <header class="main-header">
 
-    <?= Html::a('<span class="logo-mini">П</span><span class="logo-lg">' . Yii::$app->name = '' . Yii::t('app', 'ПолиТЭР') . '</span>',
+    <?= Html::a('<span class="logo-mini">С</span><span class="logo-lg">' . Yii::$app->name = '' . Yii::t('app', 'Система') . '</span>',
         Yii::$app->homeUrl, ['class' => 'logo']) ?>
     <nav class="navbar navbar-static-top">
         <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button" style="padding: 15px 15px">
             <span class="sr-only"><?php echo Yii::t('app', 'Навигация') ?></span>
         </a>
+        <span style="color: white; font-size: 8pt">Интегрированная самонастраивающаяся система управления сложным технологическим комплексом производства, передачи и потребления тепловой энергии и воды на основе BIM и BEM</span>
+        <span style="color: white; font-size: 8pt">технологий с применением предиктивного анализа данных беспроводных сенсоров и интеллектуальных микропроцессорных устройств</span>
         <div class="navbar-custom-menu" style="padding-top: 0; padding-bottom: 0">
             <ul class="nav navbar-nav">
                 <?php
