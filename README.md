@@ -10,12 +10,11 @@ The complex provides a single point of web access for users of the system to all
 The main functions of the server of this system are storing the received information, analyzing the received data, informing operators about emergency situations and making decisions to improve energy efficiency.
 
 Dashboard
-<img src="docs/21.png"/>
+<img src="docs/21.png" align="left"/>
 
 Map
-
-<img src="docs/15.png"/>
+<img src="docs/15.png" align="left"/>
 
 One of many tables
 
-<img src="docs/10.png"/>
+<img src="docs/10.png" align="left"/>
