@@ -9,9 +9,6 @@ The software is a set of software and hardware, which is a server and a set of w
 The complex provides a single point of web access for users of the system to all the necessary information with delimitation of levels of access to data.
 The main functions of the server of this system are storing the received information, analyzing the received data, informing operators about emergency situations and making decisions to improve energy efficiency.
 
-Dashboard
 <img src="docs/21.png" align="center"/>
-Map
 <img src="docs/15.png" align="center"/>
-One of many tables
 <img src="docs/10.png" align="center"/>
